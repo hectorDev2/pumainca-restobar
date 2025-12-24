@@ -1,0 +1,7 @@
+{
+  "name": "PUMAINCA RESTOBAR",
+  "description": "A high-end digital menu and ordering experience for authentic Andean-fusion cuisine.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
