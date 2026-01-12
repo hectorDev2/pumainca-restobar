@@ -2,14 +2,20 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import es from 'date-fns/locale/es';
+import 'react-datepicker/dist/react-datepicker.css';
+import '../datepicker.css';
 import Navbar from '@/components/Navbar';
+
+registerLocale('es', es);
 
 export default function ReservationPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    date: '',
+    date: new Date(),
     time: '',
     guests: 2
   });
@@ -33,6 +39,15 @@ export default function ReservationPage() {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleDateChange = (date: Date | null) => {
+    if (date) {
+      setFormData({
+        ...formData,
+        date: date
+      });
+    }
   };
 
   if (isSuccess) {
@@ -98,13 +113,15 @@ export default function ReservationPage() {
 
             <div className="col-span-1">
               <label className="block text-sm font-bold text-text-secondary mb-2">Fecha</label>
-              <input
+              <DatePicker
                 required
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                type="date"
-                className="w-full bg-background-light dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                selected={formData.date}
+                onChange={handleDateChange}
+                minDate={new Date()}
+                dateFormat="dd 'de' MMMM 'de' yyyy"
+                placeholderText="Selecciona una fecha"
+                locale="es"
+                className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
               />
             </div>
 
