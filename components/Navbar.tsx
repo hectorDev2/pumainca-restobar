@@ -1,28 +1,31 @@
+"use client";
 
 import React from 'react';
-import { Screen } from '../types';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useCart } from '@/context/CartContext';
 
 interface Props {
-  onNavigate: (screen: Screen) => void;
-  cartCount: number;
   showSearch?: boolean;
-  activeScreen?: Screen;
 }
 
-const Navbar: React.FC<Props> = ({ onNavigate, cartCount, showSearch = true, activeScreen }) => {
-  const getLinkClass = (screen: Screen) => {
-    return activeScreen === screen 
-      ? "text-primary transition-colors text-sm font-bold border-b-2 border-primary pb-0.5" 
-      : "text-white/80 hover:text-primary transition-colors text-sm font-semibold";
+const Navbar: React.FC<Props> = ({ showSearch = true }) => {
+  const pathname = usePathname();
+  const { cartCount } = useCart();
+
+  const isActive = (path: string) => {
+    return pathname === path ? 
+      "text-primary transition-colors text-sm font-bold border-b-2 border-primary pb-0.5" : 
+      "text-white/80 hover:text-primary transition-colors text-sm font-semibold";
   };
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-black/95 backdrop-blur-md">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-10 h-20 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onNavigate('home')}>
+          <Link href="/" className="flex items-center gap-3 cursor-pointer group">
             <img src="/logo.png" className="w-[120px] group-hover:scale-105 transition-transform" alt="Logo" />
-          </div>
+          </Link>
 
           {showSearch && (
             <div className="hidden md:flex relative w-80">
@@ -38,19 +41,19 @@ const Navbar: React.FC<Props> = ({ onNavigate, cartCount, showSearch = true, act
 
         <div className="flex items-center gap-4 md:gap-8">
           <div className="hidden lg:flex items-center gap-8">
-            <button onClick={() => onNavigate('menu')} className={getLinkClass('menu')}>Menú</button>
-            <button onClick={() => onNavigate('nosotros')} className={getLinkClass('nosotros')}>Nosotros</button>
-            <button onClick={() => onNavigate('reservas')} className={getLinkClass('reservas')}>Reservas</button>
+            <Link href="/menu" className={isActive('/menu')}>Menú</Link>
+            <Link href="/nosotros" className={isActive('/nosotros')}>Nosotros</Link>
+            <Link href="/reservas" className={isActive('/reservas')}>Reservas</Link>
           </div>
           
           <div className="flex gap-3">
-            <button 
-              onClick={() => onNavigate('menu')}
+            <Link 
+              href="/menu"
               className="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-red-900/30 transition-all active:scale-95">
               Mi Orden
-            </button>
-            <button 
-              onClick={() => onNavigate('cart')}
+            </Link>
+            <Link 
+              href="/cart"
               className="relative flex items-center justify-center size-10 bg-surface-dark hover:bg-surface-hover rounded-xl border border-zinc-800 transition-colors">
               <span className="material-symbols-outlined text-white">shopping_cart</span>
               {cartCount > 0 && (
@@ -58,7 +61,7 @@ const Navbar: React.FC<Props> = ({ onNavigate, cartCount, showSearch = true, act
                   {cartCount}
                 </span>
               )}
-            </button>
+            </Link>
           </div>
         </div>
       </div>
