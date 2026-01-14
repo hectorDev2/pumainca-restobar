@@ -20,6 +20,7 @@ export interface Product {
   category: string;
   subcategory?: string;
   image: string;
+  image_url?: string;
   gallery?: string[];
   ingredients?: string[];
   allergens?: string[];
