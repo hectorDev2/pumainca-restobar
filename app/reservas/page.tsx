@@ -7,69 +7,185 @@ import es from "date-fns/locale/es";
 import "react-datepicker/dist/react-datepicker.css";
 import "../datepicker.css";
 import Navbar from "@/components/Navbar";
+import { API_BASE_URL } from "@/lib/api";
 
 registerLocale("es", es);
 
+type ReservationFormData = {
+  name: string;
+  email: string;
+  phone: string;
+  date: Date;
+  time: string;
+  guests: number;
+  specialRequests: string;
+};
+
+type ReservationConfirmation = {
+  message?: string;
+  code?: string;
+};
+
+const createInitialFormData = (): ReservationFormData => ({
+  name: "",
+  email: "",
+  phone: "",
+  date: new Date(),
+  time: "",
+  guests: 2,
+  specialRequests: "",
+});
+
+const timeOptions = [
+  { value: "12:00", label: "12:00 PM" },
+  { value: "13:00", label: "01:00 PM" },
+  { value: "14:00", label: "02:00 PM" },
+  { value: "19:00", label: "07:00 PM" },
+  { value: "20:00", label: "08:00 PM" },
+  { value: "21:00", label: "09:00 PM" },
+];
+
 export default function ReservationPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    date: new Date(),
-    time: "",
-    guests: 2,
-  });
-
+  const [formData, setFormData] = useState<ReservationFormData>(() =>
+    createInitialFormData()
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-    }, 1500);
-  };
+  const [confirmation, setConfirmation] =
+    useState<ReservationConfirmation | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+    const { name, value } = e.target;
+
+    if (name === "guests") {
+      setFormData((prev) => ({ ...prev, guests: Number(value) }));
+      return;
+    }
+
+    setFormData((prev) => {
+      switch (name) {
+        case "name":
+          return { ...prev, name: value };
+        case "email":
+          return { ...prev, email: value };
+        case "phone":
+          return { ...prev, phone: value };
+        case "time":
+          return { ...prev, time: value };
+        case "specialRequests":
+          return { ...prev, specialRequests: value };
+        default:
+          return prev;
+      }
     });
   };
 
   const handleDateChange = (date: Date | null) => {
-    if (date) {
-      setFormData({
-        ...formData,
-        date: date,
+    if (!date) return;
+    setFormData((prev) => ({ ...prev, date }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!formData.time) {
+      setErrorMessage("Selecciona una hora para tu reserva.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    const payload: {
+      fullName: string;
+      email: string;
+      phoneNumber: string;
+      reservationDate: string;
+      reservationTime: string;
+      numberOfGuests: number;
+      specialRequests?: string;
+    } = {
+      fullName: formData.name,
+      email: formData.email,
+      phoneNumber: formData.phone,
+      reservationDate: formData.date.toISOString().split("T")[0],
+      reservationTime: formData.time,
+      numberOfGuests: formData.guests,
+    };
+
+    if (formData.specialRequests.trim()) {
+      payload.specialRequests = formData.specialRequests.trim();
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/reservations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ?? "No pudimos confirmar tu reserva en este momento."
+        );
+      }
+
+      setConfirmation({
+        message: data?.message ?? "Tu mesa quedó reservada con éxito.",
+        code: data?.code,
+      });
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Ocurrió un error inesperado."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (isSuccess) {
+  const resetForm = () => {
+    setConfirmation(null);
+    setFormData(createInitialFormData());
+    setErrorMessage(null);
+  };
+
+  if (confirmation) {
     return (
       <div className="min-h-screen bg-black">
         <Navbar showSearch={false} />
         <div className="pt-20 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
-          <div className="max-w-md w-full px-4 text-center animate-fade-in-up">
-            <div className="size-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="max-w-md w-full px-4 text-center animate-fade-in-up space-y-6">
+            <div className="size-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto">
               <span className="material-symbols-outlined text-4xl text-green-500">
                 check_circle
               </span>
             </div>
-            <h2 className="text-3xl font-bold text-text-primary mb-4">
+            <h2 className="text-3xl font-bold text-text-primary">
               ¡Reserva Confirmada!
             </h2>
-            <p className="text-text-secondary mb-8">
-              Hemos enviado los detalles de tu reserva a tu correo electrónico.
-              ¡Te esperamos pronto en Pumainca!
+            <p className="text-text-secondary">
+              {confirmation.message} Te esperamos el{" "}
+              <strong>
+                {formData.date.toLocaleDateString("es-PE", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })}
+              </strong>{" "}
+              a las <strong>{formData.time}</strong> para {formData.guests}{" "}
+              persona{formData.guests === 1 ? "" : "s"}.
             </p>
+            {confirmation.code && (
+              <p className="text-white font-semibold tracking-wide">
+                Código: {confirmation.code}
+              </p>
+            )}
             <div className="flex flex-col gap-3">
               <Link
                 href="/"
@@ -78,10 +194,10 @@ export default function ReservationPage() {
                 Volver al Inicio
               </Link>
               <button
-                onClick={() => setIsSuccess(false)}
+                onClick={resetForm}
                 className="text-text-secondary hover:text-text-primary px-8 py-3 font-semibold transition-colors"
               >
-                Hacer otra reserva
+                Reservar otra mesa
               </button>
             </div>
           </div>
@@ -155,12 +271,11 @@ export default function ReservationPage() {
                   className="w-full bg-background-light dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                 >
                   <option value="">Elegir hora</option>
-                  <option value="12:00">12:00 PM</option>
-                  <option value="13:00">01:00 PM</option>
-                  <option value="14:00">02:00 PM</option>
-                  <option value="19:00">07:00 PM</option>
-                  <option value="20:00">08:00 PM</option>
-                  <option value="21:00">09:00 PM</option>
+                  {timeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -213,7 +328,25 @@ export default function ReservationPage() {
                   placeholder="+51 999 999 999"
                 />
               </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm font-bold text-text-secondary mb-2">
+                  Solicitudes especiales (opcional)
+                </label>
+                <textarea
+                  name="specialRequests"
+                  value={formData.specialRequests}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full bg-background-light dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                  placeholder="Alérgenos, asientos, celebraciones, etc."
+                />
+              </div>
             </div>
+
+            {errorMessage && (
+              <p className="text-center text-sm text-red-400">{errorMessage}</p>
+            )}
 
             <button
               type="submit"

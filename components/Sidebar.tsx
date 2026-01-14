@@ -1,13 +1,14 @@
 import React from 'react';
-import { categories } from '../data';
 import { motion } from 'framer-motion';
+import { Category } from '@/types';
 
 interface Props {
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
+  categories?: Category[];
 }
 
-const Sidebar: React.FC<Props> = ({ selectedCategory, onSelectCategory }) => {
+const Sidebar: React.FC<Props> = ({ selectedCategory, onSelectCategory, categories }) => {
   // Map hardcoded icons to category IDs
   const getIcon = (id: string) => {
     switch(id) {
@@ -22,7 +23,7 @@ const Sidebar: React.FC<Props> = ({ selectedCategory, onSelectCategory }) => {
 
   const allCategories = [
     { id: 'todo', name: 'Todo el Menú', icon: 'restaurant' },
-    ...categories.map(c => ({ ...c, icon: getIcon(c.id) }))
+    ...(categories ?? []).map((c) => ({ ...c, icon: getIcon(c.id) })),
   ];
 
   return (
