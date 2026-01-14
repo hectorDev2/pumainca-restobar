@@ -78,22 +78,42 @@ export default function MenuPage() {
   const loadingProducts = isProductsFetching && !products;
   const heroDish = filteredDishes[0];
 
-  const resolvePrice = (price?: number | Record<string, number>) => {
+  const parsePriceValue = (value?: number | string): number | undefined => {
+    if (value === undefined || value === null || value === "") {
+      return undefined;
+    }
+    const parsed = typeof value === "number" ? value : Number(value);
+    return Number.isNaN(parsed) ? undefined : parsed;
+  };
+
+  const resolvePrice = (
+    price?: number | string | Record<string, number | string>
+  ) => {
     if (typeof price === "number") {
       return price;
     }
 
     if (price && typeof price === "object") {
-      const values = Object.values(price).filter(
-        (value): value is number => typeof value === "number"
-      );
+      const values = Object.values(price)
+        .map(parsePriceValue)
+        .filter((value): value is number => typeof value === "number");
       if (values.length > 0) {
         return Math.min(...values);
       }
     }
 
+    if (typeof price === "string") {
+      const parsed = parsePriceValue(price);
+      if (parsed !== undefined) {
+        return parsed;
+      }
+    }
+
     return 0;
   };
+
+  const resolveDishImage = (dish?: Product) =>
+    dish?.image || dish?.image_url || dish?.gallery?.[0] || "";
 
   const priceLabel = (dish: any) => {
     const numericPrice = resolvePrice(dish?.price);
@@ -150,9 +170,12 @@ export default function MenuPage() {
                   onClick={() => navigateToDish(heroDish.id)}
                 >
                   <div className="absolute inset-0 bg-linear-to-r from-black/90 via-black/40 to-transparent z-10" />
+
                   <div
                     className="h-[400px] bg-cover bg-center w-full transition-transform duration-700 group-hover:scale-105"
-                    style={{ backgroundImage: `url('${heroDish.image}')` }}
+                    style={{
+                      backgroundImage: `url('${resolveDishImage(heroDish)}')`,
+                    }}
                   />
                   <div className="absolute bottom-0 left-0 p-8 md:p-12 z-20 flex flex-col gap-4 max-w-2xl">
                     <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider backdrop-blur-sm w-fit border border-primary/20">
@@ -323,7 +346,11 @@ export default function MenuPage() {
                         >
                           <div
                             className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                            style={{ backgroundImage: `url('${dish.image}')` }}
+                            style={{
+                              backgroundImage: `url('${resolveDishImage(
+                                dish
+                              )}')`,
+                            }}
                           />
                           {dish.isVegetarian && (
                             <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
@@ -412,7 +439,9 @@ export default function MenuPage() {
                     >
                       <div
                         className="w-full aspect-square rounded-2xl bg-cover bg-center mb-4 transition-all group-hover:scale-[1.02] shadow-xl"
-                        style={{ backgroundImage: `url('${dish.image}')` }}
+                        style={{
+                          backgroundImage: `url('${resolveDishImage(dish)}')`,
+                        }}
                       />
                       <h4 className="text-white font-bold text-lg group-hover:text-primary transition-colors">
                         {dish.name}
