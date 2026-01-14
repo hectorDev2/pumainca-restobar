@@ -1,75 +1,136 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useCart } from '@/context/CartContext';
-import { products, categories, getSubcategories } from '@/data';
-import Navbar from '@/components/Navbar';
-import Sidebar from '@/components/Sidebar'; // sidebar might need adjustments but it should work if it accepts props
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
+import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  useCategoryDetail,
+  useCategorySubcategories,
+  useCategories,
+  useProducts,
+} from "@/lib/queries";
+import type { Product } from "@/types";
 
-// Types (Product) already imported from data or types
+type SortOption = "recommended" | "price_asc" | "price_desc" | "alphabetical";
+
+const sortOptions: { value: SortOption; label: string }[] = [
+  { value: "recommended", label: "Más recomendados" },
+  { value: "price_asc", label: "Precio: menor a mayor" },
+  { value: "price_desc", label: "Precio: mayor a menor" },
+  { value: "alphabetical", label: "Orden alfabético" },
+];
 
 export default function MenuPage() {
   const { addToCart } = useCart();
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState<string>('todo');
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>("todo");
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(
+    null
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<SortOption>("recommended");
 
-  const activeCategory = categories.find(c => c.id === selectedCategory);
-  const subcategories = selectedCategory !== 'todo' ? getSubcategories(selectedCategory) : null;
+  const { data: categories } = useCategories();
+  const { data: categoryDetail } = useCategoryDetail(
+    selectedCategory !== "todo" ? selectedCategory : undefined
+  );
+  const { data: categorySubcategories } = useCategorySubcategories(
+    selectedCategory !== "todo" ? selectedCategory : undefined
+  );
+  const { data: products, isFetching: isProductsFetching } = useProducts({
+    category: selectedCategory === "todo" ? undefined : selectedCategory,
+    search: searchQuery,
+    sort: sortOrder,
+  });
 
-  // Reset subcategory when category changes
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedSubCategory(null);
   }, [selectedCategory]);
 
-  const filteredDishes = useMemo(() => {
-    return products.filter(dish => {
-      const matchesCategory = selectedCategory === 'todo' || dish.category === selectedCategory;
-      const matchesSubCategory = !selectedSubCategory || dish.subcategory === selectedSubCategory;
-      const matchesSearch = dish.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           dish.description.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSubCategory && matchesSearch;
-    });
-  }, [selectedCategory, selectedSubCategory, searchQuery]);
+  const activeCategory =
+    selectedCategory === "todo"
+      ? undefined
+      : categoryDetail ??
+        categories?.find((category) => category.id === selectedCategory);
 
-  // Helper to display price (handle number or object)
-  const getDisplayPrice = (dish: any) => {
-    if (typeof dish.price === 'number') {
-      return `S./${dish.price.toFixed(2)}`;
+  const subcategories =
+    categorySubcategories ?? activeCategory?.subcategories ?? [];
+
+  const filteredDishes = useMemo<Product[]>(() => {
+    if (!products) {
+      return [];
     }
-    // If multiple prices, show "Desde $X" or smallest price
-    const values = Object.values(dish.price) as number[];
-    const minPrice = Math.min(...values);
-    return `Desde S./${minPrice.toFixed(2)}`;
+    if (selectedSubCategory) {
+      return products.filter(
+        (dish) => dish.subcategory === selectedSubCategory
+      );
+    }
+    return products;
+  }, [products, selectedSubCategory]);
+
+  const displayCategoryName = activeCategory?.name ?? "Todo el Menú";
+  const displayCategoryDescription =
+    activeCategory?.description ?? "Explora nuestra carta completa";
+
+  const loadingProducts = isProductsFetching && !products;
+  const heroDish = filteredDishes[0];
+
+  const resolvePrice = (price?: number | Record<string, number>) => {
+    if (typeof price === "number") {
+      return price;
+    }
+
+    if (price && typeof price === "object") {
+      const values = Object.values(price).filter(
+        (value): value is number => typeof value === "number"
+      );
+      if (values.length > 0) {
+        return Math.min(...values);
+      }
+    }
+
+    return 0;
   };
 
+  const priceLabel = (dish: any) => {
+    const numericPrice = resolvePrice(dish?.price);
+    if (numericPrice > 0) {
+      return `S./${numericPrice.toFixed(2)}`;
+    }
+    return "S./0.00";
+  };
+
+  const upsellDishes = ((products ?? []) as Product[])
+    .filter((dish) => dish.id !== heroDish?.id)
+    .slice(0, 3);
+
   const navigateToDish = (id: string) => {
-      router.push(`/menu/${id}`);
+    router.push(`/menu/${id}`);
   };
 
   return (
     <div className="h-screen flex flex-col bg-background-dark overflow-hidden">
       <Navbar showSearch={false} />
-      
+
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar 
-          selectedCategory={selectedCategory} 
-          onSelectCategory={setSelectedCategory} 
+        <Sidebar
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          categories={categories}
         />
-        
+
         <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-background-dark scroll-smooth">
           <div className="max-w-[1200px] mx-auto space-y-10">
-            
-            {/* Search Bar for Mobile/Tablet */}
             <div className="md:hidden">
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">search</span>
-                <input 
-                  type="text" 
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">
+                  search
+                </span>
+                <input
+                  type="text"
                   placeholder="Buscar plato..."
                   className="w-full bg-surface-dark border-none rounded-xl pl-12 py-3 text-white focus:ring-2 focus:ring-primary/50"
                   value={searchQuery}
@@ -78,37 +139,44 @@ export default function MenuPage() {
               </div>
             </div>
 
-            {/* Featured Section */}
-            {selectedCategory === 'todo' && !searchQuery && products.length > 0 && (
+            {heroDish && selectedCategory === "todo" && (
               <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="rounded-2xl overflow-hidden relative shadow-2xl border border-zinc-800 group cursor-pointer"
-                  onClick={() => navigateToDish(products[0].id)}>
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent z-10"></div>
-                  <div className="h-[400px] bg-cover bg-center w-full transition-transform duration-700 group-hover:scale-105" 
-                    style={{ backgroundImage: `url('${products[0].image}')` }}></div>
+                <div
+                  className="rounded-2xl overflow-hidden relative shadow-2xl border border-zinc-800 group cursor-pointer"
+                  onClick={() => navigateToDish(heroDish.id)}
+                >
+                  <div className="absolute inset-0 bg-linear-to-r from-black/90 via-black/40 to-transparent z-10" />
+                  <div
+                    className="h-[400px] bg-cover bg-center w-full transition-transform duration-700 group-hover:scale-105"
+                    style={{ backgroundImage: `url('${heroDish.image}')` }}
+                  />
                   <div className="absolute bottom-0 left-0 p-8 md:p-12 z-20 flex flex-col gap-4 max-w-2xl">
                     <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider backdrop-blur-sm w-fit border border-primary/20">
-                      <span className="material-symbols-outlined text-sm">stars</span> Especial del Chef
+                      <span className="material-symbols-outlined text-sm">
+                        stars
+                      </span>{" "}
+                      Especial del Chef
                     </span>
                     <h1 className="text-white text-4xl md:text-5xl font-black leading-tight tracking-tight">
-                      {products[0].name}
+                      {heroDish.name}
                     </h1>
                     <p className="text-gray-200 text-base md:text-lg font-medium leading-relaxed max-w-lg">
-                      {products[0].description}
+                      {heroDish.description}
                     </p>
                     <div className="flex flex-wrap gap-4 mt-2">
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          addToCart(products[0]);
+                          addToCart(heroDish);
                         }}
-                        className="flex items-center gap-2 h-12 px-6 bg-primary hover:bg-red-500 text-white text-base font-bold rounded-lg transition-all shadow-lg shadow-red-500/20">
+                        className="flex items-center gap-2 h-12 px-6 bg-primary hover:bg-red-500 text-white text-base font-bold rounded-lg transition-all shadow-lg shadow-red-500/20"
+                      >
                         <span className="material-symbols-outlined">add</span>
-                        Agregar al Pedido — {getDisplayPrice(products[0])}
+                        Agregar al Pedido — {priceLabel(heroDish)}
                       </button>
                     </div>
                   </div>
@@ -116,137 +184,263 @@ export default function MenuPage() {
               </motion.section>
             )}
 
-            {/* Main Grid */}
             <section className="space-y-6">
               <div className="flex flex-col sm:flex-row items-end justify-between border-b border-zinc-800 pb-4 gap-4">
                 <motion.div
-                    key={selectedCategory}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4 }}
+                  key={selectedCategory}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4 }}
                 >
                   <h2 className="text-primary text-2xl font-bold tracking-tight">
-                    {activeCategory ? activeCategory.name : 'Todo el Menú'}
+                    {displayCategoryName}
                   </h2>
                   <p className="text-text-secondary text-sm mt-1">
-                    {activeCategory ? activeCategory.description : 'Explora nuestra carta completa'}
+                    {displayCategoryDescription}
                   </p>
                 </motion.div>
 
-                {/* Subcategories (Tabs) */}
-                {subcategories && subcategories.length > 0 && (
-                  <div className="flex gap-2 overflow-x-auto pb-1 max-w-full no-scrollbar">
-                    <button 
-                      onClick={() => setSelectedSubCategory(null)}
-                      className="relative px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors outline-none text-white"
-                    >
-                      {!selectedSubCategory && (
-                        <motion.div 
-                          layoutId="activeSubTab"
-                          className="absolute inset-0 bg-white rounded-full"
-                          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        />
-                      )}
-                      <span className={`relative z-10 ${!selectedSubCategory ? 'text-black' : 'text-zinc-400 hover:text-white'}`}>Todos</span>
-                    </button>
-                    {subcategories.map(sub => (
-                      <button 
-                        key={sub.id}
-                        onClick={() => setSelectedSubCategory(sub.id)}
-                        className="relative px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors outline-none"
-                      >
-                         {selectedSubCategory === sub.id && (
-                            <motion.div 
-                              layoutId="activeSubTab"
-                              className="absolute inset-0 bg-white rounded-full"
-                              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                            />
-                          )}
-                        <span className={`relative z-10 ${selectedSubCategory === sub.id ? 'text-black' : 'text-zinc-400 hover:text-white'}`}>{sub.name}</span>
-                      </button>
-                    ))}
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-sm">
+                      search
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="Buscar plato..."
+                      className="hidden md:block bg-surface-dark border-none rounded-full pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-primary/50"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                   </div>
-                )}
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-text-secondary">
+                    <span className="text-white text-[10px]">Ordenar por</span>
+                    <select
+                      value={sortOrder}
+                      onChange={(event) =>
+                        setSortOrder(event.target.value as SortOption)
+                      }
+                      className="bg-black border border-zinc-800 rounded-full px-4 py-2 text-[12px] text-white outline-none"
+                    >
+                      {sortOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              {filteredDishes.length > 0 ? (
-                <motion.div 
+              {subcategories.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto pb-1 max-w-full no-scrollbar">
+                  <button
+                    onClick={() => setSelectedSubCategory(null)}
+                    className="relative px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors outline-none text-white"
+                  >
+                    {!selectedSubCategory && (
+                      <motion.div
+                        layoutId="activeSubTab"
+                        className="absolute inset-0 bg-white rounded-full"
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+                    <span
+                      className={`relative z-10 ${
+                        !selectedSubCategory
+                          ? "text-black"
+                          : "text-zinc-400 hover:text-white"
+                      }`}
+                    >
+                      Todos
+                    </span>
+                  </button>
+                  {subcategories.map((sub) => (
+                    <button
+                      key={sub.id}
+                      onClick={() => setSelectedSubCategory(sub.id)}
+                      className="relative px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors outline-none"
+                    >
+                      {selectedSubCategory === sub.id && (
+                        <motion.div
+                          layoutId="activeSubTab"
+                          className="absolute inset-0 bg-white rounded-full"
+                          transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 30,
+                          }}
+                        />
+                      )}
+                      <span
+                        className={`relative z-10 ${
+                          selectedSubCategory === sub.id
+                            ? "text-black"
+                            : "text-zinc-400 hover:text-white"
+                        }`}
+                      >
+                        {sub.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {loadingProducts ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="py-20 text-center text-white"
+                >
+                  <span className="material-symbols-outlined text-6xl text-zinc-700 mb-4">
+                    hourglass_top
+                  </span>
+                  <p className="text-zinc-500 text-sm">Cargando platos...</p>
+                </motion.div>
+              ) : filteredDishes.length > 0 ? (
+                <motion.div
                   layout
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                  <AnimatePresence mode="popLayout"> 
-                  {filteredDishes.map((dish) => (
-                    <motion.div 
-                      layout
-                      key={dish.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.3 }}
-                      className="group relative flex flex-col bg-surface-dark rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-zinc-700"
-                    >
-                      <div className="relative h-48 overflow-hidden cursor-pointer" onClick={() => navigateToDish(dish.id)}>
-                        <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" 
-                          style={{ backgroundImage: `url('${dish.image}')` }}></div>
-                        {dish.isVegetarian && (
-                          <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px] text-green-500">eco</span>
-                          </div>
-                        )}
-                        {dish.isSpicy && (
-                          <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
-                             <span className="material-symbols-outlined text-[14px] text-orange-400">local_fire_department</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="p-5 flex flex-col flex-1">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="text-white text-lg font-bold leading-tight group-hover:text-primary transition-colors">{dish.name}</h3>
-                          <span className="text-white font-bold text-sm bg-surface-hover px-2 py-1 rounded ml-2 whitespace-nowrap">{getDisplayPrice(dish)}</span>
+                  <AnimatePresence mode="popLayout">
+                    {filteredDishes.map((dish) => (
+                      <motion.div
+                        layout
+                        key={dish.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
+                        className="group relative flex flex-col bg-surface-dark rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-zinc-700"
+                      >
+                        <div
+                          className="relative h-48 overflow-hidden cursor-pointer"
+                          onClick={() => navigateToDish(dish.id)}
+                        >
+                          <div
+                            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                            style={{ backgroundImage: `url('${dish.image}')` }}
+                          />
+                          {dish.isVegetarian && (
+                            <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px] text-green-500">
+                                eco
+                              </span>
+                            </div>
+                          )}
+                          {dish.isSpicy && (
+                            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[14px] text-orange-400">
+                                local_fire_department
+                              </span>
+                            </div>
+                          )}
                         </div>
-                        <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-2">
-                          {dish.description}
-                        </p>
-                        <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between gap-3">
-                           <button 
-                            onClick={(e) => {
+
+                        <div className="p-5 flex flex-col flex-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="text-white text-lg font-bold leading-tight group-hover:text-primary transition-colors">
+                              {dish.name}
+                            </h3>
+                            <span className="text-white font-bold text-sm bg-surface-hover px-2 py-1 rounded ml-2 whitespace-nowrap">
+                              {priceLabel(dish)}
+                            </span>
+                          </div>
+                          <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-2">
+                            {dish.description}
+                          </p>
+                          <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between gap-3">
+                            <button
+                              onClick={(e) => {
                                 e.stopPropagation();
                                 addToCart(dish);
-                            }}
-                            className="bg-primary hover:bg-primary-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-1 flex-1 shadow-lg shadow-red-900/20">
-                            <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
-                            Agregar
-                          </button>
-                          <button 
-                            onClick={() => navigateToDish(dish.id)} 
-                            className="text-xs font-bold text-text-secondary hover:text-white transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover">
-                            Detalles <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                          </button>
+                              }}
+                              className="bg-primary hover:bg-primary-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-1 flex-1 shadow-lg shadow-red-900/20"
+                            >
+                              <span className="material-symbols-outlined text-sm">
+                                add_shopping_cart
+                              </span>
+                              Agregar
+                            </button>
+                            <button
+                              onClick={() => navigateToDish(dish.id)}
+                              className="text-xs font-bold text-text-secondary hover:text-white transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover"
+                            >
+                              Detalles{" "}
+                              <span className="material-symbols-outlined text-xs">
+                                arrow_forward
+                              </span>
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    ))}
                   </AnimatePresence>
                 </motion.div>
               ) : (
-                <motion.div 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }}
-                    className="py-20 text-center"
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="py-20 text-center"
                 >
-                  <span className="material-symbols-outlined text-6xl text-zinc-700 mb-4">search_off</span>
-                  <p className="text-zinc-500">No encontramos platos que coincidan con tu búsqueda.</p>
+                  <span className="material-symbols-outlined text-6xl text-zinc-700 mb-4">
+                    search_off
+                  </span>
+                  <p className="text-zinc-500">
+                    No encontramos platos que coincidan con tu búsqueda.
+                  </p>
                 </motion.div>
               )}
             </section>
+
+            <section className="border-t border-zinc-800 pt-16 pb-10">
+              <h3 className="text-primary text-2xl font-bold mb-8">
+                Acompáñalo con
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                {upsellDishes.map((dish) => {
+                  const showPrice = resolvePrice(dish.price);
+                  return (
+                    <button
+                      key={dish.id}
+                      className="group cursor-pointer text-left"
+                      onClick={() => navigateToDish(dish.id)}
+                    >
+                      <div
+                        className="w-full aspect-square rounded-2xl bg-cover bg-center mb-4 transition-all group-hover:scale-[1.02] shadow-xl"
+                        style={{ backgroundImage: `url('${dish.image}')` }}
+                      />
+                      <h4 className="text-white font-bold text-lg group-hover:text-primary transition-colors">
+                        {dish.name}
+                      </h4>
+                      <p className="text-text-secondary text-sm line-clamp-1 capitalize">
+                        {typeof dish.subcategory === "string"
+                          ? dish.subcategory.replace(/-/g, " ")
+                          : typeof dish.category === "string"
+                          ? dish.category.replace(/-/g, " ")
+                          : String(dish.category ?? "")}
+                      </p>
+                      <p className="text-primary font-bold mt-1">
+                        S./{showPrice.toFixed(2)}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
           </div>
-          
+
           <footer className="mt-20 border-t border-zinc-800 pt-8 pb-4 text-center">
-            <p className="text-text-secondary text-sm">© 2024 Pumainca Restobar. Auténtica Cocina Andina.</p>
+            <p className="text-text-secondary text-sm">
+              © 2024 Pumainca Restobar. Auténtica Cocina Andina.
+            </p>
           </footer>
         </main>
       </div>
     </div>
   );
-};
+}
