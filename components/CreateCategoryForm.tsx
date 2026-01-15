@@ -13,6 +13,16 @@ export default function CreateCategoryForm({ onCreated }: Props) {
   const [displayOrder, setDisplayOrder] = useState<string | number>(0);
   const [file, setFile] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  React.useEffect(() => {
+    if (!errorMessage) return;
+    setShowToast(true);
+    const t = setTimeout(() => {
+      setShowToast(false);
+      setErrorMessage(null);
+    }, 5000);
+    return () => clearTimeout(t);
+  }, [errorMessage]);
 
   const mutation = useCreateCategory();
 
@@ -104,8 +114,15 @@ export default function CreateCategoryForm({ onCreated }: Props) {
           {mutation.isLoading ? "Creando..." : "Crear categoría"}
         </button>
       </div>
-      {errorMessage ? (
-        <div className="text-sm text-red-400 mt-2">{errorMessage}</div>
+      {/* Toast */}
+      {showToast && errorMessage ? (
+        <div
+          aria-live="assertive"
+          className="fixed right-4 bottom-4 z-50 max-w-xs bg-red-700 text-white px-4 py-3 rounded-lg shadow-lg"
+        >
+          <div className="font-semibold">Error</div>
+          <div className="text-sm mt-1">{errorMessage}</div>
+        </div>
       ) : null}
     </form>
   );
