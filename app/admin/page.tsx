@@ -10,6 +10,9 @@ import {
   useUpdateProduct,
   useUploadProductImage,
 } from "@/lib/queries";
+import { useCreateCategory } from "@/lib/queries";
+import CreateCategoryForm from "@/components/CreateCategoryForm";
+import { useRouter } from "next/navigation";
 import type { Product } from "@/types";
 
 type ProductFormState = {
@@ -111,6 +114,7 @@ const buildProductFormState = (product: Product): ProductFormState => ({
 });
 
 export default function AdminPage() {
+  const router = useRouter();
   // --- Queries ---
   const { data: products, isFetching } = useProducts({ sort: "recommended" });
   const { data: categories } = useCategories();
@@ -134,6 +138,17 @@ export default function AdminPage() {
   const [createImagePreview, setCreateImagePreview] = useState<string | null>(
     null
   );
+  // --- Crear categoría ---
+  const [isCreateCategoryOpen, setCreateCategoryOpen] = useState(false);
+  const [createCategoryName, setCreateCategoryName] = useState("");
+  const [createCategoryDescription, setCreateCategoryDescription] =
+    useState("");
+  const [createCategoryImage, setCreateCategoryImage] = useState<File | null>(
+    null
+  );
+  const [createCategoryPreview, setCreateCategoryPreview] = useState<
+    string | null
+  >(null);
 
   const [isDetailModalOpen, setDetailModalOpen] = useState(false);
   const [detailModalProduct, setDetailModalProduct] = useState<Product | null>(
@@ -144,6 +159,12 @@ export default function AdminPage() {
   const createProductMutation = useCreateProduct();
   const updateProductMutation = useUpdateProduct();
   const uploadImageMutation = useUploadProductImage();
+  // createCategory handled inside CreateCategoryForm
+
+  const isSaving =
+    createProductMutation.isLoading ||
+    updateProductMutation.isLoading ||
+    uploadImageMutation.isLoading;
 
   // --- Memos & Effects ---
   const selectedProduct = useMemo(
@@ -172,6 +193,15 @@ export default function AdminPage() {
     }
     setCreateImagePreview(null);
   }, [createMainImage]);
+
+  useEffect(() => {
+    if (createCategoryImage) {
+      const url = URL.createObjectURL(createCategoryImage);
+      setCreateCategoryPreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setCreateCategoryPreview(null);
+  }, [createCategoryImage]);
 
   useEffect(() => {
     if (editMainImage) {
@@ -253,6 +283,11 @@ export default function AdminPage() {
         setCreateModalOpen(false);
         setCreateFormState(initialFormState);
         setCreateMainImage(null);
+        try {
+          router.refresh();
+        } catch (err) {
+          /* ignore */
+        }
       },
     });
   };
@@ -299,11 +334,23 @@ export default function AdminPage() {
             uploadImageMutation.mutate(
               { productId: product.id, file: editMainImage },
               {
-                onSuccess: () => setEditModalOpen(false),
+                onSuccess: () => {
+                  setEditModalOpen(false);
+                  try {
+                    router.refresh();
+                  } catch (err) {
+                    /* ignore */
+                  }
+                },
               }
             );
           } else {
             setEditModalOpen(false);
+            try {
+              router.refresh();
+            } catch (err) {
+              /* ignore */
+            }
           }
         },
       }
@@ -313,6 +360,14 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <Navbar showSearch={false} />
+      {isSaving && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 rounded-full border-4 border-t-transparent border-white animate-spin" />
+            <p className="text-white font-bold">Guardando cambios...</p>
+          </div>
+        </div>
+      )}
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         <header>
           <h1 className="text-3xl font-black">Panel de Gestión</h1>
@@ -344,12 +399,20 @@ export default function AdminPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button
-            onClick={() => setCreateModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-full text-sm font-bold transition w-full md:w-auto"
-          >
-            Nuevo Producto
-          </button>
+          <div className="flex gap-3 w-full md:w-auto">
+            <button
+              onClick={() => setCreateModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-full text-sm font-bold transition w-full md:w-auto"
+            >
+              Nuevo Producto
+            </button>
+            <button
+              onClick={() => setCreateCategoryOpen(true)}
+              className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-full text-sm font-bold transition w-full md:w-auto"
+            >
+              Nueva Categoría
+            </button>
+          </div>
         </div>
 
         {/* Lista de Productos */}
@@ -455,6 +518,53 @@ export default function AdminPage() {
                       })
                     }
                   />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-zinc-500 uppercase font-bold">
+                    Categoría
+                  </label>
+                  <select
+                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 mt-1"
+                    value={editFormState.category}
+                    onChange={(e) =>
+                      setEditFormState({
+                        ...editFormState,
+                        category: e.target.value,
+                        subcategory: "",
+                      })
+                    }
+                  >
+                    <option value="">Seleccionar</option>
+                    {categories?.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-zinc-500 uppercase font-bold">
+                    Subcategoría
+                  </label>
+                  <select
+                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 mt-1"
+                    value={editFormState.subcategory}
+                    onChange={(e) =>
+                      setEditFormState({
+                        ...editFormState,
+                        subcategory: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Sin subcategoría</option>
+                    {editSubcategories?.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               {/* Flags Booleanos */}
@@ -590,12 +700,10 @@ export default function AdminPage() {
               </div>
               <button
                 type="submit"
-                disabled={updateProductMutation.isLoading}
+                disabled={isSaving}
                 className="w-full bg-blue-600 py-4 rounded-2xl font-bold uppercase tracking-widest disabled:opacity-50"
               >
-                {updateProductMutation.isLoading
-                  ? "Guardando..."
-                  : "Actualizar Producto"}
+                {isSaving ? "Guardando..." : "Actualizar Producto"}
               </button>
             </form>
           </div>
@@ -833,9 +941,10 @@ export default function AdminPage() {
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="bg-blue-600 px-6 py-3 rounded-2xl font-bold"
+                  disabled={createProductMutation.isLoading}
+                  className="bg-blue-600 px-6 py-3 rounded-2xl font-bold disabled:opacity-50"
                 >
-                  Crear producto
+                  {createProductMutation.isLoading ? "Creando..." : "Crear producto"}
                 </button>
                 <button
                   type="button"
@@ -846,6 +955,48 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Crear Categoría */}
+      {isCreateCategoryOpen && (
+        <div className="fixed inset-0 z-[96] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-black">Nueva Categoría</h2>
+              <button
+                onClick={() => setCreateCategoryOpen(false)}
+                className="text-zinc-500 hover:text-white text-2xl"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <CreateCategoryForm
+                onCreated={() => {
+                  setCreateCategoryOpen(false);
+                  setCreateCategoryName("");
+                  setCreateCategoryDescription("");
+                  setCreateCategoryImage(null);
+                  try {
+                    router.refresh();
+                  } catch (err) {
+                    /* ignore */
+                  }
+                }}
+              />
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCreateCategoryOpen(false)}
+                  className="text-zinc-400"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
