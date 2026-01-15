@@ -85,7 +85,10 @@ export async function POST(req: Request) {
   // Prevent creating duplicate categories by name (case-insensitive)
   const nameNormalized = name.trim().toLowerCase();
   const duplicate = categories.find(
-    (c) => String(c.name || "").trim().toLowerCase() === nameNormalized
+    (c) =>
+      String(c.name || "")
+        .trim()
+        .toLowerCase() === nameNormalized
   );
 
   if (duplicate) {
