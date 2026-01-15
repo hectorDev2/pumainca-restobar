@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Category, Product, SubCategory } from "@/types";
 import { apiFetch } from "@/lib/api";
 
@@ -98,7 +94,7 @@ const buildPriceRecord = (
   return Object.keys(record).length > 0 ? record : undefined;
 };
 
-const coalesce = <T,>(...values: Array<T | undefined | null>): T | undefined =>
+const coalesce = <T>(...values: Array<T | undefined | null>): T | undefined =>
   values.find((value): value is T => value !== undefined && value !== null);
 
 const normalizeProduct = (backend: BackendProduct): Product => {
@@ -144,11 +140,8 @@ const normalizeProduct = (backend: BackendProduct): Product => {
     ) ?? "";
 
   const resolvedCategoryId =
-    coalesce(
-      backend.category_id,
-      backend.categoryId,
-      backend.category?.id
-    ) ?? "";
+    coalesce(backend.category_id, backend.categoryId, backend.category?.id) ??
+    "";
   const resolvedSubcategoryId = coalesce(
     backend.subcategory_id,
     backend.subcategoryId
@@ -179,7 +172,21 @@ const normalizeProduct = (backend: BackendProduct): Product => {
   };
 };
 
-export const fetchCategories = () => apiFetch<Category[]>("/api/categories");
+export const fetchCategories = async () => {
+  return apiFetch<Category[]>("/api/categories");
+};
+
+export const createCategory = (formData: FormData) =>
+  apiFetch<any>("/api/categories", { method: "POST", body: formData });
+
+export const useCreateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation<any, Error, FormData>({
+    mutationFn: createCategory,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["categories"] }),
+  });
+};
 
 export const useCategories = () =>
   useQuery<Category[], Error>({
@@ -242,9 +249,7 @@ export const useProducts = (filters: ProductFilters) =>
   });
 
 export const fetchProductById = (productId: string) =>
-  apiFetch<BackendProduct>(`/api/products/${productId}`).then(
-    normalizeProduct
-  );
+  apiFetch<BackendProduct>(`/api/products/${productId}`).then(normalizeProduct);
 
 export const useProduct = (productId: string | undefined) =>
   useQuery<Product, Error>({
