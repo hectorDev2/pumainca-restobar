@@ -944,7 +944,9 @@ export default function AdminPage() {
                   disabled={createProductMutation.isLoading}
                   className="bg-blue-600 px-6 py-3 rounded-2xl font-bold disabled:opacity-50"
                 >
-                  {createProductMutation.isLoading ? "Creando..." : "Crear producto"}
+                  {createProductMutation.isLoading
+                    ? "Creando..."
+                    : "Crear producto"}
                 </button>
                 <button
                   type="button"
