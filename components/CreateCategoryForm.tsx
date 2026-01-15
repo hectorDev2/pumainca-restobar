@@ -43,7 +43,9 @@ export default function CreateCategoryForm({ onCreated }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
-        <label className="block text-xs font-bold text-zinc-400">Nombre *</label>
+        <label className="block text-xs font-bold text-zinc-400">
+          Nombre *
+        </label>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -53,7 +55,9 @@ export default function CreateCategoryForm({ onCreated }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-zinc-400">Descripción</label>
+        <label className="block text-xs font-bold text-zinc-400">
+          Descripción
+        </label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -63,7 +67,9 @@ export default function CreateCategoryForm({ onCreated }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-zinc-400">Imagen (opcional)</label>
+        <label className="block text-xs font-bold text-zinc-400">
+          Imagen (opcional)
+        </label>
         <input
           type="file"
           accept="image/*"
@@ -73,7 +79,9 @@ export default function CreateCategoryForm({ onCreated }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-zinc-400">Orden de despliegue</label>
+        <label className="block text-xs font-bold text-zinc-400">
+          Orden de despliegue
+        </label>
         <input
           type="number"
           value={String(displayOrder)}

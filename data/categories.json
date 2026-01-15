@@ -1,0 +1,106 @@
+[
+  {
+    "id": "platos-principales",
+    "name": "Platos Principales",
+    "description": "Nuestras especialidades principales",
+    "imageUrl": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
+    "displayOrder": 0,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "subcategories": []
+  },
+  {
+    "id": "platos-vegetarianos",
+    "name": "Platos Vegetarianos",
+    "description": "Deliciosas opciones vegetarianas",
+    "imageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
+    "displayOrder": 0,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "subcategories": []
+  },
+  {
+    "id": "pizzas",
+    "name": "Pizzas",
+    "description": "Pizzas con un toque andino",
+    "imageUrl": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
+    "displayOrder": 0,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "subcategories": []
+  },
+  {
+    "id": "bebidas",
+    "name": "Bebidas",
+    "description": "Bebidas y cocteles",
+    "imageUrl": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=800&q=80",
+    "displayOrder": 0,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "subcategories": [
+      {
+        "id": "bebidas-calientes",
+        "name": "Bebidas Calientes",
+        "description": "Cafés y tés"
+      },
+      {
+        "id": "cocteles",
+        "name": "Cocteles",
+        "description": "Cocteles tradicionales y de la casa"
+      },
+      {
+        "id": "limonadas-jugos",
+        "name": "Limónadas y Jugos",
+        "description": "Bebidas refrescantes"
+      }
+    ]
+  },
+  {
+    "id": "postres",
+    "name": "Postres",
+    "description": "Dulces tentaciones",
+    "imageUrl": "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=800&q=80",
+    "displayOrder": 0,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "subcategories": []
+  },
+  {
+    "id": "comida-rapida",
+    "name": "comida rapida",
+    "description": "comida rapida como salchipapas,alitas,hamburguesas",
+    "imageUrl": null,
+    "displayOrder": 0,
+    "createdAt": "2026-01-14T21:53:25.871Z",
+    "updatedAt": "2026-01-14T21:53:25.871Z",
+    "subcategories": []
+  },
+  {
+    "id": "food-fast",
+    "name": "food fast",
+    "description": "comida rapida",
+    "imageUrl": null,
+    "displayOrder": 0,
+    "createdAt": "2026-01-14T22:35:06.954Z",
+    "updatedAt": "2026-01-14T22:35:06.954Z",
+    "subcategories": []
+  },
+  {
+    "id": "papitas",
+    "name": "papitas",
+    "imageUrl": null,
+    "displayOrder": 0,
+    "createdAt": "2026-01-15T00:25:40.254Z",
+    "updatedAt": "2026-01-15T00:25:40.254Z",
+    "subcategories": []
+  },
+  {
+    "id": "ricoooos",
+    "name": "ricoooos",
+    "imageUrl": null,
+    "displayOrder": 0,
+    "createdAt": "2026-01-15T00:45:03.304Z",
+    "updatedAt": "2026-01-15T00:45:03.304Z",
+    "subcategories": []
+  }
+]
