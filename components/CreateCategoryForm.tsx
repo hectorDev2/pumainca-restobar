@@ -12,13 +12,14 @@ export default function CreateCategoryForm({ onCreated }: Props) {
   const [description, setDescription] = useState("");
   const [displayOrder, setDisplayOrder] = useState<string | number>(0);
   const [file, setFile] = useState<File | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const mutation = useCreateCategory();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return alert("El nombre es obligatorio");
-
+    setErrorMessage(null);
     const fd = new FormData();
     fd.append("name", name.trim());
     if (description) fd.append("description", description.trim());
@@ -32,10 +33,14 @@ export default function CreateCategoryForm({ onCreated }: Props) {
         setDescription("");
         setFile(null);
         setDisplayOrder(0);
+        setErrorMessage(null);
         if (onCreated) onCreated(created);
       },
       onError: (err: any) => {
-        alert(err?.message ?? "Error creando categoría");
+        // Normalize error message
+        const raw = err?.message ?? "Error creando categoría";
+        const text = Array.isArray(raw) ? raw.join(", ") : String(raw);
+        setErrorMessage(text);
       },
     });
   };
@@ -99,6 +104,9 @@ export default function CreateCategoryForm({ onCreated }: Props) {
           {mutation.isLoading ? "Creando..." : "Crear categoría"}
         </button>
       </div>
+      {errorMessage ? (
+        <div className="text-sm text-red-400 mt-2">{errorMessage}</div>
+      ) : null}
     </form>
   );
 }
