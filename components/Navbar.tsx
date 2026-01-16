@@ -94,16 +94,29 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
     }
   };
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-black/95 backdrop-blur-md">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-10 h-20 flex items-center justify-between">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 md:gap-8">
+            {/* Mobile Menu Button */}
+            <button 
+                className="lg:hidden text-white p-2 -ml-2 hover:bg-zinc-800 rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label="Menu"
+            >
+                <span className="material-symbols-outlined text-2xl">
+                    {isMenuOpen ? 'close' : 'menu'}
+                </span>
+            </button>
+
           <Link href="/" className="flex items-center gap-3 cursor-pointer group">
-            <img src="/logo.png" className="w-[120px] group-hover:scale-105 transition-transform" alt="Logo" />
+            <img src="/logo.png" className="w-[100px] md:w-[120px] group-hover:scale-105 transition-transform" alt="Logo" />
           </Link>
 
           {showSearch && (
-            <div className="hidden md:flex relative w-80" ref={searchContainerRef}>
+            <div className="hidden md:flex relative w-60 lg:w-80" ref={searchContainerRef}>
               <button 
                 onClick={handleManualSearch}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-white transition-colors"
@@ -114,7 +127,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
               <input 
                 name="nav-search"
                 type="text" 
-                placeholder="Buscar plato, ingrediente..."
+                placeholder="Buscar..."
                 className="w-full bg-surface-dark border-none rounded-xl pl-12 py-2.5 text-sm text-white focus:ring-2 focus:ring-primary/50 transition-all"
                 value={searchTerm}
                 onChange={(e) => {
@@ -182,30 +195,79 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
           )}
         </div>
 
-        <div className="flex items-center gap-4 md:gap-8">
+        <div className="flex items-center gap-3 sm:gap-4 md:gap-8">
           <div className="hidden lg:flex items-center gap-8">
             <Link href="/menu" className={isActive('/menu')}>Menú</Link>
             <Link href="/nosotros" className={isActive('/nosotros')}>Nosotros</Link>
             <Link href="/reservas" className={isActive('/reservas')}>Reservas</Link>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             <Link 
               href="/menu"
-              className="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-red-900/30 transition-all active:scale-95">
+              className="bg-primary hover:bg-primary-dark text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-lg shadow-red-900/30 transition-all active:scale-95 whitespace-nowrap">
               Mi Orden
             </Link>
             <Link 
               href="/cart"
-              className="relative flex items-center justify-center size-10 bg-surface-dark hover:bg-surface-hover rounded-xl border border-zinc-800 transition-colors">
-              <span className="material-symbols-outlined text-white">shopping_cart</span>
+              className="relative flex items-center justify-center size-9 sm:size-10 bg-surface-dark hover:bg-surface-hover rounded-xl border border-zinc-800 transition-colors">
+              <span className="material-symbols-outlined text-white text-lg sm:text-xl">shopping_cart</span>
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 size-5 bg-primary text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-black">
+                <span className="absolute -top-1 -right-1 size-4 sm:size-5 bg-primary text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-black">
                   {cartCount}
                 </span>
               )}
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      <div className={`lg:hidden fixed inset-0 z-40 bg-black/95 backdrop-blur-xl transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} pt-24 px-6`}>
+        <div className="flex flex-col gap-6 text-center">
+            <Link 
+                href="/menu" 
+                onClick={() => setIsMenuOpen(false)}
+                className={`text-2xl font-bold py-4 border-b border-zinc-800 ${pathname === '/menu' ? 'text-primary' : 'text-white'}`}
+            >
+                Menú
+            </Link>
+            <Link 
+                href="/nosotros" 
+                onClick={() => setIsMenuOpen(false)}
+                className={`text-2xl font-bold py-4 border-b border-zinc-800 ${pathname === '/nosotros' ? 'text-primary' : 'text-white'}`}
+            >
+                Nosotros
+            </Link>
+            <Link 
+                href="/reservas" 
+                onClick={() => setIsMenuOpen(false)}
+                className={`text-2xl font-bold py-4 border-b border-zinc-800 ${pathname === '/reservas' ? 'text-primary' : 'text-white'}`}
+            >
+                Reservas
+            </Link>
+            
+            {showSearch && (
+             <div className="mt-4">
+                 <form 
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleManualSearch();
+                        setIsMenuOpen(false);
+                    }}
+                    className="relative"
+                 >
+                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">search</span>
+                     <input 
+                        type="text" 
+                        placeholder="Buscar en el menú..." 
+                        className="w-full bg-surface-dark border border-zinc-800 rounded-xl pl-12 py-3 text-white focus:ring-2 focus:ring-primary/50"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                     />
+                 </form>
+             </div>
+            )}
         </div>
       </div>
     </nav>
