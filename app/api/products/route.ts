@@ -12,6 +12,7 @@ export async function GET(req: Request) {
   const categoryId = searchParams.get("category");
   const search = searchParams.get("search");
   const sort = searchParams.get("sort");
+  const limit = searchParams.get("limit");
 
   let query = supabase
     .from("products")
@@ -43,6 +44,10 @@ export async function GET(req: Request) {
     }
   } else {
     query = query.order("display_order", { ascending: true });
+  }
+
+  if (limit) {
+    query = query.limit(Number(limit));
   }
 
   const { data, error } = await query;
