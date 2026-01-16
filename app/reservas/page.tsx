@@ -131,14 +131,20 @@ export default function ReservationPage() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(
-          data?.message ?? "No pudimos confirmar tu reserva en este momento."
-        );
+        // Backend returns structure: { success: false, error: { code, message } }
+        const serverMessage = data?.error?.message ?? data?.message;
+        const serverCode = data?.error?.code ?? null;
+        const errMsg = serverMessage
+          ? serverCode
+            ? `${serverCode}: ${serverMessage}`
+            : serverMessage
+          : "No pudimos confirmar tu reserva en este momento.";
+        throw new Error(errMsg);
       }
 
       setConfirmation({
-        message: data?.message ?? "Tu mesa quedó reservada con éxito.",
-        code: data?.code,
+        message: data?.message ?? data?.text ?? "Tu mesa quedó reservada con éxito.",
+        code: data?.reservation_code ?? data?.code,
       });
     } catch (error) {
       setErrorMessage(
