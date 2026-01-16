@@ -180,9 +180,73 @@ export default function AdminOrdersPage() {
                     ×
                   </button>
                 </div>
-                <pre className="text-sm text-zinc-300 bg-black/30 p-4 rounded">
-                  {JSON.stringify(selected, null, 2)}
-                </pre>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-zinc-400">Cliente</p>
+                      <p className="font-bold">{selected.customer_name ?? "—"}</p>
+                      <p className="text-zinc-400">{selected.customer_email}</p>
+                      <p className="text-zinc-400">{selected.customer_phone}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-zinc-400">Fecha</p>
+                      <p className="font-bold">{new Date(selected.created_at).toLocaleString()}</p>
+                      <p className="mt-2 text-zinc-400">Estado Pago</p>
+                      <p className="font-bold capitalize">{selected.payment_status}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-black/30 rounded-xl overflow-hidden">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-white/5 text-zinc-400">
+                        <tr>
+                          <th className="p-3">Producto</th>
+                          <th className="p-3 text-center">Cant.</th>
+                          <th className="p-3 text-right">Precio</th>
+                          <th className="p-3 text-right">Subtotal</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-800">
+                        {selected.items?.map((item: any) => (
+                          <tr key={item.id}>
+                            <td className="p-3">
+                              <p className="font-bold">{item.product_name}</p>
+                              {item.selected_size && <span className="text-xs text-zinc-400 mr-2">Tamaño: {item.selected_size}</span>}
+                              {item.special_instructions && <div className="text-xs text-amber-500/80 italic mt-1">Note: {item.special_instructions}</div>}
+                            </td>
+                            <td className="p-3 text-center">{item.quantity}</td>
+                            <td className="p-3 text-right">S/. {Number(item.unit_price).toFixed(2)}</td>
+                            <td className="p-3 text-right font-bold text-primary">S/. {Number(item.subtotal).toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot className="bg-white/5 font-bold">
+                        <tr>
+                          <td colSpan={3} className="p-3 text-right text-zinc-400">Subtotal</td>
+                          <td className="p-3 text-right">S/. {Number(selected.subtotal).toFixed(2)}</td>
+                        </tr>
+                         <tr>
+                          <td colSpan={3} className="p-3 text-right text-zinc-400">IGV (18%)</td>
+                          <td className="p-3 text-right">S/. {Number(selected.tax_amount).toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                          <td colSpan={3} className="p-3 text-right text-zinc-400">Servicio</td>
+                          <td className="p-3 text-right">S/. {Number(selected.service_fee).toFixed(2)}</td>
+                        </tr>
+                        <tr className="text-lg">
+                          <td colSpan={3} className="p-3 text-right">Total</td>
+                          <td className="p-3 text-right text-primary">S/. {Number(selected.total_amount).toFixed(2)}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+
+                  {selected.special_instructions && (
+                     <div className="bg-amber-900/20 border border-amber-900/50 p-3 rounded-xl text-amber-200 text-sm">
+                        <span className="font-bold">Instrucciones del pedido:</span> {selected.special_instructions}
+                     </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
