@@ -315,3 +315,111 @@ export const useUploadProductImage = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
   });
 };
+
+// Orders
+type OrdersQueryParams = {
+  status?: string;
+  paymentStatus?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  limit?: number;
+};
+
+type OrdersResponse = {
+  data: any[];
+  meta?: { total: number; page: number; limit: number; pages: number };
+};
+
+export const fetchOrders = (params?: OrdersQueryParams) => {
+  const qs = new URLSearchParams();
+  if (params) {
+    if (params.status) qs.set("status", params.status);
+    if (params.paymentStatus) qs.set("paymentStatus", params.paymentStatus);
+    if (params.from) qs.set("from", params.from);
+    if (params.to) qs.set("to", params.to);
+    if (params.page) qs.set("page", String(params.page));
+    if (params.limit) qs.set("limit", String(params.limit));
+  }
+  const path = qs.toString() ? `/api/orders?${qs.toString()}` : "/api/orders";
+  return apiFetch<OrdersResponse>(path);
+};
+
+export const useOrders = (params?: OrdersQueryParams) =>
+  useQuery<OrdersResponse, Error>({
+    queryKey: ["orders", params ?? {}],
+    queryFn: () => fetchOrders(params),
+  });
+
+export const fetchOrderByNumber = (number: string) =>
+  apiFetch<any>(`/api/orders/${number}`);
+
+export const fetchOrderStatus = (orderId: string) =>
+  apiFetch<any>(`/api/orders/${orderId}/status`);
+
+export const updateOrderStatus = (orderId: string, body: any) =>
+  apiFetch<any>(`/api/orders/${orderId}/status`, {
+    method: "PUT",
+    body: JSON.stringify(body),
+  });
+
+export const cancelOrder = (orderId: string) =>
+  apiFetch<any>(`/api/orders/${orderId}/cancel`, { method: "PUT" });
+
+export const fetchOrdersSummary = () => apiFetch<any>("/api/orders/summary");
+
+export const useCancelOrder = () => {
+  const qc = useQueryClient();
+  return useMutation<any, Error, string>({
+    mutationFn: cancelOrder,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["orders"] }),
+  });
+};
+
+export const useUpdateOrderStatus = () => {
+  const qc = useQueryClient();
+  return useMutation<any, Error, { orderId: string; body: any }>({
+    mutationFn: ({ orderId, body }) => updateOrderStatus(orderId, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["orders"] }),
+  });
+};
+
+export const useOrdersSummary = () =>
+  useQuery<any, Error>({
+    queryKey: ["orders", "summary"],
+    queryFn: fetchOrdersSummary,
+  });
+
+export const useOrderByNumber = (number?: string) =>
+  useQuery<any, Error>({
+    queryKey: ["order", number],
+    queryFn: () => fetchOrderByNumber(number!),
+    enabled: Boolean(number),
+  });
+
+export const useOrderStatus = (orderId?: string) =>
+  useQuery<any, Error>({
+    queryKey: ["order", orderId, "status"],
+    queryFn: () => fetchOrderStatus(orderId!),
+    enabled: Boolean(orderId),
+  });
+
+// Settings
+export const fetchSettings = () => apiFetch<any>("/api/settings");
+
+export const useSettings = () =>
+  useQuery<any, Error>({
+    queryKey: ["settings"],
+    queryFn: fetchSettings,
+  });
+
+export const updateSettings = (body: any) =>
+  apiFetch<any>("/api/settings", { method: "PUT", body: JSON.stringify(body) });
+
+export const useUpdateSettings = () => {
+  const qc = useQueryClient();
+  return useMutation<any, Error, any>({
+    mutationFn: updateSettings,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["settings"] }),
+  });
+};
