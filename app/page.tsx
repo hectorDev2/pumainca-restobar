@@ -27,7 +27,7 @@ export default function Home() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/30 text-xs font-bold mb-6 tracking-wide uppercase backdrop-blur-sm">
             <span className="material-symbols-outlined text-sm">stars</span> Experiencia Gastronómica
           </div>
-          <h1 className="text-white text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-6 drop-shadow-2xl">
+          <h1 className="text-white text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-6 drop-shadow-2xl">
             {title}<br/>
             <span className="text-primary">{subtitle}</span>
           </h1>
@@ -56,10 +56,10 @@ export default function Home() {
       </section>
 
       {/* History & Philosophy */}
-      <section className="py-24 bg-black relative overflow-hidden">
-        <div className="container max-w-[1100px] mx-auto px-4 space-y-32">
+      <section className="py-16 md:py-24 bg-black relative overflow-hidden">
+        <div className="container max-w-[1100px] mx-auto px-4 space-y-20 md:space-y-32">
           
-          <div className="flex flex-col lg:flex-row items-center gap-16" id="historia">
+          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16" id="historia">
             <div className="flex-1 space-y-6">
               <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-xs">
                 <span className="material-symbols-outlined text-sm">history_edu</span> {content?.history_label ?? "Orígenes"}
@@ -80,7 +80,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row-reverse items-center gap-16" id="filosofia">
+          <div className="flex flex-col lg:flex-row-reverse items-center gap-10 lg:gap-16" id="filosofia">
             <div className="flex-1 space-y-6">
               <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-xs">
                 <span className="material-symbols-outlined text-sm">spa</span> {content?.philosophy_label ?? "Filosofía"}
@@ -91,7 +91,7 @@ export default function Home() {
               <p className="text-gray-300 text-lg leading-relaxed">
                 {content?.philosophy_description ?? "Creemos que la verdadera cocina comienza en la tierra. Trabajamos directamente con agricultores locales para asegurar la frescura y calidad en cada plato."}
               </p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3 bg-surface-dark p-4 rounded-xl border border-white/10">
                   <span className="material-symbols-outlined text-primary">eco</span>
                   <span className="text-sm font-semibold text-gray-200">{content?.philosophy_badge_1 ?? "100% Orgánico"}</span>
@@ -117,11 +117,11 @@ export default function Home() {
           <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfxQRQI_nY_alVkqrgyxhTercMQFH1L_JrrMiE_17KFcyOYzXgs6Hew6Jt_xIO71kyJTwmIH6nyayvR6bayj9QTk-dyQEX3lA3e2MvbQaenoeAlZ6sq9S3vUoZBWJkOIquC4jvCTRMERmgtYbjtyN4Q1wRazaeTZhvooOAk7aQ8C5MIGS0yALbovg16DglqAL6lbYMIuS45PoTT8zU5Xxj1CqNCBuKSpZfqQm6gGtG7-6ETDKmueADaq4vO7TSOt5t9uWGiipSJjw1" className="w-full h-full object-cover" alt="" />
         </div>
         <div className="relative z-10 container mx-auto px-4">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-8">¿Listo para vivir la experiencia?</h2>
-          <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">Reserva tu mesa para este fin de semana y disfruta de nuestro menú degustación especial.</p>
+          <h2 className="text-3xl md:text-5xl font-black text-white mb-6 md:mb-8">¿Listo para vivir la experiencia?</h2>
+          <p className="text-gray-400 text-lg mb-8 md:mb-10 max-w-2xl mx-auto">Reserva tu mesa para este fin de semana y disfruta de nuestro menú degustación especial.</p>
           <Link 
             href="/menu"
-            className="bg-primary hover:bg-primary-dark text-white text-lg font-bold px-12 py-4 rounded-full shadow-2xl shadow-red-600/20 transform hover:scale-105 transition-all inline-block">
+            className="bg-primary hover:bg-primary-dark text-white text-lg font-bold px-12 py-4 rounded-full shadow-2xl shadow-red-600/20 transform hover:scale-105 transition-all inline-block w-full sm:w-auto">
             Hacer mi Pedido
           </Link>
         </div>
