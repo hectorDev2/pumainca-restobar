@@ -404,7 +404,6 @@ export const useOrderStatus = (orderId?: string) =>
     enabled: Boolean(orderId),
   });
 
-// Reservations
 export type Reservation = {
   id: string;
   reservation_code: string;
@@ -420,15 +419,32 @@ export type Reservation = {
   message?: string;
 };
 
+const normalizeReservation = (backend: any): Reservation => {
+  return {
+    id: backend.id,
+    reservation_code: backend.reservation_code,
+    fullName: backend.full_name ?? backend.fullName,
+    email: backend.email,
+    phoneNumber: backend.phone_number ?? backend.phoneNumber,
+    reservationDate: backend.reservation_date ?? backend.reservationDate,
+    reservationTime: backend.reservation_time ?? backend.reservationTime,
+    numberOfGuests: backend.number_of_guests ?? backend.numberOfGuests,
+    specialRequests: backend.special_requests ?? backend.specialRequests,
+    status: backend.status,
+    created_at: backend.created_at,
+    message: backend.message,
+  };
+};
+
 export const fetchReservations = (params?: { email?: string }) => {
   const qs = new URLSearchParams();
   if (params?.email) qs.set("email", params.email);
   const path = qs.toString() ? `/api/reservations?${qs.toString()}` : "/api/reservations";
-  return apiFetch<Reservation[]>(path);
+  return apiFetch<any[]>(path).then((data) => data.map(normalizeReservation));
 };
 
 export const fetchReservationByCode = (code: string) =>
-  apiFetch<Reservation>(`/api/reservations/${code}`);
+  apiFetch<any>(`/api/reservations/${code}`).then(normalizeReservation);
 
 export const useReservations = (email?: string) =>
   useQuery<Reservation[], Error>({
@@ -444,22 +460,4 @@ export const useReservationByCode = (code?: string) =>
     enabled: Boolean(code),
   });
 
-// Settings
-export const fetchSettings = () => apiFetch<any>("/api/settings");
 
-export const useSettings = () =>
-  useQuery<any, Error>({
-    queryKey: ["settings"],
-    queryFn: fetchSettings,
-  });
-
-export const updateSettings = (body: any) =>
-  apiFetch<any>("/api/settings", { method: "PUT", body: JSON.stringify(body) });
-
-export const useUpdateSettings = () => {
-  const qc = useQueryClient();
-  return useMutation<any, Error, any>({
-    mutationFn: updateSettings,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["settings"] }),
-  });
-};
