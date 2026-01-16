@@ -143,7 +143,8 @@ export default function ReservationPage() {
       }
 
       setConfirmation({
-        message: data?.message ?? data?.text ?? "Tu mesa quedó reservada con éxito.",
+        message:
+          data?.message ?? data?.text ?? "Tu mesa quedó reservada con éxito.",
         code: data?.reservation_code ?? data?.code,
       });
     } catch (error) {
