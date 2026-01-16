@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Category, Product, SubCategory } from "@/types";
 import { apiFetch } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
 export type ProductFilters = {
   category?: string;
@@ -475,3 +476,39 @@ export const useReservationByCode = (code?: string) =>
   });
 
 
+
+
+
+export const fetchSiteContent = async () => {
+  const { data, error } = await supabase.from("site_content").select("*");
+  if (error) throw error;
+  return data.reduce((acc: any, item: any) => {
+    acc[item.key] = item.value;
+    return acc;
+  }, {}) as Record<string, string>;
+};
+
+export const updateSiteContent = async (content: Record<string, string>) => {
+  const updates = Object.entries(content).map(([key, value]) => ({
+    key,
+    value,
+  }));
+  
+  const { error } = await supabase.from("site_content").upsert(updates);
+  if (error) throw error;
+  return true;
+};
+
+export const useSiteContent = () =>
+  useQuery<Record<string, string>, Error>({
+    queryKey: ["siteContent"],
+    queryFn: fetchSiteContent,
+  });
+
+export const useUpdateSiteContent = () => {
+  const qc = useQueryClient();
+  return useMutation<any, Error, Record<string, string>>({
+    mutationFn: updateSiteContent,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["siteContent"] }),
+  });
+};
