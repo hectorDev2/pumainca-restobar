@@ -162,9 +162,9 @@ export default function AdminPage() {
   // createCategory handled inside CreateCategoryForm
 
   const isSaving =
-    createProductMutation.isLoading ||
-    updateProductMutation.isLoading ||
-    uploadImageMutation.isLoading;
+    createProductMutation.isPending ||
+    updateProductMutation.isPending ||
+    uploadImageMutation.isPending;
 
   // --- Memos & Effects ---
   const selectedProduct = useMemo(
@@ -325,32 +325,20 @@ export default function AdminPage() {
     if (editFormState.displayOrder)
       formPayload.append("display_order", editFormState.displayOrder);
 
-    // No adjuntamos la imagen al PUT para evitar duplicados.
+    // Adjuntamos la imagen al PUT si existe
+    if (editMainImage) {
+      formPayload.append("image", editMainImage);
+    }
+
     updateProductMutation.mutate(
       { productId: editProductId, formData: formPayload },
       {
-        onSuccess: (product) => {
-          if (editMainImage) {
-            uploadImageMutation.mutate(
-              { productId: product.id, file: editMainImage },
-              {
-                onSuccess: () => {
-                  setEditModalOpen(false);
-                  try {
-                    router.refresh();
-                  } catch (err) {
-                    /* ignore */
-                  }
-                },
-              }
-            );
-          } else {
-            setEditModalOpen(false);
-            try {
-              router.refresh();
-            } catch (err) {
-              /* ignore */
-            }
+        onSuccess: () => {
+          setEditModalOpen(false);
+          try {
+            router.refresh();
+          } catch (err) {
+            /* ignore */
           }
         },
       }
@@ -941,10 +929,10 @@ export default function AdminPage() {
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  disabled={createProductMutation.isLoading}
+                  disabled={createProductMutation.isPending}
                   className="bg-blue-600 px-6 py-3 rounded-2xl font-bold disabled:opacity-50"
                 >
-                  {createProductMutation.isLoading
+                  {createProductMutation.isPending
                     ? "Creando..."
                     : "Crear producto"}
                 </button>
