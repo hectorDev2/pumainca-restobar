@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
 
 const Navbar: React.FC<Props> = ({ showSearch = true }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const { cartCount } = useCart();
 
   const isActive = (path: string) => {
@@ -34,6 +35,14 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                 type="text" 
                 placeholder="Buscar plato, ingrediente..."
                 className="w-full bg-surface-dark border-none rounded-xl pl-12 py-2.5 text-sm text-white focus:ring-2 focus:ring-primary/50 transition-all"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const term = (e.target as HTMLInputElement).value;
+                    if (term.trim()) {
+                      router.push(`/menu?search=${encodeURIComponent(term)}`);
+                    }
+                  }
+                }}
               />
             </div>
           )}
