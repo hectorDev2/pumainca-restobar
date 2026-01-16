@@ -1,16 +1,17 @@
-"use client";
-
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useProducts } from '@/lib/queries';
+import { useQueryClient } from '@tanstack/react-query';
+import type { Product } from '@/types';
 
 interface Props {
   showSearch?: boolean;
 }
 
 const Navbar: React.FC<Props> = ({ showSearch = true }) => {
+  const queryClient = useQueryClient();
   const pathname = usePathname();
   const router = useRouter();
   const { cartCount } = useCart();
@@ -29,10 +30,45 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Fetch products for in-situ search
-  const { data: searchResults, isFetching } = useProducts({ 
-    search: debouncedTerm.length >= 2 ? debouncedTerm : "___NO_SEARCH___" // Avoid fetching all if term is short
+  // OPTIMIZATION: Check if we already have the full menu loaded in cache (e.g. from visiting /menu)
+  // Key matches the one in useProducts default: category=null, search="", sort="recommended", limit=null
+  const fullMenuKey = ["products", null, "", "recommended", null];
+  const cachedMenuData = queryClient.getQueryData<Product[]>(fullMenuKey);
+
+  // Fetch products from server (Fallback)
+  // Only fetch if we DON'T have cached data or if search term is active
+  // Actually, we always hook useProducts but disable it if we find cache? 
+  // No, easiest is to let it fetch or simply use the data we have.
+  // If we have cachedData, we don't *need* to fetch, but React Query hooks must strictly follow rules of hooks.
+  // So we pass a condition to `enabled`.
+  
+  const shouldFetchFromServer = debouncedTerm.length >= 2 && !cachedMenuData;
+
+  const { data: serverSearchResults, isFetching } = useProducts({ 
+    search: debouncedTerm.length >= 2 ? debouncedTerm : "___NO_SEARCH___",
+    limit: 6
   });
+  
+  // Combine results
+  const searchResults = React.useMemo(() => {
+    if (debouncedTerm.length < 2) return [];
+
+    // Prioritize Local Cache Filtering
+    if (cachedMenuData) {
+        const lowerTerm = debouncedTerm.toLowerCase();
+        return cachedMenuData.filter(p => 
+            p.name.toLowerCase().includes(lowerTerm) || 
+            (p.category && p.category.toLowerCase().includes(lowerTerm))
+        ).slice(0, 6);
+    }
+
+    return serverSearchResults || [];
+  }, [debouncedTerm, cachedMenuData, serverSearchResults]);
+
+  // Determine loading state
+  // If using cache, loading is essentially false (instant).
+  // If using server, use isFetching.
+  const isLoading = !cachedMenuData && isFetching;
 
   const isActive = (path: string) => {
     return pathname === path ? 
@@ -99,7 +135,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
               {/* In-situ Search Dropdown */}
               {showDropdown && searchTerm.length >= 2 && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    {isFetching ? (
+                    {isLoading ? (
                         <div className="p-4 text-center text-zinc-500 text-sm flex items-center justify-center gap-2">
                             <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
                             Buscando...
@@ -110,18 +146,9 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                                 <button
                                     key={product.id}
                                     onClick={() => {
-                                        router.push(`/menu?search=${encodeURIComponent(product.name)}`); // Navigate to menu focused on product or just filter
-                                        // Alternatively: `/menu/${product.id}` if detail page exists. 
-                                        // Logic: User wants to see the product. Menu filter is safest if detail page is modal or not ready.
-                                        // Wait, user said "insitu search", usually implies going to the result.
-                                        // Let's assume navigating to menu with filter is good, OR detail.
-                                        // I'll stick to search param to be safe as per previous request.
-                                        // Actually, let's better navigate to search param filter to show it in context.
-                                        // Or if detail page /menu/[id] works, that's even better.
-                                        // Let's use /menu?search=... for broader context.
-                                        setSearchTerm(product.name);
+                                        setSearchTerm("");
                                         setShowDropdown(false);
-                                        router.push(`/menu?search=${encodeURIComponent(product.name)}`);
+                                        router.push(`/menu/${product.id}`);
                                     }}
                                     className="w-full text-left p-3 hover:bg-zinc-800 flex items-center gap-3 transition-colors border-b border-zinc-800/50 last:border-0"
                                 >

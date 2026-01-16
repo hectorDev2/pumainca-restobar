@@ -9,6 +9,7 @@ export type ProductFilters = {
   category?: string;
   search?: string;
   sort?: string;
+  limit?: number;
 };
 
 type BackendProductPrice = {
@@ -231,6 +232,10 @@ export const fetchProducts = (filters: ProductFilters) => {
     params.set("sort", filters.sort);
   }
 
+  if (filters.limit) {
+    params.set("limit", String(filters.limit));
+  }
+
   const query = params.toString();
   const path = query ? `/api/products?${query}` : "/api/products";
   return apiFetch<BackendProduct[]>(path).then((products) =>
@@ -245,6 +250,7 @@ export const useProducts = (filters: ProductFilters) =>
       filters.category ?? null,
       filters.search ?? "",
       filters.sort ?? "",
+      filters.limit ?? null,
     ],
     queryFn: () => fetchProducts(filters),
   });
