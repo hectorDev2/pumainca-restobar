@@ -51,6 +51,9 @@ Acceso protegido mediante autenticación.
     -   Historial completo de reservas.
     -   Filtros por Email o Código de Reserva.
     -   **Gestión de Estado**: Aprueba o cancela reservas con un clic.
+-   **Gestión de Contenido (`/admin/content`)**:
+    -   Edita los textos principales de la página de inicio (Título, Subtítulo, Descripción).
+    -   Actualización en tiempo real.
 -   **Inventario**:
     -   Creación y edición de productos.
     -   Subida de imágenes (Supabase Storage).
