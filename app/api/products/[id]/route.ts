@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { uploadImage } from "@/lib/imagekit";
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-z0-9.-]/gi, "_");
@@ -135,17 +136,34 @@ export async function PUT(
     const imageField = formData.get("image") as File | null;
     if (imageField && (imageField as any).size) {
         const file = imageField as File;
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
         const ext = file.name.split(".").pop() || "jpg";
-        const fileName = `${Date.now()}-${sanitizeFileName(updates.name || id)}.${ext}`;
-        const filePath = `products/${fileName}`;
+        const fileName = `${sanitizeFileName(updates.name || id)}.${ext}`;
         
-        const { error: uploadError } = await supabase.storage.from('menu').upload(filePath, buffer);
-        if (uploadError) throw uploadError;
+        let folder = "products";
+        let targetCategoryId = category_id; // From form data if present
+
+        if (!targetCategoryId) {
+            // Fetch current category if not updating it
+             const { data: prod } = await supabase
+                .from('products')
+                .select('category_id')
+                .eq('id', id)
+                .single();
+             targetCategoryId = prod?.category_id;
+        }
+
+        if (targetCategoryId) {
+            const { data: cat } = await supabase
+                .from('categories')
+                .select('name')
+                .eq('id', targetCategoryId)
+                .single();
+            if (cat?.name) {
+                folder = `products/${sanitizeFileName(cat.name)}`;
+            }
+        }
         
-        const { data: publicUrlData } = supabase.storage.from('menu').getPublicUrl(filePath);
-        updates.image_url = publicUrlData.publicUrl;
+        updates.image_url = await uploadImage(file, fileName, folder);
     }
 
     const { data: updated, error: updateError } = await supabase
