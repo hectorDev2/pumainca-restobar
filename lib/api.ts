@@ -5,7 +5,32 @@ export async function apiFetch<T>(
   init?: RequestInit
 ): Promise<T> {
   const url = `${API_BASE_URL}${path}`;
-  const response = await fetch(url, init);
+
+  // Obtener token del localStorage
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  // Construir headers incluyendo el token si existe
+  const headers: HeadersInit = {
+    ...(init?.headers || {}),
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  // No establecer Content-Type si el body es FormData
+  // (el navegador lo establece automáticamente con el boundary correcto)
+  const isFormData = init?.body instanceof FormData;
+  if (!isFormData && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const response = await fetch(url, {
+    ...init,
+    headers,
+  });
+
   const payload = (await response.json().catch(() => null)) as any;
 
   if (!response.ok) {
