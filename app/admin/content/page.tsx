@@ -4,27 +4,32 @@ import React, { useEffect, useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminHeader from "@/components/AdminHeader";
 import { useSiteContent, useUpdateSiteContent } from "@/lib/queries";
-
+import { uploadImage } from "@/lib/imagekit";
 
 export default function AdminContentPage() {
   const { data: content, isLoading: isContentLoading } = useSiteContent();
   const updateMutation = useUpdateSiteContent();
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     hero_title: "",
     hero_subtitle: "",
     hero_description: "",
+    hero_background_image: "",
     history_label: "",
     history_title: "",
     history_description: "",
+    history_image: "",
     footer_description: "",
     contact_address: "",
     contact_phone: "",
     philosophy_label: "",
     philosophy_title: "",
     philosophy_description: "",
+    philosophy_image: "",
     philosophy_badge_1: "",
     philosophy_badge_2: "",
+    cta_background_image: "",
   });
 
   const [message, setMessage] = useState<string | null>(null);
@@ -35,17 +40,21 @@ export default function AdminContentPage() {
         hero_title: content.hero_title || "",
         hero_subtitle: content.hero_subtitle || "",
         hero_description: content.hero_description || "",
+        hero_background_image: content.hero_background_image || "",
         history_label: content.history_label || "",
         history_title: content.history_title || "",
         history_description: content.history_description || "",
+        history_image: content.history_image || "",
         footer_description: content.footer_description || "",
         contact_address: content.contact_address || "",
         contact_phone: content.contact_phone || "",
         philosophy_label: content.philosophy_label || "",
         philosophy_title: content.philosophy_title || "",
         philosophy_description: content.philosophy_description || "",
+        philosophy_image: content.philosophy_image || "",
         philosophy_badge_1: content.philosophy_badge_1 || "",
         philosophy_badge_2: content.philosophy_badge_2 || "",
+        cta_background_image: content.cta_background_image || "",
       });
     }
   }, [content]);
@@ -53,6 +62,23 @@ export default function AdminContentPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingField(field);
+      const url = await uploadImage(file, field, "site-content");
+      setFormData((prev) => ({ ...prev, [field]: url }));
+      setMessage(`Imagen para ${field} subida correctamente.`);
+    } catch (err) {
+      console.error(err);
+      setMessage("Error al subir imagen.");
+    } finally {
+      setUploadingField(null);
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -125,6 +151,23 @@ export default function AdminContentPage() {
                       placeholder="Descripción breve..."
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-xs text-zinc-400 mb-2">Imagen de Fondo (Hero)</label>
+                    <div className="flex gap-4 items-start">
+                        {formData.hero_background_image && (
+                            <img src={formData.hero_background_image} alt="Hero" className="w-24 h-16 object-cover rounded-md border border-zinc-700" />
+                        )}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e, "hero_background_image")}
+                            disabled={uploadingField === "hero_background_image"}
+                            className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
+                        />
+                        {uploadingField === "hero_background_image" && <span className="text-sm text-primary animate-pulse">Subiendo...</span>}
+                    </div>
+                  </div>
                 </div>
 
                 {/* History Section */}
@@ -165,6 +208,23 @@ export default function AdminContentPage() {
                       className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 focus:border-primary focus:outline-none transition-colors"
                       placeholder="Descripción de la historia..."
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-zinc-400 mb-2">Imagen Historia</label>
+                    <div className="flex gap-4 items-start">
+                        {formData.history_image && (
+                            <img src={formData.history_image} alt="History" className="w-24 h-16 object-cover rounded-md border border-zinc-700" />
+                        )}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e, "history_image")}
+                            disabled={uploadingField === "history_image"}
+                            className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
+                        />
+                         {uploadingField === "history_image" && <span className="text-sm text-primary animate-pulse">Subiendo...</span>}
+                    </div>
                   </div>
                 </div>
 
@@ -230,6 +290,44 @@ export default function AdminContentPage() {
                         type="text"
                         placeholder="Ej: Comercio Justo"
                       />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-zinc-400 mb-2">Imagen Filosofía</label>
+                    <div className="flex gap-4 items-start">
+                        {formData.philosophy_image && (
+                            <img src={formData.philosophy_image} alt="Philosophy" className="w-24 h-16 object-cover rounded-md border border-zinc-700" />
+                        )}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e, "philosophy_image")}
+                            disabled={uploadingField === "philosophy_image"}
+                            className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
+                        />
+                         {uploadingField === "philosophy_image" && <span className="text-sm text-primary animate-pulse">Subiendo...</span>}
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA Section */}
+                <div className="space-y-4 pt-6 border-t border-zinc-800">
+                  <h3 className="text-xl font-bold text-primary">Sección Llamada a la Acción (CTA)</h3>
+                   <div>
+                    <label className="block text-xs text-zinc-400 mb-2">Imagen de Fondo (CTA)</label>
+                    <div className="flex gap-4 items-start">
+                        {formData.cta_background_image && (
+                            <img src={formData.cta_background_image} alt="CTA" className="w-24 h-16 object-cover rounded-md border border-zinc-700" />
+                        )}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e, "cta_background_image")}
+                            disabled={uploadingField === "cta_background_image"}
+                            className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
+                        />
+                         {uploadingField === "cta_background_image" && <span className="text-sm text-primary animate-pulse">Subiendo...</span>}
                     </div>
                   </div>
                 </div>
