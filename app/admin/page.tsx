@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import Navbar from "@/components/Navbar";
+import AdminHeader from "@/components/AdminHeader";
 import {
   useCategories,
   useProducts,
@@ -359,7 +359,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      <Navbar showSearch={false} />
+      <AdminHeader />
       {isSaving && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60">
           <div className="flex flex-col items-center gap-4">
