@@ -35,6 +35,12 @@ const AdminHeader: React.FC = () => {
             >
               Ajustes
             </Link>
+            <Link
+              href="/admin/reservations"
+              className={isActive("/admin/reservations")}
+            >
+              Reservas
+            </Link>
           </nav>
         </div>
 

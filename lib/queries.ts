@@ -404,6 +404,46 @@ export const useOrderStatus = (orderId?: string) =>
     enabled: Boolean(orderId),
   });
 
+// Reservations
+export type Reservation = {
+  id: string;
+  reservation_code: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  reservationDate: string;
+  reservationTime: string;
+  numberOfGuests: number;
+  specialRequests?: string;
+  status?: string;
+  created_at?: string;
+  message?: string;
+};
+
+export const fetchReservations = (params?: { email?: string }) => {
+  const qs = new URLSearchParams();
+  if (params?.email) qs.set("email", params.email);
+  const path = qs.toString() ? `/api/reservations?${qs.toString()}` : "/api/reservations";
+  return apiFetch<Reservation[]>(path);
+};
+
+export const fetchReservationByCode = (code: string) =>
+  apiFetch<Reservation>(`/api/reservations/${code}`);
+
+export const useReservations = (email?: string) =>
+  useQuery<Reservation[], Error>({
+    queryKey: ["reservations", email ?? null],
+    queryFn: () => fetchReservations(email ? { email } : undefined),
+    enabled: true,
+  });
+
+export const useReservationByCode = (code?: string) =>
+  useQuery<Reservation, Error>({
+    queryKey: ["reservation", code],
+    queryFn: () => fetchReservationByCode(code!),
+    enabled: Boolean(code),
+  });
+
 // Settings
 export const fetchSettings = () => apiFetch<any>("/api/settings");
 
