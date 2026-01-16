@@ -4,8 +4,15 @@ import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useSiteContent } from '@/lib/queries';
 
 export default function Home() {
+  const { data: content } = useSiteContent();
+
+  const title = content?.hero_title ?? "Sabores Auténticos,";
+  const subtitle = content?.hero_subtitle ?? "Experiencia Inolvidable.";
+  const description = content?.hero_description ?? "Descubre la mejor cocina de autor en un ambiente único y sofisticado. Donde la tradición se encuentra con la innovación en cada plato.";
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -21,11 +28,11 @@ export default function Home() {
             <span className="material-symbols-outlined text-sm">stars</span> Experiencia Gastronómica
           </div>
           <h1 className="text-white text-5xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-6 drop-shadow-2xl">
-            Sabores Auténticos,<br/>
-            <span className="text-primary">Experiencia Inolvidable.</span>
+            {title}<br/>
+            <span className="text-primary">{subtitle}</span>
           </h1>
           <p className="text-gray-200 text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto mb-10 text-opacity-90">
-            Descubre la mejor cocina de autor en un ambiente único y sofisticado. Donde la tradición se encuentra con la innovación en cada plato.
+            {description}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
@@ -55,13 +62,13 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center gap-16" id="historia">
             <div className="flex-1 space-y-6">
               <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-xs">
-                <span className="material-symbols-outlined text-sm">history_edu</span> Orígenes
+                <span className="material-symbols-outlined text-sm">history_edu</span> {content?.history_label ?? "Orígenes"}
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
-                Raíces profundas en los Andes
+                {content?.history_title ?? "Raíces profundas en los Andes"}
               </h2>
               <p className="text-gray-300 text-lg leading-relaxed">
-                PUMAINCA nació de la pasión por rescatar los sabores ancestrales y fusionarlos con técnicas modernas. Nuestra historia comienza en los valles altos, donde los ingredientes cuentan historias de la tierra y el sol.
+                {content?.history_description ?? "PUMAINCA nació de la pasión por rescatar los sabores ancestrales y fusionarlos con técnicas modernas. Nuestra historia comienza en los valles altos, donde los ingredientes cuentan historias de la tierra y el sol."}
               </p>
               <button className="inline-flex items-center text-primary font-bold hover:text-primary-dark transition-colors border-b-2 border-primary pb-1">
                 Leer la historia completa <span className="material-symbols-outlined text-sm ml-1">arrow_forward</span>
@@ -76,22 +83,22 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row-reverse items-center gap-16" id="filosofia">
             <div className="flex-1 space-y-6">
               <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-xs">
-                <span className="material-symbols-outlined text-sm">spa</span> Filosofía
+                <span className="material-symbols-outlined text-sm">spa</span> {content?.philosophy_label ?? "Filosofía"}
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
-                Respeto por el ingrediente
+                {content?.philosophy_title ?? "Respeto por el ingrediente"}
               </h2>
               <p className="text-gray-300 text-lg leading-relaxed">
-                Creemos que la verdadera cocina comienza en la tierra. Trabajamos directamente con agricultores locales para asegurar la frescura y calidad en cada plato.
+                {content?.philosophy_description ?? "Creemos que la verdadera cocina comienza en la tierra. Trabajamos directamente con agricultores locales para asegurar la frescura y calidad en cada plato."}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-3 bg-surface-dark p-4 rounded-xl border border-white/10">
                   <span className="material-symbols-outlined text-primary">eco</span>
-                  <span className="text-sm font-semibold text-gray-200">100% Orgánico</span>
+                  <span className="text-sm font-semibold text-gray-200">{content?.philosophy_badge_1 ?? "100% Orgánico"}</span>
                 </div>
                 <div className="flex items-center gap-3 bg-surface-dark p-4 rounded-xl border border-white/10">
                   <span className="material-symbols-outlined text-primary">handshake</span>
-                  <span className="text-sm font-semibold text-gray-200">Comercio Justo</span>
+                  <span className="text-sm font-semibold text-gray-200">{content?.philosophy_badge_2 ?? "Comercio Justo"}</span>
                 </div>
               </div>
             </div>
