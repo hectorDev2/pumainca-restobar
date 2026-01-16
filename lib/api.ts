@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://localhost:4000";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 export async function apiFetch<T>(
   path: string,
@@ -11,8 +11,8 @@ export async function apiFetch<T>(
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   // Construir headers incluyendo el token si existe
-  const headers: HeadersInit = {
-    ...(init?.headers || {}),
+  const headers: Record<string, string> = {
+    ...(init?.headers as Record<string, string> || {}),
   };
 
   if (token) {
