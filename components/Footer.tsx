@@ -1,7 +1,11 @@
+"use client";
 
 import React from 'react';
+import { useSiteContent } from '@/lib/queries';
 
 const Footer: React.FC = () => {
+  const { data: content } = useSiteContent();
+
   return (
     <footer className="bg-black border-t border-zinc-900 pt-16 pb-8">
       <div className="max-w-[1280px] mx-auto px-6 sm:px-10">
@@ -11,7 +15,7 @@ const Footer: React.FC = () => {
               <img src="/logo.png" className="w-[150px]" alt="Pumainca" />
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed">
-              Cocina de autor con raíces andinas y visión contemporánea. Una experiencia culinaria diseñada para despertar los sentidos.
+              {content?.footer_description ?? "Cocina de autor con raíces andinas y visión contemporánea. Una experiencia culinaria diseñada para despertar los sentidos."}
             </p>
           </div>
           <div>
@@ -28,11 +32,11 @@ const Footer: React.FC = () => {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-primary text-sm mt-0.5">location_on</span>
-                <span className="text-zinc-500 text-sm">Av. La Mar 1234, Miraflores<br/>Lima, Perú</span>
+                <span className="text-zinc-500 text-sm whitespace-pre-line">{content?.contact_address ?? "Av. La Mar 1234, Miraflores\nLima, Perú"}</span>
               </li>
               <li className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-sm">call</span>
-                <span className="text-zinc-500 text-sm">+51 1 555-0199</span>
+                <span className="text-zinc-500 text-sm">{content?.contact_phone ?? "+51 1 555-0199"}</span>
               </li>
             </ul>
           </div>
