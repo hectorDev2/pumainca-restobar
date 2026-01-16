@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminHeader from "@/components/AdminHeader";
-import { useReservations, useReservationByCode, Reservation } from "@/lib/queries";
+import { useReservations, useReservationByCode, useUpdateReservationStatus, Reservation } from "@/lib/queries";
 
 export default function AdminReservationsPage() {
   const [emailFilter, setEmailFilter] = useState("");
@@ -12,8 +12,18 @@ export default function AdminReservationsPage() {
 
   const { data: list, isLoading: loadingList } = useReservations(emailFilter || undefined);
   const { data: byCode, isLoading: loadingCode } = useReservationByCode(codeFilter || undefined);
+  const updateMutation = useUpdateReservationStatus();
 
   const results = codeFilter ? (byCode ? [byCode] : []) : list ?? [];
+
+  const getStatusColor = (status?: string) => {
+    switch(status) {
+      case 'completed': return 'text-green-500';
+      case 'confirmed': return 'text-blue-500';
+      case 'cancelled': return 'text-red-500';
+      default: return 'text-yellow-500';
+    }
+  };
 
   return (
     <ProtectedRoute>
@@ -43,18 +53,18 @@ export default function AdminReservationsPage() {
             </div>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-            <h2 className="text-lg font-semibold mb-4">Resultados</h2>
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+            <h2 className="text-lg font-semibold p-4 border-b border-zinc-800">Resultados</h2>
 
             {loadingList || loadingCode ? (
-              <p className="text-zinc-400">Cargando...</p>
+              <p className="p-4 text-zinc-400">Cargando...</p>
             ) : results.length === 0 ? (
-              <p className="text-zinc-500">No se encontraron reservas.</p>
+              <p className="p-4 text-zinc-500">No se encontraron reservas.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
-                  <thead>
-                    <tr className="text-zinc-400 text-sm">
+                  <thead className="bg-black/20">
+                    <tr className="text-zinc-400 text-sm border-b border-zinc-800">
                       <th className="p-3">Código</th>
                       <th className="p-3">Nombre</th>
                       <th className="p-3">Email</th>
@@ -67,16 +77,28 @@ export default function AdminReservationsPage() {
                   </thead>
                   <tbody>
                     {results.map((r) => (
-                      <tr key={r.reservation_code} className="border-t border-zinc-800">
-                        <td className="p-3 align-top">{r.reservation_code}</td>
-                        <td className="p-3 align-top">{r.fullName}</td>
-                        <td className="p-3 align-top">{r.email}</td>
-                        <td className="p-3 align-top">{r.reservationDate}</td>
-                        <td className="p-3 align-top">{r.reservationTime}</td>
-                        <td className="p-3 align-top">{r.numberOfGuests}</td>
-                        <td className="p-3 align-top">{r.status ?? "—"}</td>
-                        <td className="p-3 align-top">
-                          <button onClick={() => setSelected(r)} className="bg-white/5 px-3 py-1 rounded-md">Ver</button>
+                      <tr key={r.reservation_code} className="border-b border-zinc-800 hover:bg-zinc-800/30">
+                        <td className="p-3 align-middle font-mono text-sm text-zinc-400">{r.reservation_code}</td>
+                        <td className="p-3 align-middle font-bold">{r.fullName}</td>
+                        <td className="p-3 align-middle text-sm text-zinc-400">{r.email}</td>
+                        <td className="p-3 align-middle">{r.reservationDate}</td>
+                        <td className="p-3 align-middle">{r.reservationTime}</td>
+                        <td className="p-3 align-middle text-center">{r.numberOfGuests}</td>
+                        <td className="p-3 align-middle">
+                           <select
+                              className={`bg-transparent border-none font-bold text-sm focus:ring-0 cursor-pointer rounded px-2 py-1 ${getStatusColor(r.status)}`}
+                              value={r.status ?? "pending"}
+                              onChange={(e) => updateMutation.mutate({ code: r.reservation_code, status: e.target.value })}
+                              disabled={updateMutation.isPending}
+                            >
+                              <option value="pending" className="text-black">Pendiente</option>
+                              <option value="confirmed" className="text-black">Confirmado</option>
+                              <option value="completed" className="text-black">Completado</option>
+                              <option value="cancelled" className="text-black">Cancelado</option>
+                            </select>
+                        </td>
+                        <td className="p-3 align-middle">
+                          <button onClick={() => setSelected(r)} className="bg-zinc-800 hover:bg-zinc-700 transition-colors px-3 py-1 rounded-md text-sm">Ver</button>
                         </td>
                       </tr>
                     ))}
@@ -87,20 +109,53 @@ export default function AdminReservationsPage() {
           </div>
 
           {selected && (
-            <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4">
-              <div className="bg-zinc-900 p-6 rounded-2xl max-w-lg w-full">
-                <h3 className="text-xl font-bold mb-2">Reserva {selected.reservation_code}</h3>
-                <p className="text-zinc-400 mb-1">Nombre: <strong className="text-white">{selected.fullName}</strong></p>
-                <p className="text-zinc-400 mb-1">Email: <strong className="text-white">{selected.email}</strong></p>
-                <p className="text-zinc-400 mb-1">Teléfono: <strong className="text-white">{selected.phoneNumber}</strong></p>
-                <p className="text-zinc-400 mb-1">Fecha: <strong className="text-white">{selected.reservationDate}</strong></p>
-                <p className="text-zinc-400 mb-1">Hora: <strong className="text-white">{selected.reservationTime}</strong></p>
-                <p className="text-zinc-400 mb-1">Personas: <strong className="text-white">{selected.numberOfGuests}</strong></p>
-                {selected.specialRequests && <p className="text-zinc-400 mb-1">Solicitudes: <strong className="text-white">{selected.specialRequests}</strong></p>}
-                <p className="text-zinc-400 mb-4">Status: <strong className="text-white">{selected.status ?? '—'}</strong></p>
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl max-w-lg w-full shadow-2xl">
+                <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold">Reserva {selected.reservation_code}</h3>
+                    <button onClick={() => setSelected(null)} className="text-zinc-400 hover:text-white">✕</button>
+                </div>
+                
+                <div className="space-y-3 mb-6">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-zinc-500 text-xs uppercase font-bold">Cliente</p>
+                            <p className="text-white font-medium">{selected.fullName}</p>
+                            <p className="text-zinc-400 text-sm">{selected.email}</p>
+                            <p className="text-zinc-400 text-sm">{selected.phoneNumber}</p>
+                        </div>
+                         <div>
+                            <p className="text-zinc-500 text-xs uppercase font-bold">Detalles</p>
+                            <p className="text-white">{selected.reservationDate} a las {selected.reservationTime}</p>
+                            <p className="text-zinc-400 text-sm">{selected.numberOfGuests} personas</p>
+                        </div>
+                    </div>
+                    
+                    {selected.specialRequests && (
+                        <div className="bg-amber-900/10 border border-amber-900/30 p-3 rounded-lg">
+                            <p className="text-amber-500 text-xs uppercase font-bold mb-1">Solicitudes Especiales</p>
+                            <p className="text-amber-200 text-sm italic">{selected.specialRequests}</p>
+                        </div>
+                    )}
+
+                    <div>
+                         <p className="text-zinc-500 text-xs uppercase font-bold mb-2">Estado de la Reserva</p>
+                         <select
+                              className={`w-full bg-black/50 border border-zinc-700 rounded-xl px-4 py-2 font-bold ${getStatusColor(selected.status)}`}
+                              value={selected.status ?? "pending"}
+                              onChange={(e) => updateMutation.mutate({ code: selected.reservation_code, status: e.target.value })}
+                              disabled={updateMutation.isPending}
+                            >
+                              <option value="pending" className="text-black">Pendiente</option>
+                              <option value="confirmed" className="text-black">Confirmado</option>
+                              <option value="completed" className="text-black">Completado</option>
+                              <option value="cancelled" className="text-black">Cancelado</option>
+                            </select>
+                    </div>
+                </div>
 
                 <div className="flex justify-end gap-2">
-                  <button onClick={() => setSelected(null)} className="px-4 py-2 rounded-xl bg-white/5">Cerrar</button>
+                  <button onClick={() => setSelected(null)} className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors font-medium">Cerrar</button>
                 </div>
               </div>
             </div>
