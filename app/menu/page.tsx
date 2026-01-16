@@ -141,7 +141,7 @@ function MenuContent() {
 
   return (
     <div className="h-screen flex flex-col bg-background-dark overflow-hidden">
-      <Navbar showSearch={false} />
+      <Navbar />
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
