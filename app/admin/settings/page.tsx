@@ -3,16 +3,15 @@
 import React, { useEffect, useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminHeader from "@/components/AdminHeader";
-import { useUpdateSettings } from "@/lib/queries";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 export default function AdminSettingsPage() {
-  const updateMutation = useUpdateSettings();
   const { user } = useAuth();
-
   const [email, setEmail] = useState(user?.email ?? "");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setEmail(user?.email ?? "");
@@ -21,12 +20,30 @@ export default function AdminSettingsPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
-    const payload: any = { admin_email: email };
-    if (password) payload.admin_password = password;
-    updateMutation.mutate(payload, {
-      onSuccess: (res) => setMessage("Guardado correctamente"),
-      onError: (err: any) => setMessage(err?.message ?? "Error guardando"),
-    });
+    setIsLoading(true);
+
+    try {
+      const attributes: any = {};
+      if (email !== user?.email) attributes.email = email;
+      if (password) attributes.password = password;
+
+      if (Object.keys(attributes).length === 0) {
+        setMessage("No hay cambios para guardar.");
+        setIsLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.updateUser(attributes);
+
+      if (error) throw error;
+      
+      setMessage("Ajustes actualizados. (Si cambiaste el email, verifica tu nueva dirección)");
+      setPassword(""); // Clear password field
+    } catch (err: any) {
+      setMessage(err.message || "Error al actualizar");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -71,10 +88,10 @@ export default function AdminSettingsPage() {
               <div className="flex items-center gap-3">
                 <button
                   type="submit"
-                  disabled={updateMutation.isLoading}
+                  disabled={isLoading}
                   className="bg-green-600 px-4 py-2 rounded-xl font-bold disabled:opacity-50"
                 >
-                  {updateMutation.isLoading ? "Guardando..." : "Guardar"}
+                  {isLoading ? "Guardando..." : "Guardar"}
                 </button>
                 {message && (
                   <div className="text-sm text-amber-300">{message}</div>
