@@ -443,6 +443,20 @@ export const fetchReservations = (params?: { email?: string }) => {
   return apiFetch<any[]>(path).then((data) => data.map(normalizeReservation));
 };
 
+export const updateReservationStatus = (code: string, status: string) =>
+  apiFetch<any>(`/api/reservations/${code}`, {
+    method: "PUT",
+    body: JSON.stringify({ status }),
+  });
+
+export const useUpdateReservationStatus = () => {
+  const qc = useQueryClient();
+  return useMutation<any, Error, { code: string; status: string }>({
+    mutationFn: ({ code, status }) => updateReservationStatus(code, status),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["reservations"] }),
+  });
+};
+
 export const fetchReservationByCode = (code: string) =>
   apiFetch<any>(`/api/reservations/${code}`).then(normalizeReservation);
 
