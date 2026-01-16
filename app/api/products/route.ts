@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { uploadImage } from "@/lib/imagekit";
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-z0-9.-]/gi, "_");
@@ -124,19 +125,22 @@ export async function POST(req: Request) {
     
     if (imageField && (imageField as any).size) {
         const file = imageField as File;
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
         const ext = file.name.split(".").pop() || "jpg";
-        const fileName = `${Date.now()}-${sanitizeFileName(name)}.${ext}`;
-        const filePath = `products/${fileName}`;
+        const fileName = `${sanitizeFileName(name)}.${ext}`;
         
-        const { error: uploadError } = await supabase.storage.from('menu').upload(filePath, buffer, {
-           contentType: file.type
-        });
-        if (uploadError) throw uploadError;
+        let folder = "products";
+        if (categoryId) {
+            const { data: cat } = await supabase
+                .from('categories')
+                .select('name')
+                .eq('id', categoryId)
+                .single();
+            if (cat?.name) {
+                folder = `products/${sanitizeFileName(cat.name)}`;
+            }
+        }
         
-        const { data: publicUrlData } = supabase.storage.from('menu').getPublicUrl(filePath);
-        savedImageUrl = publicUrlData.publicUrl;
+        savedImageUrl = await uploadImage(file, fileName, folder);
     }
 
     const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || `prod-${Date.now()}`;
