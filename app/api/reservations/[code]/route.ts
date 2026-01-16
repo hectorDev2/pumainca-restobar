@@ -23,3 +23,25 @@ export async function GET(
 
   return NextResponse.json(data);
 }
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ code: string }> }
+) {
+  const { code } = await params;
+  try {
+    const body = await req.json();
+    
+    const { data, error } = await supabase
+      .from("reservations")
+      .update(body)
+      .eq("reservation_code", code)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    return NextResponse.json(data);
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
