@@ -1,0 +1,221 @@
+{
+  "meta": {
+    "project": "Pumainca Restobar Digital Management System",
+    "date": "2026-01-15",
+    "prepared_by": "Equipo Pumainca"
+  },
+  "product_overview": "Pumainca Restobar is a modern web platform designed to enhance the dining experience by providing customers with online menu browsing, ordering for pickup, and table reservations while offering administrators a robust backend to manage products, orders, reservations, and site content in real-time.",
+  "core_goals": [
+    "Increase online order sales by 40% within 6 months",
+    "Reduce operational call load by 60%",
+    "Minimize order errors by 80%",
+    "Boost online table reservations by 50%",
+    "Provide a centralized and efficient admin management system",
+    "Ensure a fast, reliable, and accessible user experience across devices",
+    "Facilitate clear pricing, order tracking, and reservation confirmation for customers"
+  ],
+  "key_features": [
+    "Interactive homepage with hero section, restaurant story, philosophy, and CTAs",
+    "Dynamic digital menu with filtering, searching, detailed product views, and visual dietary indicators",
+    "Shopping cart with quantity management, subtotal and tax calculations, and session persistence",
+    "Checkout process with client contact form, pickup time selection, payment methods, and order confirmation with unique order number",
+    "Reservation system with date/time/persons input, availability validation, unique reservation codes, and confirmation emails",
+    "Complete admin panel with authentication, dashboards, order/reservation/product/category management, and content editing",
+    "API endpoints supporting CRUD operations for products, categories, orders, reservations, and image uploads",
+    "Image upload and optimization via ImageKit and Supabase Storage",
+    "Real-time data fetching and UI updates through React Query",
+    "Responsive navigation and footer with essential info and shopping cart indicator"
+  ],
+  "user_flow_summary": [
+    "Customer visits homepage and navigates to the digital menu",
+    "Filters or searches products and views detailed product pages",
+    "Adds products to the shopping cart and adjusts quantities if needed",
+    "Proceeds to checkout, fills in contact details, selects pickup time and payment method",
+    "Submits order and receives a unique order confirmation with estimated preparation time",
+    "Customer can also reserve tables by completing a form with validation and receiving a unique reservation code",
+    "Admin logs in through a protected route to access dashboard and manages orders, reservations, products, categories, and site content",
+    "Admin updates order and reservation statuses in real-time with filters and search capabilities"
+  ],
+  "validation_criteria": [
+    "Homepage loads in under 2 seconds and displays correctly on all device types",
+    "Menu filtering and search respond in real-time with correct product results",
+    "Shopping cart totals and tax calculations are accurate and persist across sessions",
+    "Checkout validates required fields with correct email and phone formatting",
+    "Unique order and reservation codes are generated and confirmed via email",
+    "Admin routes and APIs are secured with authentication middleware",
+    "Orders and reservations can be filtered, updated, and cancelled with UI updating immediately",
+    "CRUD operations for products and categories handle image uploads, validations, and prevent deletion of referenced entities",
+    "All API endpoints return appropriate HTTP status codes for success and errors",
+    "Performance goals like 99.5% uptime and API response times under 500ms are respected"
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "Next.js 16",
+      "React 19",
+      "Tailwind CSS 4",
+      "Supabase",
+      "PostgreSQL",
+      "React Query (TanStack Query) v5",
+      "Framer Motion",
+      "ImageKit",
+      "React DatePicker"
+    ],
+    "features": [
+      {
+        "name": "Home Page",
+        "description": "Página principal con hero section, historia del restaurante, filosofía y call-to-actions principales",
+        "files": [
+          "app/page.tsx"
+        ]
+      },
+      {
+        "name": "Menu Page",
+        "description": "Página de menú digital con exploración de productos por categorías, filtros, búsqueda y visualización de platos",
+        "files": [
+          "app/menu/page.tsx",
+          "app/menu/[id]/page.tsx"
+        ]
+      },
+      {
+        "name": "Shopping Cart",
+        "description": "Sistema de carrito de compras con gestión de items, cantidades, cálculo de subtotales e IGV",
+        "files": [
+          "app/cart/page.tsx",
+          "context/CartContext.tsx"
+        ]
+      },
+      {
+        "name": "Checkout",
+        "description": "Proceso de checkout con formulario de contacto, tiempo estimado de recogida y confirmación de pedidos",
+        "files": [
+          "app/checkout/page.tsx"
+        ]
+      },
+      {
+        "name": "Reservations",
+        "description": "Sistema de reservas de mesas con formulario de fecha, hora, número de personas y validación",
+        "files": [
+          "app/reservas/page.tsx"
+        ]
+      },
+      {
+        "name": "Admin Panel",
+        "description": "Panel de administración completo para gestión de productos, pedidos, reservas y contenido",
+        "files": [
+          "app/admin/page.tsx",
+          "app/admin/orders/page.tsx",
+          "app/admin/reservations/page.tsx",
+          "app/admin/content/page.tsx",
+          "app/admin/settings/page.tsx",
+          "app/admin/layout.tsx"
+        ]
+      },
+      {
+        "name": "Product Management",
+        "description": "CRUD completo de productos con subida de imágenes, categorías, precios variables y flags booleanos",
+        "files": [
+          "app/admin/page.tsx",
+          "lib/queries.ts"
+        ]
+      },
+      {
+        "name": "Order Management",
+        "description": "Gestión de pedidos con estados, seguimiento, cancelación y resumen de ventas",
+        "files": [
+          "app/admin/orders/page.tsx",
+          "app/api/orders/route.ts",
+          "app/api/orders/[id]/route.ts",
+          "app/api/orders/[id]/cancel/route.ts",
+          "app/api/orders/[id]/status/route.ts",
+          "app/api/orders/summary/route.ts"
+        ]
+      },
+      {
+        "name": "Reservation Management",
+        "description": "Gestión de reservas con búsqueda por código o email, validación y confirmación",
+        "files": [
+          "app/admin/reservations/page.tsx",
+          "app/api/reservations/route.ts",
+          "app/api/reservations/[code]/route.ts"
+        ]
+      },
+      {
+        "name": "Authentication",
+        "description": "Sistema de autenticación con login, protección de rutas y gestión de sesiones",
+        "files": [
+          "app/login/page.tsx",
+          "components/ProtectedRoute.tsx",
+          "context/AuthContext.tsx",
+          "lib/supabase.ts"
+        ]
+      },
+      {
+        "name": "API Routes",
+        "description": "Endpoints API para productos, categorías, pedidos, reservas y subida de archivos",
+        "files": [
+          "app/api/products/route.ts",
+          "app/api/products/[id]/route.ts",
+          "app/api/categories/route.ts",
+          "app/api/orders/route.ts",
+          "app/api/reservations/route.ts",
+          "app/api/upload/route.ts"
+        ]
+      },
+      {
+        "name": "Image Upload",
+        "description": "Sistema de subida de imágenes con ImageKit para productos y galerías",
+        "files": [
+          "app/api/upload/route.ts",
+          "lib/imagekit.ts",
+          "lib/queries.ts"
+        ]
+      },
+      {
+        "name": "Data Fetching",
+        "description": "Hooks y funciones para fetching de datos con React Query, normalización y mutaciones",
+        "files": [
+          "lib/queries.ts",
+          "lib/api.ts"
+        ]
+      },
+      {
+        "name": "Navigation",
+        "description": "Componente de navegación con búsqueda, dropdown de productos y contador de carrito",
+        "files": [
+          "components/Navbar.tsx"
+        ]
+      },
+      {
+        "name": "Footer",
+        "description": "Componente de footer con información de contacto y redes sociales",
+        "files": [
+          "components/Footer.tsx"
+        ]
+      },
+      {
+        "name": "Admin Sidebar",
+        "description": "Barra lateral de navegación para el panel de administración",
+        "files": [
+          "components/Sidebar.tsx",
+          "components/AdminHeader.tsx"
+        ]
+      },
+      {
+        "name": "Category Management",
+        "description": "Gestión de categorías y subcategorías de productos",
+        "files": [
+          "components/CreateCategoryForm.tsx",
+          "app/api/categories/route.ts"
+        ]
+      },
+      {
+        "name": "About Page",
+        "description": "Página de información sobre el restaurante",
+        "files": [
+          "app/nosotros/page.tsx"
+        ]
+      }
+    ]
+  }
+}
