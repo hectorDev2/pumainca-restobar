@@ -1,0 +1,170 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "Next.js 16",
+    "React 19",
+    "Tailwind CSS 4",
+    "Supabase",
+    "PostgreSQL",
+    "React Query (TanStack Query) v5",
+    "Framer Motion",
+    "ImageKit",
+    "React DatePicker"
+  ],
+  "features": [
+    {
+      "name": "Home Page",
+      "description": "Página principal con hero section, historia del restaurante, filosofía y call-to-actions principales",
+      "files": [
+        "app/page.tsx"
+      ]
+    },
+    {
+      "name": "Menu Page",
+      "description": "Página de menú digital con exploración de productos por categorías, filtros, búsqueda y visualización de platos",
+      "files": [
+        "app/menu/page.tsx",
+        "app/menu/[id]/page.tsx"
+      ]
+    },
+    {
+      "name": "Shopping Cart",
+      "description": "Sistema de carrito de compras con gestión de items, cantidades, cálculo de subtotales e IGV",
+      "files": [
+        "app/cart/page.tsx",
+        "context/CartContext.tsx"
+      ]
+    },
+    {
+      "name": "Checkout",
+      "description": "Proceso de checkout con formulario de contacto, tiempo estimado de recogida y confirmación de pedidos",
+      "files": [
+        "app/checkout/page.tsx"
+      ]
+    },
+    {
+      "name": "Reservations",
+      "description": "Sistema de reservas de mesas con formulario de fecha, hora, número de personas y validación",
+      "files": [
+        "app/reservas/page.tsx"
+      ]
+    },
+    {
+      "name": "Admin Panel",
+      "description": "Panel de administración completo para gestión de productos, pedidos, reservas y contenido",
+      "files": [
+        "app/admin/page.tsx",
+        "app/admin/orders/page.tsx",
+        "app/admin/reservations/page.tsx",
+        "app/admin/content/page.tsx",
+        "app/admin/settings/page.tsx",
+        "app/admin/layout.tsx"
+      ]
+    },
+    {
+      "name": "Product Management",
+      "description": "CRUD completo de productos con subida de imágenes, categorías, precios variables y flags booleanos",
+      "files": [
+        "app/admin/page.tsx",
+        "lib/queries.ts"
+      ]
+    },
+    {
+      "name": "Order Management",
+      "description": "Gestión de pedidos con estados, seguimiento, cancelación y resumen de ventas",
+      "files": [
+        "app/admin/orders/page.tsx",
+        "app/api/orders/route.ts",
+        "app/api/orders/[id]/route.ts",
+        "app/api/orders/[id]/cancel/route.ts",
+        "app/api/orders/[id]/status/route.ts",
+        "app/api/orders/summary/route.ts"
+      ]
+    },
+    {
+      "name": "Reservation Management",
+      "description": "Gestión de reservas con búsqueda por código o email, validación y confirmación",
+      "files": [
+        "app/admin/reservations/page.tsx",
+        "app/api/reservations/route.ts",
+        "app/api/reservations/[code]/route.ts"
+      ]
+    },
+    {
+      "name": "Authentication",
+      "description": "Sistema de autenticación con login, protección de rutas y gestión de sesiones",
+      "files": [
+        "app/login/page.tsx",
+        "components/ProtectedRoute.tsx",
+        "context/AuthContext.tsx",
+        "lib/supabase.ts"
+      ]
+    },
+    {
+      "name": "API Routes",
+      "description": "Endpoints API para productos, categorías, pedidos, reservas y subida de archivos",
+      "files": [
+        "app/api/products/route.ts",
+        "app/api/products/[id]/route.ts",
+        "app/api/categories/route.ts",
+        "app/api/orders/route.ts",
+        "app/api/reservations/route.ts",
+        "app/api/upload/route.ts"
+      ]
+    },
+    {
+      "name": "Image Upload",
+      "description": "Sistema de subida de imágenes con ImageKit para productos y galerías",
+      "files": [
+        "app/api/upload/route.ts",
+        "lib/imagekit.ts",
+        "lib/queries.ts"
+      ]
+    },
+    {
+      "name": "Data Fetching",
+      "description": "Hooks y funciones para fetching de datos con React Query, normalización y mutaciones",
+      "files": [
+        "lib/queries.ts",
+        "lib/api.ts"
+      ]
+    },
+    {
+      "name": "Navigation",
+      "description": "Componente de navegación con búsqueda, dropdown de productos y contador de carrito",
+      "files": [
+        "components/Navbar.tsx"
+      ]
+    },
+    {
+      "name": "Footer",
+      "description": "Componente de footer con información de contacto y redes sociales",
+      "files": [
+        "components/Footer.tsx"
+      ]
+    },
+    {
+      "name": "Admin Sidebar",
+      "description": "Barra lateral de navegación para el panel de administración",
+      "files": [
+        "components/Sidebar.tsx",
+        "components/AdminHeader.tsx"
+      ]
+    },
+    {
+      "name": "Category Management",
+      "description": "Gestión de categorías y subcategorías de productos",
+      "files": [
+        "components/CreateCategoryForm.tsx",
+        "app/api/categories/route.ts"
+      ]
+    },
+    {
+      "name": "About Page",
+      "description": "Página de información sobre el restaurante",
+      "files": [
+        "app/nosotros/page.tsx"
+      ]
+    }
+  ]
+}
