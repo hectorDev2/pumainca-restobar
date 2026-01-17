@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminHeader from "@/components/AdminHeader";
 import { useSiteContent, useUpdateSiteContent } from "@/lib/queries";
-import { uploadImage } from "@/lib/imagekit";
 
 export default function AdminContentPage() {
   const { data: content, isLoading: isContentLoading } = useSiteContent();
@@ -70,7 +69,21 @@ export default function AdminContentPage() {
 
     try {
       setUploadingField(field);
-      const url = await uploadImage(file, field, "site-content");
+      
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+      uploadData.append("folder", "site-content");
+      uploadData.append("fileName", field);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const { url } = await res.json();
+      
       setFormData((prev) => ({ ...prev, [field]: url }));
       setMessage(`Imagen para ${field} subida correctamente.`);
     } catch (err) {
@@ -155,9 +168,11 @@ export default function AdminContentPage() {
                   <div>
                     <label className="block text-xs text-zinc-400 mb-2">Imagen de Fondo (Hero)</label>
                     <div className="flex gap-4 items-start">
-                        {formData.hero_background_image && (
-                            <img src={formData.hero_background_image} alt="Hero" className="w-24 h-16 object-cover rounded-md border border-zinc-700" />
-                        )}
+                        <img 
+                            src={formData.hero_background_image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuATXk6MPNKGx57CMdde5-DdiTX5gT1k4FcksnnlebD-cSsZFtfTZkEOgg_qGAjRMBkKnN4lRmk49DGt_CkCnIJFhxgb4ErT87gcJieqE--4p4lwbdOPE_2u4PSiak7lkRXM5tG1-Rg1GaX7rKU8PVe4hgi63r5GhAuwJt4_rxs6JEmmq-BxmIeVKzoWkYRiXEjFcbdZPwWSsXPmoMFDY0TmAY9VuYan0app-qcECaPVlAWW08ArAi-n6B_nzpEYj3gAopAgZ-06bNJZ'} 
+                            alt="Hero" 
+                            className="w-24 h-16 object-cover rounded-md border border-zinc-700" 
+                        />
                         <input
                             type="file"
                             accept="image/*"
@@ -213,9 +228,11 @@ export default function AdminContentPage() {
                   <div>
                     <label className="block text-xs text-zinc-400 mb-2">Imagen Historia</label>
                     <div className="flex gap-4 items-start">
-                        {formData.history_image && (
-                            <img src={formData.history_image} alt="History" className="w-24 h-16 object-cover rounded-md border border-zinc-700" />
-                        )}
+                        <img 
+                            src={formData.history_image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuC3GvdLR0O-ER0B-sxxrf96gAi13pxiiPGAtbv6w6VjPTONsilcTJTXM78DO_lmjKg7DB2uL8HHKbhHMXs-vS6khXEBXFZ2AdZ63PshtY8fBfYqUWM_PD7796N1gmnUPVOL5sdQEfprp531eehNJU17kRuf301TwQNYLclmxY8vQrGN5nTXTTwQj6gCO8eKEssD20UixEwt8kXFlD1lZZ95mNKWGIxOWnSLyIg_5ftjpfp7BzA4dXGWK9htHIfpI7c5HYmWwhpTuvaP'} 
+                            alt="History" 
+                            className="w-24 h-16 object-cover rounded-md border border-zinc-700" 
+                        />
                         <input
                             type="file"
                             accept="image/*"
@@ -296,9 +313,11 @@ export default function AdminContentPage() {
                   <div>
                     <label className="block text-xs text-zinc-400 mb-2">Imagen Filosofía</label>
                     <div className="flex gap-4 items-start">
-                        {formData.philosophy_image && (
-                            <img src={formData.philosophy_image} alt="Philosophy" className="w-24 h-16 object-cover rounded-md border border-zinc-700" />
-                        )}
+                        <img 
+                            src={formData.philosophy_image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDztdE740-TFm6yhUQ3PH1VV9KdanoNC0UmkJ0eIXv7otH1TSK87gsmbwOi2O_sVT05IwslnbE2Uw9bvlyisgCYBW1f3Hgn4Y-ADGT_SVbtQ-3jx6Xa03nzU2QEFZsdT5YpS7nMK9IiyI1NIfLVRyHxcbOrzPyyZGmgtQVf8x4r8CaBFoVZ2nb10uopliC5R8vqEE4-q8bNq2YeKGEa_O0C1db7Yn8TQUYrou8LdZ3xtdmihkOcf9gujQkTXdWCsnVX7zUI9u7FFYiZ'} 
+                            alt="Philosophy" 
+                            className="w-24 h-16 object-cover rounded-md border border-zinc-700" 
+                        />
                         <input
                             type="file"
                             accept="image/*"
@@ -317,9 +336,11 @@ export default function AdminContentPage() {
                    <div>
                     <label className="block text-xs text-zinc-400 mb-2">Imagen de Fondo (CTA)</label>
                     <div className="flex gap-4 items-start">
-                        {formData.cta_background_image && (
-                            <img src={formData.cta_background_image} alt="CTA" className="w-24 h-16 object-cover rounded-md border border-zinc-700" />
-                        )}
+                        <img 
+                            src={formData.cta_background_image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDfxQRQI_nY_alVkqrgyxhTercMQFH1L_JrrMiE_17KFcyOYzXgs6Hew6Jt_xIO71kyJTwmIH6nyayvR6bayj9QTk-dyQEX3lA3e2MvbQaenoeAlZ6sq9S3vUoZBWJkOIquC4jvCTRMERmgtYbjtyN4Q1wRazaeTZhvooOAk7aQ8C5MIGS0yALbovg16DglqAL6lbYMIuS45PoTT8zU5Xxj1CqNCBuKSpZfqQm6gGtG7-6ETDKmueADaq4vO7TSOt5t9uWGiipSJjw1'} 
+                            alt="CTA" 
+                            className="w-24 h-16 object-cover rounded-md border border-zinc-700" 
+                        />
                         <input
                             type="file"
                             accept="image/*"
