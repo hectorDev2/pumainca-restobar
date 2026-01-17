@@ -1,0 +1,18 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000/admin",
+  "loginUser": "polbarazorda@gmail.com",
+  "loginPassword": "admin1",
+  "executionArgs": {
+    "projectName": "pumainca-restobar",
+    "projectPath": "/Users/hector/Desktop/pumainca/pumainca-restobar",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-MqT9evbyl4i3323FOKmJKtBlc819s3QnoNHV7UeT8U8IhfTJ9s0N1S3pSuJ35v1k_eQ6ePci3O42wTuxyK2gep4WURgTKwB96YVIZDOiF9rhesVYPGfMNNX2TW4Wo1u3RXA"
+    }
+  },
+  "proxy": "http://725457a6-0223-4e7f-b504-82b454f7d89c:VqDzAi8rhi4UQbIC8MhwSZ9NBvKhiuSu@tun.testsprite.com:8080"
+}
