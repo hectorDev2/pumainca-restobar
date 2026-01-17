@@ -61,7 +61,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => setCart([]);
 
   const cartTotal = useMemo(() => {
-    const subtotal = cart.reduce((acc, item) => {
+    const rawTotal = cart.reduce((acc, item) => {
       let price = 0;
       if (typeof item.dish.price === "number") {
         price = item.dish.price;
@@ -73,9 +73,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return acc + price * item.quantity;
     }, 0);
 
-    const tax = subtotal * 0.18;
-    const serviceFee = subtotal > 0 ? 2.0 : 0;
-    return { subtotal, tax, serviceFee, total: subtotal + tax + serviceFee };
+    // Total now includes IGV.
+    // Price = Net + IGV
+    // Price = Net + (Net * 0.18) = Net * 1.18
+    // Net = Price / 1.18
+    const subtotal = rawTotal / 1.18;
+    const tax = rawTotal - subtotal;
+    const serviceFee = 0;
+    
+    return { subtotal, tax, serviceFee, total: rawTotal };
   }, [cart]);
 
   return (

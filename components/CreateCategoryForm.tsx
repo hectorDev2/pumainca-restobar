@@ -108,10 +108,10 @@ export default function CreateCategoryForm({ onCreated }: Props) {
       <div>
         <button
           type="submit"
-          disabled={mutation.isLoading}
+          disabled={mutation.isPending}
           className="bg-green-600 px-4 py-2 rounded-xl font-bold disabled:opacity-50"
         >
-          {mutation.isLoading ? "Creando..." : "Crear categoría"}
+          {mutation.isPending ? "Creando..." : "Crear categoría"}
         </button>
       </div>
       {/* Toast */}

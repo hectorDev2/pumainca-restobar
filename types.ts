@@ -29,6 +29,7 @@ export interface Product {
   isGlutenFree?: boolean;
   isChefSpecial?: boolean;
   isRecommended?: boolean;
+  isAvailable?: boolean;
 }
 
 // Alias for backward compatibility during refactor

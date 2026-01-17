@@ -32,21 +32,8 @@ export default function ProtectedRoute({
     return null;
   }
 
-  // Verificar que sea owner
-  if (user.role !== "owner") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-500 mb-4">
-            Acceso denegado
-          </h1>
-          <p className="text-zinc-400">
-            No tienes permisos para acceder a esta página.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Verificar role si es necesario (por ahora permitimos cualquier usuario logueado en Supabase)
+  // if (user.role !== "owner") { ... }
 
   return <>{children}</>;
 }

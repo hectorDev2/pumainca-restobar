@@ -3,11 +3,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Category, Product, SubCategory } from "@/types";
 import { apiFetch } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
 export type ProductFilters = {
   category?: string;
   search?: string;
   sort?: string;
+  limit?: number;
 };
 
 type BackendProductPrice = {
@@ -230,6 +232,10 @@ export const fetchProducts = (filters: ProductFilters) => {
     params.set("sort", filters.sort);
   }
 
+  if (filters.limit) {
+    params.set("limit", String(filters.limit));
+  }
+
   const query = params.toString();
   const path = query ? `/api/products?${query}` : "/api/products";
   return apiFetch<BackendProduct[]>(path).then((products) =>
@@ -244,6 +250,7 @@ export const useProducts = (filters: ProductFilters) =>
       filters.category ?? null,
       filters.search ?? "",
       filters.sort ?? "",
+      filters.limit ?? null,
     ],
     queryFn: () => fetchProducts(filters),
   });
@@ -404,22 +411,110 @@ export const useOrderStatus = (orderId?: string) =>
     enabled: Boolean(orderId),
   });
 
-// Settings
-export const fetchSettings = () => apiFetch<any>("/api/settings");
+export type Reservation = {
+  id: string;
+  reservation_code: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  reservationDate: string;
+  reservationTime: string;
+  numberOfGuests: number;
+  specialRequests?: string;
+  status?: string;
+  created_at?: string;
+  message?: string;
+};
 
-export const useSettings = () =>
-  useQuery<any, Error>({
-    queryKey: ["settings"],
-    queryFn: fetchSettings,
+const normalizeReservation = (backend: any): Reservation => {
+  return {
+    id: backend.id,
+    reservation_code: backend.reservation_code,
+    fullName: backend.full_name ?? backend.fullName,
+    email: backend.email,
+    phoneNumber: backend.phone_number ?? backend.phoneNumber,
+    reservationDate: backend.reservation_date ?? backend.reservationDate,
+    reservationTime: backend.reservation_time ?? backend.reservationTime,
+    numberOfGuests: backend.number_of_guests ?? backend.numberOfGuests,
+    specialRequests: backend.special_requests ?? backend.specialRequests,
+    status: backend.status,
+    created_at: backend.created_at,
+    message: backend.message,
+  };
+};
+
+export const fetchReservations = (params?: { email?: string }) => {
+  const qs = new URLSearchParams();
+  if (params?.email) qs.set("email", params.email);
+  const path = qs.toString() ? `/api/reservations?${qs.toString()}` : "/api/reservations";
+  return apiFetch<any[]>(path).then((data) => data.map(normalizeReservation));
+};
+
+export const updateReservationStatus = (code: string, status: string) =>
+  apiFetch<any>(`/api/reservations/${code}`, {
+    method: "PUT",
+    body: JSON.stringify({ status }),
   });
 
-export const updateSettings = (body: any) =>
-  apiFetch<any>("/api/settings", { method: "PUT", body: JSON.stringify(body) });
-
-export const useUpdateSettings = () => {
+export const useUpdateReservationStatus = () => {
   const qc = useQueryClient();
-  return useMutation<any, Error, any>({
-    mutationFn: updateSettings,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["settings"] }),
+  return useMutation<any, Error, { code: string; status: string }>({
+    mutationFn: ({ code, status }) => updateReservationStatus(code, status),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["reservations"] }),
+  });
+};
+
+export const fetchReservationByCode = (code: string) =>
+  apiFetch<any>(`/api/reservations/${code}`).then(normalizeReservation);
+
+export const useReservations = (email?: string) =>
+  useQuery<Reservation[], Error>({
+    queryKey: ["reservations", email ?? null],
+    queryFn: () => fetchReservations(email ? { email } : undefined),
+    enabled: true,
+  });
+
+export const useReservationByCode = (code?: string) =>
+  useQuery<Reservation, Error>({
+    queryKey: ["reservation", code],
+    queryFn: () => fetchReservationByCode(code!),
+    enabled: Boolean(code),
+  });
+
+
+
+
+
+export const fetchSiteContent = async () => {
+  const { data, error } = await supabase.from("site_content").select("*");
+  if (error) throw error;
+  return data.reduce((acc: any, item: any) => {
+    acc[item.key] = item.value;
+    return acc;
+  }, {}) as Record<string, string>;
+};
+
+export const updateSiteContent = async (content: Record<string, string>) => {
+  const updates = Object.entries(content).map(([key, value]) => ({
+    key,
+    value,
+  }));
+  
+  const { error } = await supabase.from("site_content").upsert(updates);
+  if (error) throw error;
+  return true;
+};
+
+export const useSiteContent = () =>
+  useQuery<Record<string, string>, Error>({
+    queryKey: ["siteContent"],
+    queryFn: fetchSiteContent,
+  });
+
+export const useUpdateSiteContent = () => {
+  const qc = useQueryClient();
+  return useMutation<any, Error, Record<string, string>>({
+    mutationFn: updateSiteContent,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["siteContent"] }),
   });
 };

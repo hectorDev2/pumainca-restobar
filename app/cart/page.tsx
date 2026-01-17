@@ -124,24 +124,21 @@ export default function CartPage() {
                 <h2 className="text-primary text-xl font-bold mb-6">Resumen del Pedido</h2>
                 <div className="space-y-4 mb-6 border-b border-zinc-800 pb-6">
                   <div className="flex justify-between text-text-secondary">
-                    <span>Subtotal</span>
+                    <span>Subtotal (Sin IGV)</span>
                     <span className="text-white font-medium">S./{totals.subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-text-secondary">
-                    <span>Impuestos (18% IGV)</span>
+                    <span>IGV (18%)</span>
                     <span className="text-white font-medium">S./{totals.tax.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-text-secondary">
-                    <span>Tarifa de Servicio</span>
-                    <span className="text-white font-medium">S./{totals.serviceFee.toFixed(2)}</span>
-                  </div>
+                  {/* Service fee removed */}
                 </div>
                 
                 <div className="flex justify-between items-end mb-8">
                   <span className="text-white font-bold text-lg">Total</span>
                   <div className="flex flex-col items-end">
                     <span className="text-3xl font-black text-primary">S./{totals.total.toFixed(2)}</span>
-                    <span className="text-xs text-text-secondary">Incluye todas las tarifas</span>
+                    <span className="text-xs text-text-secondary">Incluye IGV</span>
                   </div>
                 </div>
 

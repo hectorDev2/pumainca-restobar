@@ -15,8 +15,10 @@ type ContactInfo = {
 
 type OrderItemPayload = {
   product_id: string;
+  product_name: string;
   quantity: number;
   unit_price: number;
+  subtotal: number;
   selected_size?: string;
   cooking_point?: string;
   special_instructions?: string;
@@ -131,10 +133,14 @@ export default function CheckoutPage() {
 
     const items: OrderItemPayload[] = cart.map((item) => {
       const unitPrice = getItemPrice(item);
+      const subtotal = Number((unitPrice * item.quantity).toFixed(2));
+      
       const itemPayload: OrderItemPayload = {
         product_id: item.dish.id,
+        product_name: item.dish.name,
         quantity: item.quantity,
         unit_price: unitPrice,
+        subtotal: subtotal,
       };
 
       if (item.selectedSize) {
@@ -482,7 +488,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="p-6 bg-black/50 border-t border-zinc-800 space-y-3">
                   <div className="flex justify-between text-zinc-500 text-sm">
-                    <span>Subtotal</span>
+                    <span>Subtotal (Sin IGV)</span>
                     <span className="text-white">
                       S./{totals.subtotal.toFixed(2)}
                     </span>
@@ -493,12 +499,7 @@ export default function CheckoutPage() {
                       S./{totals.tax.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-zinc-500 text-sm pb-2">
-                    <span>Costo de servicio</span>
-                    <span className="text-white">
-                      S./{totals.serviceFee.toFixed(2)}
-                    </span>
-                  </div>
+                  {/* Service fee removed */}
                   <div className="border-t border-zinc-800 pt-4 flex justify-between items-center">
                     <span className="text-white font-bold text-lg">Total</span>
                     <span className="text-primary font-black text-3xl tracking-tighter">

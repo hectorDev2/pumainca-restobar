@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import DatePicker, { registerLocale } from "react-datepicker";
-import es from "date-fns/locale/es";
+import { es } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 import "../datepicker.css";
 import Navbar from "@/components/Navbar";

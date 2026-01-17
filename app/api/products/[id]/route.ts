@@ -1,41 +1,6 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
-
-type ProductRecord = any;
-
-const DATA_FILE = path.join(process.cwd(), "data", "products.json");
-const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
-
-async function ensureUploadsDir() {
-  try {
-    await fs.mkdir(UPLOADS_DIR, { recursive: true });
-  } catch (e) {}
-}
-
-async function readProducts(): Promise<ProductRecord[]> {
-  try {
-    const txt = await fs.readFile(DATA_FILE, "utf-8");
-    return JSON.parse(txt) as ProductRecord[];
-  } catch (err) {
-    // fallback to data.ts products if file missing
-    try {
-      const mod = await import("../../../../data");
-      const products = mod.products ?? [];
-      // persist initial snapshot
-      await writeProducts(products);
-      return products;
-    } catch (e) {
-      return [];
-    }
-  }
-}
-
-async function writeProducts(list: ProductRecord[]) {
-  const dir = path.dirname(DATA_FILE);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(list, null, 2), "utf-8");
-}
+import { supabase } from "@/lib/supabase";
+import { uploadImage } from "@/lib/imagekit";
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-z0-9.-]/gi, "_");
@@ -43,142 +8,176 @@ function sanitizeFileName(name: string) {
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
-  const products = await readProducts();
-  const p = products.find((x) => x.id === id);
-  if (!p) {
+  const { id } = await params;
+
+  const { data: p, error } = await supabase
+    .from("products")
+    .select(`
+      *,
+      category:categories(id, name, description, image_url),
+      subcategory:subcategories(id, name, description),
+      prices:product_prices(size_name, price),
+      ingredients:product_ingredients(ingredient_name),
+      allergens:product_allergens(allergen_name),
+      gallery:product_gallery(image_url, display_order)
+    `)
+    .eq("id", id)
+    .single();
+
+  if (error || !p) {
     return NextResponse.json(
       { statusCode: 404, message: "Not found" },
       { status: 404 }
     );
   }
-  return NextResponse.json(p);
+
+  const mappedData = {
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    category_id: p.category_id,
+    subcategory_id: p.subcategory_id,
+    image_url: p.image_url,
+    price: p.price,
+    is_variable_price: p.is_variable_price,
+    is_available: p.is_available,
+    is_vegetarian: p.is_vegetarian,
+    is_spicy: p.is_spicy,
+    is_gluten_free: p.is_gluten_free,
+    is_chef_special: p.is_chef_special,
+    is_recommended: p.is_recommended,
+    preparation_time_minutes: p.preparation_time_minutes,
+    display_order: p.display_order,
+    category: p.category,
+    image: p.image_url,
+    imageUrl: p.image_url,
+    prices: p.prices,
+    ingredients: p.ingredients.map((i: any) => i.ingredient_name),
+    allergens: p.allergens.map((a: any) => a.allergen_name),
+    gallery: p.gallery,
+    created_at: p.created_at,
+    updated_at: p.updated_at,
+    // CamelCase aliases
+    isVegetarian: p.is_vegetarian,
+    isSpicy: p.is_spicy,
+    isGlutenFree: p.is_gluten_free,
+    isChefSpecial: p.is_chef_special,
+    isRecommended: p.is_recommended
+  };
+
+  return NextResponse.json(mappedData);
 }
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const contentType = req.headers.get("content-type") || "";
   if (!contentType.includes("multipart/form-data")) {
     return NextResponse.json(
-      {
-        statusCode: 400,
-        message: ["Content-Type must be multipart/form-data"],
-        error: "Bad Request",
-      },
+      { message: "Content-Type must be multipart/form-data" },
       { status: 400 }
     );
   }
 
-  const formData = await req.formData();
-  const products = await readProducts();
-  const idx = products.findIndex((p) => p.id === id);
-  if (idx === -1) {
-    return NextResponse.json(
-      { statusCode: 404, message: "Product not found" },
-      { status: 404 }
-    );
-  }
+  try {
+    const formData = await req.formData();
+    
+    // Build update object
+    const updates: any = { updated_at: new Date().toISOString() };
+    const maybe = (key: string) => {
+        const v = formData.get(key);
+        return v === null ? undefined : String(v);
+    };
 
-  const product = { ...products[idx] } as any;
+    const name = maybe("name");
+    if (name) updates.name = name;
+    
+    const description = maybe("description");
+    if (description) updates.description = description;
 
-  const setIf = (field: string, value: any) => {
-    if (value !== undefined && value !== null) product[field] = value;
-  };
+    const category_id = maybe("category_id") || maybe("category");
+    if (category_id) updates.category_id = category_id;
 
-  const maybe = (key: string) => {
-    const v = formData.get(key);
-    return v === null ? undefined : String(v);
-  };
-
-  // Update simple string fields
-  const name = maybe("name");
-  if (name !== undefined) setIf("name", name);
-
-  const description = maybe("description");
-  if (description !== undefined) setIf("description", description);
-
-  const category_id = maybe("category_id");
-  if (category_id !== undefined) setIf("category", category_id);
-
-  const subcategory_id = formData.get("subcategory_id");
-  if (subcategory_id !== null) {
-    const s = String(subcategory_id);
-    product.subcategory = s === "" ? undefined : s;
-  }
-
-  const subcategory_name = maybe("subcategory_name");
-  if (subcategory_name !== undefined)
-    setIf("subcategory_name", subcategory_name);
-
-  const priceRaw = formData.get("price");
-  if (priceRaw !== null) {
-    const parsed = Number(String(priceRaw));
-    if (!Number.isNaN(parsed)) product.price = parsed;
-    else product.price = String(priceRaw);
-  }
-
-  const boolFields = [
-    "is_variable_price",
-    "is_available",
-    "is_vegetarian",
-    "is_spicy",
-    "is_gluten_free",
-    "is_chef_special",
-    "is_recommended",
-  ];
-  for (const f of boolFields) {
-    const v = formData.get(f);
-    if (v !== null) {
-      const s = String(v).toLowerCase();
-      product[f.replace(/_/g, "")] = s === "true" || s === "1" || s === "on";
-      // also support original snake case
-      product[f] = s === "true" || s === "1" || s === "on";
+    const subcategory_id = formData.get("subcategory_id");
+    if (subcategory_id !== null) {
+        updates.subcategory_id = subcategory_id === "" ? null : String(subcategory_id);
     }
-  }
 
-  const prep = formData.get("preparation_time_minutes");
-  if (prep !== null) {
-    const n = Number(String(prep));
-    if (!Number.isNaN(n)) product.preparation_time_minutes = n;
-  }
-
-  const displayOrder = formData.get("display_order");
-  if (displayOrder !== null) {
-    const n = Number(String(displayOrder));
-    if (!Number.isNaN(n)) product.display_order = n;
-  }
-
-  // Image file
-  const imageField = formData.get("image") as File | null;
-  if (imageField && (imageField as any).size) {
-    await ensureUploadsDir();
-    try {
-      const file = imageField as File;
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const ext = path.extname(file.name) || ".jpg";
-      const fileName = `${Date.now()}-${sanitizeFileName(file.name)}${ext}`;
-      const filePath = path.join(UPLOADS_DIR, fileName);
-      await fs.writeFile(filePath, buffer);
-      product.image = `/uploads/${fileName}`;
-      product.image_url = `/uploads/${fileName}`;
-    } catch (err) {
-      console.error("Error saving image", err);
-      return NextResponse.json(
-        { statusCode: 500, message: "Error saving image" },
-        { status: 500 }
-      );
+    const priceRaw = formData.get("price");
+    if (priceRaw !== null) {
+        updates.price = Number(priceRaw);
     }
+
+    // Booleans
+    const boolFields = [
+        "is_variable_price", "is_available", "is_vegetarian", "is_spicy", 
+        "is_gluten_free", "is_chef_special", "is_recommended"
+    ];
+    
+    for (const f of boolFields) {
+        const v = formData.get(f);
+        if (v !== null) {
+            const s = String(v).toLowerCase();
+            updates[f] = s === 'true' || s === '1' || s === 'on';
+        }
+    }
+
+    const prep = formData.get("preparation_time_minutes");
+    if (prep !== null) updates.preparation_time_minutes = Number(prep);
+
+    const displayOrder = formData.get("display_order");
+    if (displayOrder !== null) updates.display_order = Number(displayOrder);
+
+    // Image Upload
+    const imageField = formData.get("image") as File | null;
+    if (imageField && (imageField as any).size) {
+        const file = imageField as File;
+        const ext = file.name.split(".").pop() || "jpg";
+        const fileName = `${sanitizeFileName(updates.name || id)}.${ext}`;
+        
+        let folder = "products";
+        let targetCategoryId = category_id; // From form data if present
+
+        if (!targetCategoryId) {
+            // Fetch current category if not updating it
+             const { data: prod } = await supabase
+                .from('products')
+                .select('category_id')
+                .eq('id', id)
+                .single();
+             targetCategoryId = prod?.category_id;
+        }
+
+        if (targetCategoryId) {
+            const { data: cat } = await supabase
+                .from('categories')
+                .select('name')
+                .eq('id', targetCategoryId)
+                .single();
+            if (cat?.name) {
+                folder = `products/${sanitizeFileName(cat.name)}`;
+            }
+        }
+        
+        updates.image_url = await uploadImage(file, fileName, folder);
+    }
+
+    const { data: updated, error: updateError } = await supabase
+        .from('products')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (updateError) throw updateError;
+    
+    return NextResponse.json(updated);
+
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
-
-  product.updatedAt = new Date().toISOString();
-  products[idx] = product;
-  await writeProducts(products);
-
-  return NextResponse.json(product);
 }

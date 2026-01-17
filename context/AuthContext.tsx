@@ -2,18 +2,15 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-type User = {
-  id: string;
-  email: string;
-  role: string;
-};
+import { supabase } from "@/lib/supabase";
+import { User, Session } from "@supabase/supabase-js";
 
 type AuthContextType = {
   user: User | null;
-  token: string | null;
+  session: Session | null;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  signup: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   isLoading: boolean;
 };
 
@@ -21,80 +18,65 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Cargar token del localStorage al iniciar
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
 
-    if (storedToken && storedUser) {
-      try {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.error("Error parsing stored user:", err);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      }
-    }
-    setIsLoading(false);
+    // Listen for changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await fetch("http://localhost:4000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || "Error al iniciar sesión");
-      }
-
-      const data = await response.json();
-      const accessToken = data.access_token;
-
-      // Decodificar el token para obtener los datos del usuario (payload)
-      // El JWT tiene formato: header.payload.signature
-      const payload = JSON.parse(atob(accessToken.split(".")[1]));
-      const userData: User = {
-        id: payload.sub,
-        email: payload.email,
-        role: payload.role,
-      };
-
-      // Guardar en localStorage
-      localStorage.setItem("token", accessToken);
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      setToken(accessToken);
-      setUser(userData);
-
-      // Redirigir al admin
-      router.push("/admin");
-    } catch (error: any) {
-      console.error("Login error:", error);
-      throw error;
+    if (error) {
+      throw new Error(error.message);
     }
+    
+    // Auth state change listener will handle the redirect if needed, 
+    // or we can do it here explicitly.
+    router.push("/admin");
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setToken(null);
-    setUser(null);
+  const signup = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    // Auto-login or wait for confirmation depending on settings. 
+    // Usually signUp signs in immediately if confirmation is disabled.
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
     router.push("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, session, login, signup, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

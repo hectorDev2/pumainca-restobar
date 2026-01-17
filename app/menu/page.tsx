@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
@@ -23,14 +23,15 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: "alphabetical", label: "Orden alfabético" },
 ];
 
-export default function MenuPage() {
+function MenuContent() {
   const { addToCart } = useCart();
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string>("todo");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(
     null
   );
-  const [searchQuery, setSearchQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [sortOrder, setSortOrder] = useState<SortOption>("recommended");
 
   const { data: categories } = useCategories();
@@ -49,6 +50,13 @@ export default function MenuPage() {
   useEffect(() => {
     setSelectedSubCategory(null);
   }, [selectedCategory]);
+
+  useEffect(() => {
+    const query = searchParams.get("search");
+    if (query !== null && query !== searchQuery) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
 
   const activeCategory =
     selectedCategory === "todo"
@@ -133,7 +141,7 @@ export default function MenuPage() {
 
   return (
     <div className="h-screen flex flex-col bg-background-dark overflow-hidden">
-      <Navbar showSearch={false} />
+      <Navbar />
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
@@ -471,5 +479,13 @@ export default function MenuPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function MenuPage() {
+  return (
+    <Suspense fallback={<div className="h-screen bg-black flex items-center justify-center text-white">Cargando menú...</div>}>
+      <MenuContent />
+    </Suspense>
   );
 }
