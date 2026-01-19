@@ -1,4 +1,3 @@
-
 import ImageKit from "imagekit";
 
 const imagekit = new ImageKit({
@@ -7,7 +6,11 @@ const imagekit = new ImageKit({
   urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || "",
 });
 
-export const uploadImage = async (file: File, fileName: string, folder?: string): Promise<string> => {
+export const uploadImage = async (
+  file: File,
+  fileName: string,
+  folder?: string,
+): Promise<string> => {
   try {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -21,12 +24,12 @@ export const uploadImage = async (file: File, fileName: string, folder?: string)
 
     return response.url;
   } catch (err: any) {
-    console.error('ImageKit upload error:', {
+    console.error("ImageKit upload error:", {
       name: err?.name,
       message: err?.message,
       status: err?.response?.status,
       // avoid printing sensitive response bodies directly
-      body: err?.response?.data ? '[response data]' : undefined,
+      body: err?.response?.data ? "[response data]" : undefined,
     });
     throw err;
   }

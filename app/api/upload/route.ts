@@ -6,7 +6,7 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const file = formData.get("file") as File;
     const folder = formData.get("folder") as string;
-    const fileName = formData.get("fileName") as string || "upload";
+    const fileName = (formData.get("fileName") as string) || "upload";
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -21,8 +21,11 @@ export async function POST(req: Request) {
       message: err?.message,
       name: err?.name,
       status: err?.response?.status,
-      stack: err?.stack?.split('\n')?.slice(0, 6),
+      stack: err?.stack?.split("\n")?.slice(0, 6),
     });
-    return NextResponse.json({ error: "Failed to upload image" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to upload image" },
+      { status: 500 },
+    );
   }
 }
