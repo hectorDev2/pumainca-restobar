@@ -6,10 +6,14 @@ function getImageKitInstance() {
   if (imagekitInstance) return imagekitInstance;
 
   const publicKey =
-    process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || process.env.IMAGEKIT_PUBLIC_KEY || "";
+    process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY ||
+    process.env.IMAGEKIT_PUBLIC_KEY ||
+    "";
   const privateKey = process.env.IMAGEKIT_PRIVATE_KEY || "";
   const urlEndpoint =
-    process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || process.env.IMAGEKIT_URL_ENDPOINT || "";
+    process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT ||
+    process.env.IMAGEKIT_URL_ENDPOINT ||
+    "";
 
   if (!publicKey) {
     // Avoid throwing during module evaluation/build. Log and return null so callers
