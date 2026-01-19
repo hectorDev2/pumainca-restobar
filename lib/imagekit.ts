@@ -1,23 +1,55 @@
 import ImageKit from "imagekit";
 
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY || "",
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "",
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || "",
-});
+let imagekitInstance: any | null = null;
+
+function getImageKitInstance() {
+  if (imagekitInstance) return imagekitInstance;
+
+  const publicKey =
+    process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || process.env.IMAGEKIT_PUBLIC_KEY || "";
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY || "";
+  const urlEndpoint =
+    process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || process.env.IMAGEKIT_URL_ENDPOINT || "";
+
+  if (!publicKey) {
+    // Avoid throwing during module evaluation/build. Log and return null so callers
+    // can handle missing configuration gracefully at runtime.
+    console.warn("ImageKit not configured: missing publicKey");
+    return null;
+  }
+
+  try {
+    imagekitInstance = new ImageKit({
+      publicKey,
+      privateKey,
+      urlEndpoint,
+    });
+    return imagekitInstance;
+  } catch (err) {
+    console.error("Failed to initialize ImageKit:", err);
+    return null;
+  }
+}
 
 export const uploadImage = async (
   file: File,
   fileName: string,
   folder?: string,
 ): Promise<string> => {
+  const ik = getImageKitInstance();
+  if (!ik) {
+    const msg = "ImageKit is not configured in this environment";
+    console.error(msg);
+    throw new Error(msg);
+  }
+
   try {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const response = await imagekit.upload({
-      file: buffer, // required
-      fileName: fileName, // required
+    const response = await ik.upload({
+      file: buffer,
+      fileName: fileName,
       folder: folder || process.env.IMAGEKIT_FOLDER || "products",
       useUniqueFileName: true,
     });
@@ -28,11 +60,8 @@ export const uploadImage = async (
       name: err?.name,
       message: err?.message,
       status: err?.response?.status,
-      // avoid printing sensitive response bodies directly
       body: err?.response?.data ? "[response data]" : undefined,
     });
     throw err;
   }
 };
-
-export default imagekit;
