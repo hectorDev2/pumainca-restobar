@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Solo usar 'standalone' si se ejecuta dentro de Docker (detectar con variable)
-  ...(process.env.DOCKER_BUILD === 'true' && { output: 'standalone' }),
+  // Solo usar 'standalone' si se ejecuta dentro de Docker y NO en Vercel
+  ...(process.env.DOCKER_BUILD === 'true' && !process.env.VERCEL && { output: 'standalone' }),
   images: {
     remotePatterns: [
       {
