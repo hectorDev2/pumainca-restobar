@@ -453,9 +453,9 @@ npm run lint         # Ejecuta ESLint
 
 ### Opción 2: Docker (Recomendado para control total)
 
-El proyecto está completamente dockerizado y puede desplegarse en cualquier plataforma que soporte Docker:
+El proyecto está completamente dockerizado y puede desplegarse en cualquier plataforma que soporte Docker y contenedores.
 
-#### Plataformas Cloud que soportan Docker:
+#### Plataformas Cloud que soportan Docker
 
 - **Railway**: Detecta Dockerfile automáticamente
 - **Render**: Soporte nativo para Docker
@@ -465,7 +465,13 @@ El proyecto está completamente dockerizado y puede desplegarse en cualquier pla
 - **Azure Container Instances**: Contenedores en Azure
 - **DigitalOcean App Platform**: Deploy con Docker
 
-#### Despliegue Rápido con Docker:
+#### Pasos rápidos con scripts incluidos
+
+1. Clona el repositorio y crea el archivo `.env.local` con tus variables de entorno.
+2. Ejecuta `npm run docker:dev` para levantar el stack de desarrollo o `npm run docker:prod` para producción.
+3. `scripts/docker-compose-wrapper.sh` detecta automáticamente si el sistema expone `docker compose` o el binario `docker-compose` para garantizar compatibilidad.
+
+#### Despliegue rápido con Docker
 
 ```bash
 # 1. Build de la imagen
@@ -507,6 +513,28 @@ Este es un proyecto privado. Para contribuciones, contacta al equipo de desarrol
 ## 📞 Soporte
 
 Para soporte técnico o consultas, contacta al equipo de desarrollo de Pumainca Restobar.
+
+---
+
+## 🧰 Comandos Útiles
+
+### Desarrollo y pruebas locales
+
+- `npm run dev` / `bun dev`: ejecuta Next.js en modo desarrollo con hot reload.
+- `npm run start:dev`: alias a `npm run dev`.
+- `npm run build`: genera el build optimizado.
+- `npm run start`: ejecuta el build en modo producción local.
+- `npm run lint`: corre ESLint con la configuración de Next.js.
+
+### Docker y contenedores
+
+- `npm run docker:dev`: arranca el stack de desarrollo mediante `scripts/docker-compose-wrapper.sh`.
+- `npm run docker:dev:build`: reconstruye las imágenes del entorno de desarrollo.
+- `npm run docker:dev:down`: detiene y elimina los contenedores del entorno de desarrollo.
+- `npm run docker:dev:logs`: muestra los logs en tiempo real del entorno de desarrollo.
+- `npm run docker:build`: construye la imagen de producción `pumainca-restobar`.
+- `npm run docker:prod`: levanta los servicios definidos en `docker-compose.prod.yml` (con el wrapper detectando `docker compose` o `docker-compose`).
+- `npm run docker:prod:build`, `npm run docker:prod:down`, `npm run docker:prod:logs`: lleva la gestión completa del entorno de producción.
 
 ---
 
