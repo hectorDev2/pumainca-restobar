@@ -13,6 +13,7 @@ import {
   useProducts,
 } from "@/lib/queries";
 import type { Product } from "@/types";
+import { GlareCard } from "@/components/ui/glare-card";
 
 type SortOption = "recommended" | "price_asc" | "price_desc" | "alphabetical";
 
@@ -346,72 +347,74 @@ function MenuContent() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.3 }}
-                        className="group relative flex flex-col bg-surface-dark rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 border border-transparent hover:border-zinc-700"
+                        className="group relative h-full"
                       >
-                        <div
-                          className="relative h-48 overflow-hidden cursor-pointer"
-                          onClick={() => navigateToDish(dish.id)}
-                        >
+                        <GlareCard className="flex flex-col bg-surface-dark h-full">
                           <div
-                            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                            style={{
-                              backgroundImage: `url('${resolveDishImage(
-                                dish
-                              )}')`,
-                            }}
-                          />
-                          {dish.isVegetarian && (
-                            <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[14px] text-green-500">
-                                eco
-                              </span>
-                            </div>
-                          )}
-                          {dish.isSpicy && (
-                            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[14px] text-orange-400">
-                                local_fire_department
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="p-5 flex flex-col flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="text-white text-lg font-bold leading-tight group-hover:text-primary transition-colors">
-                              {dish.name}
-                            </h3>
-                            <span className="text-white font-bold text-sm bg-surface-hover px-2 py-1 rounded ml-2 whitespace-nowrap">
-                              {priceLabel(dish)}
-                            </span>
-                          </div>
-                          <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-2">
-                            {dish.description}
-                          </p>
-                          <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between gap-3">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                addToCart(dish);
+                            className="relative h-48 overflow-hidden cursor-pointer shrink-0"
+                            onClick={() => navigateToDish(dish.id)}
+                          >
+                            <div
+                              className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                              style={{
+                                backgroundImage: `url('${resolveDishImage(
+                                  dish
+                                )}')`,
                               }}
-                              className="bg-primary hover:bg-primary-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-1 flex-1 shadow-lg shadow-red-900/20"
-                            >
-                              <span className="material-symbols-outlined text-sm">
-                                add_shopping_cart
-                              </span>
-                              Agregar
-                            </button>
-                            <button
-                              onClick={() => navigateToDish(dish.id)}
-                              className="text-xs font-bold text-text-secondary hover:text-white transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover"
-                            >
-                              Detalles{" "}
-                              <span className="material-symbols-outlined text-xs">
-                                arrow_forward
-                              </span>
-                            </button>
+                            />
+                            {dish.isVegetarian && (
+                              <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[14px] text-green-500">
+                                  eco
+                                </span>
+                              </div>
+                            )}
+                            {dish.isSpicy && (
+                              <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[14px] text-orange-400">
+                                  local_fire_department
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        </div>
+
+                          <div className="p-5 flex flex-col flex-1">
+                            <div className="flex justify-between items-start mb-2">
+                              <h3 className="text-white text-lg font-bold leading-tight group-hover:text-primary transition-colors">
+                                {dish.name}
+                              </h3>
+                              <span className="text-white font-bold text-sm bg-surface-hover px-2 py-1 rounded ml-2 whitespace-nowrap">
+                                {priceLabel(dish)}
+                              </span>
+                            </div>
+                            <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-2">
+                              {dish.description}
+                            </p>
+                            <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between gap-3">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToCart(dish);
+                                }}
+                                className="bg-primary hover:bg-primary-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-1 flex-1 shadow-lg shadow-red-900/20 z-20 relative"
+                              >
+                                <span className="material-symbols-outlined text-sm">
+                                  add_shopping_cart
+                                </span>
+                                Agregar
+                              </button>
+                              <button
+                                onClick={() => navigateToDish(dish.id)}
+                                className="text-xs font-bold text-text-secondary hover:text-white transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover z-20 relative"
+                              >
+                                Detalles{" "}
+                                <span className="material-symbols-outlined text-xs">
+                                  arrow_forward
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+                        </GlareCard>
                       </motion.div>
                     ))}
                   </AnimatePresence>
