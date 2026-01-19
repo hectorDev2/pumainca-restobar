@@ -1,13 +1,8 @@
 /** @type {import('next').NextConfig} */
-console.log('[NextConfig] Environment Check:', {
-  DOCKER_BUILD: process.env.DOCKER_BUILD,
-  VERCEL: process.env.VERCEL,
-  NODE_ENV: process.env.NODE_ENV,
-});
-
 const nextConfig = {
-  // Solo usar 'standalone' si se ejecuta dentro de Docker y NO en Vercel
-  ...(process.env.DOCKER_BUILD === 'true' && !process.env.VERCEL && { output: 'standalone' }),
+  // Use 'standalone' output ONLY when explicitly building for Docker.
+  // This ensures Vercel deployments (where this var is unset) use the default output.
+  ...(process.env.DOCKER_BUILD === 'true' && { output: 'standalone' }),
   images: {
     remotePatterns: [
       {
