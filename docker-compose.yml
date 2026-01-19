@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -11,17 +9,20 @@ services:
       - .:/app
       - /app/node_modules
       - /app/.next
+    # Cargar variables desde .env.local primero
+    env_file:
+      - .env.local
     environment:
       - NODE_ENV=development
+      # Las variables NEXT_PUBLIC_* deben estar disponibles en tiempo de ejecución
+      # Docker Compose leerá estas del archivo .env.local o del entorno del host
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
-      - NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:3000/api}
       - NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=${NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT:-}
       - NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=${NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY:-}
       - IMAGEKIT_PRIVATE_KEY=${IMAGEKIT_PRIVATE_KEY:-}
-    env_file:
-      - .env.local
     restart: unless-stopped
     networks:
       - pumainca-network

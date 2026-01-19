@@ -17,7 +17,8 @@
     "docker:prod": "bash scripts/docker-compose-wrapper.sh -f docker-compose.prod.yml up -d",
     "docker:prod:build": "bash scripts/docker-compose-wrapper.sh -f docker-compose.prod.yml build",
     "docker:prod:down": "bash scripts/docker-compose-wrapper.sh -f docker-compose.prod.yml down",
-    "docker:prod:logs": "bash scripts/docker-compose-wrapper.sh -f docker-compose.prod.yml logs -f"
+    "docker:prod:logs": "bash scripts/docker-compose-wrapper.sh -f docker-compose.prod.yml logs -f",
+    "docker:check-env": "bash scripts/check-env.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
