@@ -26,11 +26,12 @@ services:
     networks:
       - pumainca-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"] || exit 1
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
 
 networks:
   pumainca-network:
