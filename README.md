@@ -1,5 +1,5 @@
 <div align="center">
-<img width="300" src="/logo.png" alt="Pumainca Restobar Logo" />
+<img width="300" src="https://ik.imagekit.io/pumainca/public/cover.jpeg?updatedAt=1768571680905" alt="Pumainca Restobar Logo" />
 <h1>Pumainca Restobar</h1>
 <p><strong>Sistema de Gestión Digital para Restaurante</strong></p>
 <p>Plataforma web moderna para digitalizar y optimizar la experiencia gastronómica</p>
