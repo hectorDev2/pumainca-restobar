@@ -21,6 +21,22 @@ docker compose version
 docker-compose --version
 ```
 
+### Configurar Variables de Entorno
+
+**IMPORTANTE**: Antes de iniciar Docker, asegúrate de tener un archivo `.env.local` en la raíz del proyecto:
+
+```bash
+# Verificar que las variables estén configuradas
+npm run docker:check-env
+
+# O manualmente verificar que .env.local existe y contiene:
+# NEXT_PUBLIC_SUPABASE_URL=tu_url
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_key
+# SUPABASE_SERVICE_ROLE_KEY=tu_service_key
+```
+
+Si el script muestra errores, crea o actualiza `.env.local` con tus credenciales de Supabase.
+
 ## 🚀 Desarrollo Local con Docker
 
 ### Iniciar el entorno de desarrollo

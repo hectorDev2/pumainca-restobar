@@ -4,10 +4,10 @@ import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { useSiteContent } from '@/lib/queries';
+import { useSettings } from '@/lib/queries';
 
 export default function Home() {
-  const { data: content } = useSiteContent();
+  const { data: content } = useSettings();
 
   const title = content?.hero_title ?? "Sabores Auténticos,";
   const subtitle = content?.hero_subtitle ?? "Experiencia Inolvidable.";

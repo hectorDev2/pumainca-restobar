@@ -1,10 +1,10 @@
 "use client";
 
 import React from 'react';
-import { useSiteContent } from '@/lib/queries';
+import { useSettings } from '@/lib/queries';
 
 const Footer: React.FC = () => {
-  const { data: content } = useSiteContent();
+  const { data: content } = useSettings();
 
   return (
     <footer className="bg-black border-t border-zinc-900 pt-16 pb-8">

@@ -5,10 +5,15 @@ WORKDIR /app
 COPY package.json package-lock.json* bun.lockb* ./
 RUN bun install
 
+# Copiar scripts
+COPY scripts/docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Copiar código fuente
 COPY . .
 
 EXPOSE 3000
 
-# Usar el script de desarrollo de Next.js
+# Usar entrypoint para verificar variables antes de iniciar
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["bun", "run", "dev"]

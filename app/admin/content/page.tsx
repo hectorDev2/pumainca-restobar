@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminHeader from "@/components/AdminHeader";
-import { useSiteContent, useUpdateSiteContent } from "@/lib/queries";
+import { useSettings, useUpdateSettings } from "@/lib/queries";
 
 export default function AdminContentPage() {
-  const { data: content, isLoading: isContentLoading } = useSiteContent();
-  const updateMutation = useUpdateSiteContent();
+  const { data: content, isLoading: isContentLoading } = useSettings();
+  const updateMutation = useUpdateSettings();
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
