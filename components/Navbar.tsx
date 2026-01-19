@@ -5,6 +5,7 @@ import { useCart } from '@/context/CartContext';
 import { useProducts } from '@/lib/queries';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Product } from '@/types';
+import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 
 interface Props {
   showSearch?: boolean;
@@ -73,7 +74,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
   const isActive = (path: string) => {
     return pathname === path ? 
       "text-primary transition-colors text-sm font-bold border-b-2 border-primary pb-0.5" : 
-      "text-white/80 hover:text-primary transition-colors text-sm font-semibold";
+      "text-text-secondary hover:text-primary transition-colors text-sm font-semibold";
   };
 
   // Close dropdown on click outside
@@ -97,12 +98,12 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-black/95 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-background-dark/95 backdrop-blur-md transition-colors duration-300">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-10 h-20 flex items-center justify-between">
         <div className="flex items-center gap-4 md:gap-8">
             {/* Mobile Menu Button */}
             <button 
-                className="lg:hidden text-white p-2 -ml-2 hover:bg-zinc-800 rounded-lg transition-colors"
+                className="lg:hidden text-text-primary p-2 -ml-2 hover:bg-surface-hover rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Menu"
             >
@@ -119,7 +120,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
             <div className="hidden md:flex relative w-60 lg:w-80" ref={searchContainerRef}>
               <button 
                 onClick={handleManualSearch}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-white transition-colors"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition-colors"
                 aria-label="Buscar"
               >
                 <span className="material-symbols-outlined">search</span>
@@ -128,7 +129,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                 name="nav-search"
                 type="text" 
                 placeholder="Buscar..."
-                className="w-full bg-surface-dark border-none rounded-xl pl-12 py-2.5 text-sm text-white focus:ring-2 focus:ring-primary/50 transition-all"
+                className="w-full bg-surface-dark border-none rounded-xl pl-12 py-2.5 text-sm text-text-primary placeholder-text-secondary focus:ring-2 focus:ring-primary/50 transition-all"
                 value={searchTerm}
                 onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -147,9 +148,9 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
 
               {/* In-situ Search Dropdown */}
               {showDropdown && searchTerm.length >= 2 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-background-dark border border-zinc-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     {isLoading ? (
-                        <div className="p-4 text-center text-zinc-500 text-sm flex items-center justify-center gap-2">
+                        <div className="p-4 text-center text-text-secondary text-sm flex items-center justify-center gap-2">
                             <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
                             Buscando...
                         </div>
@@ -163,14 +164,14 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                                         setShowDropdown(false);
                                         router.push(`/menu/${product.id}`);
                                     }}
-                                    className="w-full text-left p-3 hover:bg-zinc-800 flex items-center gap-3 transition-colors border-b border-zinc-800/50 last:border-0"
+                                    className="w-full text-left p-3 hover:bg-surface-hover flex items-center gap-3 transition-colors border-b border-zinc-800/50 last:border-0"
                                 >
-                                    <div className="size-10 rounded-lg bg-zinc-800 bg-cover bg-center shrink-0" 
+                                    <div className="size-10 rounded-lg bg-surface-dark bg-cover bg-center shrink-0" 
                                          style={{ backgroundImage: `url('${product.image || product.image_url || '/placeholder.png'}')` }} 
                                     />
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-white text-sm font-bold truncate">{product.name}</p>
-                                        <p className="text-zinc-500 text-xs truncate">{product.category}</p>
+                                        <p className="text-text-primary text-sm font-bold truncate">{product.name}</p>
+                                        <p className="text-text-secondary text-xs truncate">{product.category}</p>
                                     </div>
                                     <span className="text-primary text-xs font-bold whitespace-nowrap">
                                         S/. {typeof product.price === 'number' ? product.price.toFixed(2) : '0.00'}
@@ -179,13 +180,13 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                             ))}
                             <button 
                                 onClick={handleManualSearch}
-                                className="w-full p-2 text-center text-xs text-primary font-bold hover:bg-zinc-800 transition-colors uppercase tracking-wider"
+                                className="w-full p-2 text-center text-xs text-primary font-bold hover:bg-surface-hover transition-colors uppercase tracking-wider"
                             >
                                 Ver todos los resultados
                             </button>
                         </div>
                     ) : (
-                        <div className="p-4 text-center text-zinc-500 text-sm">
+                        <div className="p-4 text-center text-text-secondary text-sm">
                             No se encontraron resultados
                         </div>
                     )}
@@ -203,6 +204,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
           </div>
           
           <div className="flex gap-2 sm:gap-3">
+            <AnimatedThemeToggler />
             <Link 
               href="/menu"
               className="bg-primary hover:bg-primary-dark text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold shadow-lg shadow-red-900/30 transition-all active:scale-95 whitespace-nowrap">
@@ -211,9 +213,9 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
             <Link 
               href="/cart"
               className="relative flex items-center justify-center size-9 sm:size-10 bg-surface-dark hover:bg-surface-hover rounded-xl border border-zinc-800 transition-colors">
-              <span className="material-symbols-outlined text-white text-lg sm:text-xl">shopping_cart</span>
+              <span className="material-symbols-outlined text-text-primary text-lg sm:text-xl">shopping_cart</span>
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 size-4 sm:size-5 bg-primary text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-black">
+                <span className="absolute -top-1 -right-1 size-4 sm:size-5 bg-primary text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-background-dark">
                   {cartCount}
                 </span>
               )}
@@ -223,26 +225,26 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
       </div>
 
       {/* Mobile Menu Overlay */}
-      <div className={`lg:hidden fixed inset-0 z-40 bg-black/95 backdrop-blur-xl transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} pt-24 px-6`}>
+      <div className={`lg:hidden fixed inset-0 z-40 bg-background-dark/95 backdrop-blur-xl transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} pt-24 px-6`}>
         <div className="flex flex-col gap-6 text-center">
             <Link 
                 href="/menu" 
                 onClick={() => setIsMenuOpen(false)}
-                className={`text-2xl font-bold py-4 border-b border-zinc-800 ${pathname === '/menu' ? 'text-primary' : 'text-white'}`}
+                className={`text-2xl font-bold py-4 border-b border-zinc-800 ${pathname === '/menu' ? 'text-primary' : 'text-text-primary'}`}
             >
                 Menú
             </Link>
             <Link 
                 href="/nosotros" 
                 onClick={() => setIsMenuOpen(false)}
-                className={`text-2xl font-bold py-4 border-b border-zinc-800 ${pathname === '/nosotros' ? 'text-primary' : 'text-white'}`}
+                className={`text-2xl font-bold py-4 border-b border-zinc-800 ${pathname === '/nosotros' ? 'text-primary' : 'text-text-primary'}`}
             >
                 Nosotros
             </Link>
             <Link 
                 href="/reservas" 
                 onClick={() => setIsMenuOpen(false)}
-                className={`text-2xl font-bold py-4 border-b border-zinc-800 ${pathname === '/reservas' ? 'text-primary' : 'text-white'}`}
+                className={`text-2xl font-bold py-4 border-b border-zinc-800 ${pathname === '/reservas' ? 'text-primary' : 'text-text-primary'}`}
             >
                 Reservas
             </Link>
@@ -261,7 +263,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                      <input 
                         type="text" 
                         placeholder="Buscar en el menú..." 
-                        className="w-full bg-surface-dark border border-zinc-800 rounded-xl pl-12 py-3 text-white focus:ring-2 focus:ring-primary/50"
+                        className="w-full bg-surface-dark border border-zinc-800 rounded-xl pl-12 py-3 text-text-primary placeholder-text-secondary focus:ring-2 focus:ring-primary/50"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                      />
