@@ -1,5 +1,5 @@
 <div align="center">
-<img width="300" src="/logo.png" alt="Pumainca Restobar Logo" />
+<img width="300" src="https://ik.imagekit.io/pumainca/public/cover.jpeg?updatedAt=1768571680905" alt="Pumainca Restobar Logo" />
 <h1>Pumainca Restobar</h1>
 <p><strong>Sistema de Gestión Digital para Restaurante</strong></p>
 <p>Plataforma web moderna para digitalizar y optimizar la experiencia gastronómica</p>
@@ -149,12 +149,14 @@ Acceso protegido mediante autenticación con Supabase Auth.
 
 ## 🛠️ Instalación y Configuración
 
-### Prerrequisitos
+### Opción 1: Instalación Local (Sin Docker)
+
+#### Prerrequisitos
 - **Node.js** 18+ o **Bun** 1.0+
 - Cuenta en [Supabase](https://supabase.com/)
 - Cuenta en [ImageKit.io](https://imagekit.io/) (opcional, para CDN de imágenes)
 
-### Pasos de Instalación
+#### Pasos de Instalación
 
 1. **Clonar el repositorio**:
    ```bash
@@ -216,6 +218,53 @@ Acceso protegido mediante autenticación con Supabase Auth.
 6. **Acceder al panel de administración**:
    - Navega a `/admin` o `/login`
    - Inicia sesión con tus credenciales de administrador
+
+### Opción 2: Instalación con Docker (Recomendado)
+
+#### Prerrequisitos
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) instalado
+- Docker Compose v3.8+
+
+#### Pasos Rápidos
+
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/tu-usuario/pumainca-restobar.git
+   cd pumainca-restobar
+   ```
+
+2. **Configurar Variables de Entorno**:
+   
+   Crea `.env.local` con tus credenciales (ver Opción 1, paso 3)
+
+3. **Iniciar con Docker**:
+   ```bash
+   # Desarrollo
+   npm run docker:dev
+   
+   # O directamente
+   docker-compose up
+   ```
+
+4. **Acceder a la aplicación**:
+   - Abre [http://localhost:3000](http://localhost:3000)
+   - Los cambios en el código se reflejan automáticamente (hot reload)
+
+#### Comandos Docker Útiles
+
+```bash
+# Desarrollo
+npm run docker:dev          # Iniciar entorno de desarrollo
+npm run docker:dev:logs     # Ver logs en tiempo real
+npm run docker:dev:down     # Detener contenedores
+
+# Producción
+npm run docker:build        # Construir imagen de producción
+npm run docker:prod         # Iniciar en modo producción
+npm run docker:prod:logs    # Ver logs de producción
+```
+
+📖 **Documentación completa de Docker**: Ver [DOCKER.md](./DOCKER.md) para más detalles sobre despliegue, troubleshooting y configuración avanzada.
 
 ---
 
@@ -396,19 +445,56 @@ npm run lint         # Ejecuta ESLint
 
 ## 🚀 Despliegue
 
-### Vercel (Recomendado)
+### Opción 1: Vercel (Recomendado para Next.js)
 
 1. Conecta tu repositorio a Vercel
 2. Configura las variables de entorno en el dashboard
 3. Vercel detectará automáticamente Next.js y desplegará
 
-### Otros Proveedores
+### Opción 2: Docker (Recomendado para control total)
+
+El proyecto está completamente dockerizado y puede desplegarse en cualquier plataforma que soporte Docker y contenedores.
+
+#### Plataformas Cloud que soportan Docker
+
+- **Railway**: Detecta Dockerfile automáticamente
+- **Render**: Soporte nativo para Docker
+- **Fly.io**: Optimizado para Docker
+- **AWS ECS/Fargate**: Contenedores escalables
+- **Google Cloud Run**: Serverless con Docker
+- **Azure Container Instances**: Contenedores en Azure
+- **DigitalOcean App Platform**: Deploy con Docker
+
+#### Pasos rápidos con scripts incluidos
+
+1. Clona el repositorio y crea el archivo `.env.local` con tus variables de entorno.
+2. Ejecuta `npm run docker:dev` para levantar el stack de desarrollo o `npm run docker:prod` para producción.
+3. `scripts/docker-compose-wrapper.sh` detecta automáticamente si el sistema expone `docker compose` o el binario `docker-compose` para garantizar compatibilidad.
+
+#### Despliegue rápido con Docker
+
+```bash
+# 1. Build de la imagen
+docker build -t pumainca-restobar .
+
+# 2. Ejecutar localmente para probar
+docker run -p 3000:3000 \
+  -e NEXT_PUBLIC_SUPABASE_URL=tu_url \
+  -e NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_key \
+  pumainca-restobar
+
+# 3. O usar docker-compose para producción
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+📖 **Guía completa de Docker**: Ver [DOCKER.md](./DOCKER.md) para instrucciones detalladas de despliegue en diferentes plataformas.
+
+### Opción 3: Otros Proveedores
 
 El proyecto puede desplegarse en cualquier plataforma que soporte Next.js:
 - Netlify
 - AWS Amplify
-- Railway
-- Render
+- Cloudflare Pages
 
 ---
 
@@ -427,6 +513,28 @@ Este es un proyecto privado. Para contribuciones, contacta al equipo de desarrol
 ## 📞 Soporte
 
 Para soporte técnico o consultas, contacta al equipo de desarrollo de Pumainca Restobar.
+
+---
+
+## 🧰 Comandos Útiles
+
+### Desarrollo y pruebas locales
+
+- `npm run dev` / `bun dev`: ejecuta Next.js en modo desarrollo con hot reload.
+- `npm run start:dev`: alias a `npm run dev`.
+- `npm run build`: genera el build optimizado.
+- `npm run start`: ejecuta el build en modo producción local.
+- `npm run lint`: corre ESLint con la configuración de Next.js.
+
+### Docker y contenedores
+
+- `npm run docker:dev`: arranca el stack de desarrollo mediante `scripts/docker-compose-wrapper.sh`.
+- `npm run docker:dev:build`: reconstruye las imágenes del entorno de desarrollo.
+- `npm run docker:dev:down`: detiene y elimina los contenedores del entorno de desarrollo.
+- `npm run docker:dev:logs`: muestra los logs en tiempo real del entorno de desarrollo.
+- `npm run docker:build`: construye la imagen de producción `pumainca-restobar`.
+- `npm run docker:prod`: levanta los servicios definidos en `docker-compose.prod.yml` (con el wrapper detectando `docker compose` o `docker-compose`).
+- `npm run docker:prod:build`, `npm run docker:prod:down`, `npm run docker:prod:logs`: lleva la gestión completa del entorno de producción.
 
 ---
 
