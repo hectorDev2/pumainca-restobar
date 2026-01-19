@@ -8,17 +8,28 @@ const imagekit = new ImageKit({
 });
 
 export const uploadImage = async (file: File, fileName: string, folder?: string): Promise<string> => {
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-  const response = await imagekit.upload({
-    file: buffer, // required
-    fileName: fileName, // required
-    folder: folder || process.env.IMAGEKIT_FOLDER || "products",
-    useUniqueFileName: true,
-  });
+    const response = await imagekit.upload({
+      file: buffer, // required
+      fileName: fileName, // required
+      folder: folder || process.env.IMAGEKIT_FOLDER || "products",
+      useUniqueFileName: true,
+    });
 
-  return response.url;
+    return response.url;
+  } catch (err: any) {
+    console.error('ImageKit upload error:', {
+      name: err?.name,
+      message: err?.message,
+      status: err?.response?.status,
+      // avoid printing sensitive response bodies directly
+      body: err?.response?.data ? '[response data]' : undefined,
+    });
+    throw err;
+  }
 };
 
 export default imagekit;

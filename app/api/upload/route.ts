@@ -16,7 +16,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ url });
   } catch (error) {
-    console.error("Upload error:", error);
+    const err: any = error;
+    console.error("Upload error:", {
+      message: err?.message,
+      name: err?.name,
+      status: err?.response?.status,
+      stack: err?.stack?.split('\n')?.slice(0, 6),
+    });
     return NextResponse.json({ error: "Failed to upload image" }, { status: 500 });
   }
 }
