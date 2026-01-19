@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+console.log('[NextConfig] Environment Check:', {
+  DOCKER_BUILD: process.env.DOCKER_BUILD,
+  VERCEL: process.env.VERCEL,
+  NODE_ENV: process.env.NODE_ENV,
+});
+
 const nextConfig = {
   // Solo usar 'standalone' si se ejecuta dentro de Docker y NO en Vercel
   ...(process.env.DOCKER_BUILD === 'true' && !process.env.VERCEL && { output: 'standalone' }),
