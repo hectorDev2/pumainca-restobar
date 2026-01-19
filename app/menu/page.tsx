@@ -151,7 +151,7 @@ function MenuContent() {
           categories={categories}
         />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-background-dark scroll-smooth">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-background-dark scroll-smooth transition-colors duration-300">
           <div className="max-w-[1200px] mx-auto space-y-10">
             <div className="md:hidden">
               <div className="relative">
@@ -161,7 +161,7 @@ function MenuContent() {
                 <input
                   type="text"
                   placeholder="Buscar plato..."
-                  className="w-full bg-surface-dark border-none rounded-xl pl-12 py-3 text-white focus:ring-2 focus:ring-primary/50"
+                  className="w-full bg-surface-dark border-none rounded-xl pl-12 py-3 text-text-primary focus:ring-2 focus:ring-primary/50"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -175,10 +175,10 @@ function MenuContent() {
                 transition={{ duration: 0.5 }}
               >
                 <div
-                  className="rounded-2xl overflow-hidden relative shadow-2xl border border-zinc-800 group cursor-pointer"
+                  className="rounded-2xl overflow-hidden relative shadow-2xl border border-zinc-800/50 group cursor-pointer"
                   onClick={() => navigateToDish(heroDish.id)}
                 >
-                  <div className="absolute inset-0 bg-linear-to-r from-black/90 via-black/40 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-linear-to-r from-background-dark/90 via-background-dark/40 to-transparent z-10" />
 
                   <div
                     className="h-[400px] bg-cover bg-center w-full transition-transform duration-700 group-hover:scale-105"
@@ -193,10 +193,10 @@ function MenuContent() {
                       </span>{" "}
                       Especial del Chef
                     </span>
-                    <h1 className="text-white text-4xl md:text-5xl font-black leading-tight tracking-tight">
+                    <h1 className="text-text-primary text-4xl md:text-5xl font-black leading-tight tracking-tight shadow-md">
                       {heroDish.name}
                     </h1>
-                    <p className="text-gray-200 text-base md:text-lg font-medium leading-relaxed max-w-lg">
+                    <p className="text-text-secondary text-base md:text-lg font-medium leading-relaxed max-w-lg drop-shadow-sm">
                       {heroDish.description}
                     </p>
                     <div className="flex flex-wrap gap-4 mt-2">
@@ -240,19 +240,19 @@ function MenuContent() {
                     <input
                       type="text"
                       placeholder="Buscar plato..."
-                      className="hidden md:block bg-surface-dark border-none rounded-full pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-primary/50"
+                      className="hidden md:block bg-surface-dark border-none rounded-full pl-10 pr-4 py-2 text-sm text-text-primary focus:ring-2 focus:ring-primary/50 placeholder-text-secondary/50"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
                   <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-text-secondary">
-                    <span className="text-white text-[10px]">Ordenar por</span>
+                    <span className="text-text-primary text-[10px]">Ordenar por</span>
                     <select
                       value={sortOrder}
                       onChange={(event) =>
                         setSortOrder(event.target.value as SortOption)
                       }
-                      className="bg-black border border-zinc-800 rounded-full px-4 py-2 text-[12px] text-white outline-none"
+                      className="bg-surface-dark border border-zinc-800 rounded-full px-4 py-2 text-[12px] text-text-primary outline-none"
                     >
                       {sortOptions.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -268,12 +268,12 @@ function MenuContent() {
                 <div className="flex gap-2 overflow-x-auto pb-1 max-w-full no-scrollbar">
                   <button
                     onClick={() => setSelectedSubCategory(null)}
-                    className="relative px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors outline-none text-white"
+                    className="relative px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors outline-none text-text-primary"
                   >
                     {!selectedSubCategory && (
                       <motion.div
                         layoutId="activeSubTab"
-                        className="absolute inset-0 bg-white rounded-full"
+                        className="absolute inset-0 bg-primary rounded-full alpha-100"
                         transition={{
                           type: "spring",
                           stiffness: 400,
@@ -284,8 +284,8 @@ function MenuContent() {
                     <span
                       className={`relative z-10 ${
                         !selectedSubCategory
-                          ? "text-black"
-                          : "text-zinc-400 hover:text-white"
+                          ? "text-white"
+                          : "text-text-secondary hover:text-text-primary"
                       }`}
                     >
                       Todos
@@ -300,7 +300,7 @@ function MenuContent() {
                       {selectedSubCategory === sub.id && (
                         <motion.div
                           layoutId="activeSubTab"
-                          className="absolute inset-0 bg-white rounded-full"
+                          className="absolute inset-0 bg-primary rounded-full"
                           transition={{
                             type: "spring",
                             stiffness: 400,
@@ -311,8 +311,8 @@ function MenuContent() {
                       <span
                         className={`relative z-10 ${
                           selectedSubCategory === sub.id
-                            ? "text-black"
-                            : "text-zinc-400 hover:text-white"
+                            ? "text-white"
+                            : "text-text-secondary hover:text-text-primary"
                         }`}
                       >
                         {sub.name}
@@ -326,7 +326,7 @@ function MenuContent() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="py-20 text-center text-white"
+                  className="py-20 text-center text-text-primary"
                 >
                   <span className="material-symbols-outlined text-6xl text-zinc-700 mb-4">
                     hourglass_top
@@ -380,10 +380,10 @@ function MenuContent() {
 
                           <div className="p-5 flex flex-col flex-1">
                             <div className="flex justify-between items-start mb-2">
-                              <h3 className="text-white text-lg font-bold leading-tight group-hover:text-primary transition-colors">
+                              <h3 className="text-text-primary text-lg font-bold leading-tight group-hover:text-primary transition-colors">
                                 {dish.name}
                               </h3>
-                              <span className="text-white font-bold text-sm bg-surface-hover px-2 py-1 rounded ml-2 whitespace-nowrap">
+                              <span className="text-text-primary font-bold text-sm bg-surface-hover px-2 py-1 rounded ml-2 whitespace-nowrap">
                                 {priceLabel(dish)}
                               </span>
                             </div>
@@ -405,7 +405,7 @@ function MenuContent() {
                               </button>
                               <button
                                 onClick={() => navigateToDish(dish.id)}
-                                className="text-xs font-bold text-text-secondary hover:text-white transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover z-20 relative"
+                                className="text-xs font-bold text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover z-20 relative"
                               >
                                 Detalles{" "}
                                 <span className="material-symbols-outlined text-xs">
@@ -454,7 +454,7 @@ function MenuContent() {
                           backgroundImage: `url('${resolveDishImage(dish)}')`,
                         }}
                       />
-                      <h4 className="text-white font-bold text-lg group-hover:text-primary transition-colors">
+                      <h4 className="text-text-primary font-bold text-lg group-hover:text-primary transition-colors">
                         {dish.name}
                       </h4>
                       <p className="text-text-secondary text-sm line-clamp-1 capitalize">
