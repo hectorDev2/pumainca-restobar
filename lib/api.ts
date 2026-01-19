@@ -1,10 +1,15 @@
+// En ambientes como Vercel usaremos rutas relativas si no se especifica la base
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+
+export function resolveApiUrl(path: string) {
+  return API_BASE_URL ? `${API_BASE_URL}${path}` : path;
+}
 
 export async function apiFetch<T>(
   path: string,
   init?: RequestInit
 ): Promise<T> {
-  const url = `${API_BASE_URL}${path}`;
+  const url = resolveApiUrl(path);
 
   // Obtener token del localStorage
   const token =
