@@ -149,12 +149,14 @@ Acceso protegido mediante autenticación con Supabase Auth.
 
 ## 🛠️ Instalación y Configuración
 
-### Prerrequisitos
+### Opción 1: Instalación Local (Sin Docker)
+
+#### Prerrequisitos
 - **Node.js** 18+ o **Bun** 1.0+
 - Cuenta en [Supabase](https://supabase.com/)
 - Cuenta en [ImageKit.io](https://imagekit.io/) (opcional, para CDN de imágenes)
 
-### Pasos de Instalación
+#### Pasos de Instalación
 
 1. **Clonar el repositorio**:
    ```bash
@@ -216,6 +218,53 @@ Acceso protegido mediante autenticación con Supabase Auth.
 6. **Acceder al panel de administración**:
    - Navega a `/admin` o `/login`
    - Inicia sesión con tus credenciales de administrador
+
+### Opción 2: Instalación con Docker (Recomendado)
+
+#### Prerrequisitos
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) instalado
+- Docker Compose v3.8+
+
+#### Pasos Rápidos
+
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/tu-usuario/pumainca-restobar.git
+   cd pumainca-restobar
+   ```
+
+2. **Configurar Variables de Entorno**:
+   
+   Crea `.env.local` con tus credenciales (ver Opción 1, paso 3)
+
+3. **Iniciar con Docker**:
+   ```bash
+   # Desarrollo
+   npm run docker:dev
+   
+   # O directamente
+   docker-compose up
+   ```
+
+4. **Acceder a la aplicación**:
+   - Abre [http://localhost:3000](http://localhost:3000)
+   - Los cambios en el código se reflejan automáticamente (hot reload)
+
+#### Comandos Docker Útiles
+
+```bash
+# Desarrollo
+npm run docker:dev          # Iniciar entorno de desarrollo
+npm run docker:dev:logs     # Ver logs en tiempo real
+npm run docker:dev:down     # Detener contenedores
+
+# Producción
+npm run docker:build        # Construir imagen de producción
+npm run docker:prod         # Iniciar en modo producción
+npm run docker:prod:logs    # Ver logs de producción
+```
+
+📖 **Documentación completa de Docker**: Ver [DOCKER.md](./DOCKER.md) para más detalles sobre despliegue, troubleshooting y configuración avanzada.
 
 ---
 
@@ -396,19 +445,50 @@ npm run lint         # Ejecuta ESLint
 
 ## 🚀 Despliegue
 
-### Vercel (Recomendado)
+### Opción 1: Vercel (Recomendado para Next.js)
 
 1. Conecta tu repositorio a Vercel
 2. Configura las variables de entorno en el dashboard
 3. Vercel detectará automáticamente Next.js y desplegará
 
-### Otros Proveedores
+### Opción 2: Docker (Recomendado para control total)
+
+El proyecto está completamente dockerizado y puede desplegarse en cualquier plataforma que soporte Docker:
+
+#### Plataformas Cloud que soportan Docker:
+
+- **Railway**: Detecta Dockerfile automáticamente
+- **Render**: Soporte nativo para Docker
+- **Fly.io**: Optimizado para Docker
+- **AWS ECS/Fargate**: Contenedores escalables
+- **Google Cloud Run**: Serverless con Docker
+- **Azure Container Instances**: Contenedores en Azure
+- **DigitalOcean App Platform**: Deploy con Docker
+
+#### Despliegue Rápido con Docker:
+
+```bash
+# 1. Build de la imagen
+docker build -t pumainca-restobar .
+
+# 2. Ejecutar localmente para probar
+docker run -p 3000:3000 \
+  -e NEXT_PUBLIC_SUPABASE_URL=tu_url \
+  -e NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_key \
+  pumainca-restobar
+
+# 3. O usar docker-compose para producción
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+📖 **Guía completa de Docker**: Ver [DOCKER.md](./DOCKER.md) para instrucciones detalladas de despliegue en diferentes plataformas.
+
+### Opción 3: Otros Proveedores
 
 El proyecto puede desplegarse en cualquier plataforma que soporte Next.js:
 - Netlify
 - AWS Amplify
-- Railway
-- Render
+- Cloudflare Pages
 
 ---
 

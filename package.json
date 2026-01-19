@@ -8,7 +8,16 @@
     "start:dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "docker:dev": "bash scripts/docker-compose-wrapper.sh up",
+    "docker:dev:build": "bash scripts/docker-compose-wrapper.sh build",
+    "docker:dev:down": "bash scripts/docker-compose-wrapper.sh down",
+    "docker:dev:logs": "bash scripts/docker-compose-wrapper.sh logs -f",
+    "docker:build": "docker build -t pumainca-restobar .",
+    "docker:prod": "bash scripts/docker-compose-wrapper.sh -f docker-compose.prod.yml up -d",
+    "docker:prod:build": "bash scripts/docker-compose-wrapper.sh -f docker-compose.prod.yml build",
+    "docker:prod:down": "bash scripts/docker-compose-wrapper.sh -f docker-compose.prod.yml down",
+    "docker:prod:logs": "bash scripts/docker-compose-wrapper.sh -f docker-compose.prod.yml logs -f"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
