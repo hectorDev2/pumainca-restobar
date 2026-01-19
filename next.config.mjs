@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone', // Necesario para Docker
+  // Solo usar 'standalone' si se ejecuta dentro de Docker (detectar con variable)
+  ...(process.env.DOCKER_BUILD === 'true' && { output: 'standalone' }),
   images: {
     remotePatterns: [
       {
@@ -10,6 +11,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ik.imagekit.io',
       },
     ],
   },
