@@ -12,6 +12,8 @@ import {
 } from "@/lib/queries";
 import { useCreateCategory } from "@/lib/queries";
 import CreateCategoryForm from "@/components/CreateCategoryForm";
+import { AdminModal } from "@/components/ui/admin-modal";
+import { FileUpload } from "@/components/ui/file-upload";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types";
 
@@ -650,7 +652,7 @@ export default function AdminPage() {
               </div>
 
               {/* Imagen principal */}
-              <div className="space-y-2">
+              <div className="grid gap-2">
                 <label className="text-xs text-zinc-500 uppercase font-bold">
                   Imagen principal
                 </label>
@@ -667,19 +669,12 @@ export default function AdminPage() {
                     </div>
                   )}
                 </div>
-                <label className="relative inline-flex items-center gap-3 rounded-2xl border border-zinc-800 px-4 py-2 mt-2 cursor-pointer">
-                  <span className="text-xs font-bold uppercase text-zinc-300">
-                    {editMainImage ? "Cambiar imagen" : "Subir imagen"}
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="absolute inset-0 opacity-0 cursor-pointer rounded-2xl"
-                    onChange={(e) =>
-                      setEditMainImage(e.target.files?.[0] ?? null)
-                    }
-                  />
-                </label>
+                <FileUpload
+                  label="Añadir imagen"
+                  description="Arrastra o selecciona un archivo JPEG/PNG"
+                  accept="image/*"
+                  onChange={(files) => setEditMainImage(files[0] ?? null)}
+                />
                 {editMainImage && (
                   <p className="text-xs text-zinc-400">
                     Archivo: {editMainImage.name}
@@ -889,7 +884,7 @@ export default function AdminPage() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="grid gap-2">
                 <label className="text-xs text-zinc-500 uppercase font-bold">
                   Imagen principal (opcional)
                 </label>
@@ -906,19 +901,12 @@ export default function AdminPage() {
                     </div>
                   )}
                 </div>
-                <label className="relative inline-flex items-center gap-3 rounded-2xl border border-zinc-800 px-4 py-2 mt-2 cursor-pointer">
-                  <span className="text-xs font-bold uppercase text-zinc-300">
-                    {createMainImage ? "Cambiar imagen" : "Seleccionar imagen"}
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="absolute inset-0 opacity-0 cursor-pointer rounded-2xl"
-                    onChange={(e) =>
-                      setCreateMainImage(e.target.files?.[0] ?? null)
-                    }
-                  />
-                </label>
+                <FileUpload
+                  label="Seleccionar imagen"
+                  description="Máx. 5MB, JPG/PNG"
+                  accept="image/*"
+                  onChange={(files) => setCreateMainImage(files[0] ?? null)}
+                />
                 {createMainImage && (
                   <p className="text-xs text-zinc-400">
                     Archivo: {createMainImage.name}
