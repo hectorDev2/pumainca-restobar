@@ -336,11 +336,11 @@ function MenuContent() {
               ) : filteredDishes.length > 0 ? (
                 <motion.div
                   layout
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6"
                 >
                   <AnimatePresence mode="popLayout">
                     {filteredDishes.map((dish) => (
-                      <motion.div
+                    <motion.div
                         layout
                         key={dish.id}
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -349,9 +349,9 @@ function MenuContent() {
                         transition={{ duration: 0.3 }}
                         className="group relative h-full"
                       >
-                        <GlareCard className="flex flex-col bg-surface-dark h-full">
+                        <GlareCard className="flex flex-col bg-surface-dark h-full min-h-[440px] shadow-2xl">
                           <div
-                            className="relative h-48 overflow-hidden cursor-pointer shrink-0"
+                            className="relative h-48 sm:h-56 md:h-64 overflow-hidden cursor-pointer shrink-0"
                             onClick={() => navigateToDish(dish.id)}
                           >
                             <div
@@ -378,7 +378,7 @@ function MenuContent() {
                             )}
                           </div>
 
-                          <div className="p-5 flex flex-col flex-1">
+                          <div className="p-5 flex flex-col flex-1 h-full">
                             <div className="flex justify-between items-start mb-2">
                               <h3 className="text-text-primary text-lg font-bold leading-tight group-hover:text-primary transition-colors">
                                 {dish.name}
@@ -387,10 +387,10 @@ function MenuContent() {
                                 {priceLabel(dish)}
                               </span>
                             </div>
-                            <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-2">
+                            <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-3">
                               {dish.description}
                             </p>
-                            <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between gap-3">
+                            <div className="mt-auto pt-4 border-t border-zinc-800 space-y-3 sm:flex sm:items-center sm:justify-between sm:space-y-0">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -405,7 +405,7 @@ function MenuContent() {
                               </button>
                               <button
                                 onClick={() => navigateToDish(dish.id)}
-                                className="text-xs font-bold text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover z-20 relative"
+                                className="text-xs font-bold text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover z-20 relative w-full sm:w-auto text-center"
                               >
                                 Detalles{" "}
                                 <span className="material-symbols-outlined text-xs">
