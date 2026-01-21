@@ -2,17 +2,63 @@
 
 import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
 import Link from "next/link";
-import { useState } from "react";
-import { useProducts, useProduct } from "@/lib/queries";
+import { memo, useState } from "react";
+import { useProducts } from "@/lib/queries";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types";
 import Image from "next/image";
-import { Modal, ModalBody, ModalContent, ModalFooter } from "@/components/ui/animated-modal";
 
-const neuralSets = [
-  { name: "Neural Set Alpha", time: "22:00", dj: "DJ Neon" },
-  { name: "Neural Set Beta", time: "00:00", dj: "DJ Void" },
-  { name: "Neural Set Gamma", time: "02:00", dj: "DJ Pulse" },
+// Bento Gallery Images
+const barGalleryImages = [
+  {
+    src: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=2000&q=80",
+    alt: "Bar Atmosphere",
+    span: [2, 2], // Large featured image
+    title: "Ambiente Nocturno",
+    subtitle: "Experiencia única",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?auto=format&fit=crop&w=800&q=80",
+    alt: "Cocktail Preparation",
+    span: [1, 1],
+    title: "Mixología",
+    subtitle: "Arte molecular",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80",
+    alt: "Neon Cocktails",
+    span: [1, 1],
+    title: "Cócteles Neon",
+    subtitle: "Brillan en la oscuridad",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?auto=format&fit=crop&w=800&q=80",
+    alt: "Bar Counter",
+    span: [1, 2],
+    title: "Barra Principal",
+    subtitle: "El corazón del bar",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=800&q=80",
+    alt: "Cocktail Glass",
+    span: [1, 1],
+    title: "Precisión",
+    subtitle: "Cada detalle cuenta",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?auto=format&fit=crop&w=800&q=80",
+    alt: "Bar Lighting",
+    span: [1, 1],
+    title: "Iluminación",
+    subtitle: "Aura cyberpunk",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80",
+    alt: "Night Scene",
+    span: [1, 2],
+    title: "Noches Épicas",
+    subtitle: "22:00 - 03:00",
+  },
 ];
 
 // Helper function to calculate molecular formula based on ingredients
@@ -70,9 +116,154 @@ const generateFlavorProfile = (product: Product): string[] => {
   return profile.length > 0 ? profile : ["Clásico"];
 };
 
+// Helper function to format price
+function formatPrice(price: number | { [key: string]: number } | undefined): string {
+  if (!price) return "S./0.00";
+  if (typeof price === "number") {
+    return `S./${price.toFixed(2)}`;
+  }
+  const firstPrice = Object.values(price)[0];
+  return `S./${firstPrice.toFixed(2)}`;
+}
+
+// Individual Drink Card Component with isolated hover state
+const DrinkCard = memo(function DrinkCard({
+  drink,
+  onAddToCart,
+}: {
+  drink: Product;
+  onAddToCart: (drink: Product) => void;
+}) {
+  const [isCardHovered, setIsCardHovered] = useState(false);
+  const molecular = calculateMolecularFormula(drink.ingredients || []);
+  const intensity = calculateIntensity(drink);
+  const profile = generateFlavorProfile(drink);
+
+  return (
+    <NeonGradientCard 
+      cardId={`drink-${drink.id}`}
+      neonColor="#ff2975"
+      secondaryColor="#00FFF1"
+      className="h-[450px] cursor-pointer"
+      onMouseEnter={() => {
+        setIsCardHovered(true);
+      }}
+      onMouseLeave={() => {
+        setIsCardHovered(false);
+      }}
+    >
+      <div 
+        className="flex flex-col gap-4 w-full h-full overflow-hidden" 
+        style={{ 
+          height: "100%", 
+          maxHeight: "100%",
+          minHeight: "100%",
+          width: "100%",
+          boxSizing: "border-box",
+          position: "relative",
+        }}
+      >
+        {/* Drink Image - Clickable */}
+        {drink.image && (
+          <Link 
+            href={`/bar/product/${drink.id}`}
+            className="relative w-full h-32 rounded-xl overflow-hidden border border-[#ff2975]/20 shrink-0 group/image cursor-pointer"
+          >
+            <Image
+              src={drink.image}
+              alt={drink.name}
+              fill
+              className="object-cover group-hover/image:scale-110 transition-transform duration-500"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            />
+          </Link>
+        )}
+
+        <div className="space-y-2 shrink-0">
+          <h3 className={`text-2xl font-black tracking-tight transition-colors duration-300 ${isCardHovered ? 'text-[#ff2975]' : 'text-white'}`}>
+            {drink.name}
+          </h3>
+          <div className="h-px w-12 bg-gradient-to-r from-[#ff2975] to-transparent" />
+        </div>
+        
+        <div className="space-y-3 flex-1 min-h-0 flex flex-col overflow-hidden">
+          <div className="shrink-0">
+            <p className="text-xs font-bold text-[#00FFF1] uppercase tracking-[0.4em] drop-shadow-[0_0_8px_rgba(0,255,241,0.5)]">
+              {formatPrice(drink.price)}
+            </p>
+            
+            <p className="text-sm text-zinc-400 font-medium leading-relaxed line-clamp-2 mt-2">
+              {drink.description}
+            </p>
+          </div>
+
+          {/* Molecular Profile on Hover - Always rendered but hidden to prevent layout shift */}
+          <div 
+            className="pt-4 border-t border-zinc-800 overflow-hidden shrink-0"
+            style={{ 
+              height: isCardHovered ? "auto" : "0px",
+              maxHeight: isCardHovered ? "180px" : "0px",
+              opacity: isCardHovered ? 1 : 0,
+              transition: "opacity 0.3s ease, max-height 0.3s ease, height 0.3s ease",
+              visibility: isCardHovered ? "visible" : "hidden",
+            }}
+          >
+            <div className="space-y-2">
+              <div className="text-[10px] font-bold text-[#ff2975] uppercase tracking-[0.3em]">
+                Molecular Formula
+              </div>
+              <div className="text-xs font-mono text-[#00FFF1] break-all">
+                {molecular}
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="text-[10px] text-zinc-500 uppercase shrink-0">Intensity</div>
+                <div className="flex-1 h-1 bg-zinc-800 rounded-full overflow-hidden min-w-0">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#ff2975] to-[#00FFF1] transition-all duration-500"
+                    style={{ width: `${intensity}%` }}
+                  />
+                </div>
+                <div className="text-[10px] text-zinc-400 shrink-0">{intensity}%</div>
+              </div>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {profile.slice(0, 3).map((tag) => (
+                  <span 
+                    key={tag}
+                    className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] rounded-full border border-[#ff2975]/30 bg-[#ff2975]/10 text-[#ff2975]"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-3 mt-auto flex-wrap shrink-0">
+          <button 
+            onClick={() => onAddToCart(drink)}
+            className="group/btn relative px-6 py-2 rounded-full overflow-hidden transition-all duration-300 flex-1 min-w-[140px]"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-[#ff2975] to-[#00FFF1] opacity-20 group-hover/btn:opacity-40 transition-opacity" />
+            <div className="absolute inset-px rounded-full bg-black z-0" />
+            <span className="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] text-white">
+              Añadir
+            </span>
+          </button>
+          
+          <Link
+            href={`/bar/product/${drink.id}`}
+            className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors border border-zinc-800 rounded-full hover:border-[#00FFF1] text-center"
+          >
+            Detalles
+          </Link>
+        </div>
+      </div>
+    </NeonGradientCard>
+  );
+});
+
 export default function BarPage() {
-  const [selectedDrinkId, setSelectedDrinkId] = useState<string | null>(null);
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const { addToCart } = useCart();
 
   // Fetch drinks from backend
@@ -81,20 +272,8 @@ export default function BarPage() {
     sort: "recommended",
   });
 
-  // Fetch selected drink details
-  const { data: selectedDrink } = useProduct(selectedDrinkId || undefined);
-
   const handleAddToCart = (product: Product) => {
     addToCart(product, 1);
-  };
-
-  const formatPrice = (price: number | { [key: string]: number } | undefined): string => {
-    if (!price) return "S./0.00";
-    if (typeof price === "number") {
-      return `S./${price.toFixed(2)}`;
-    }
-    const firstPrice = Object.values(price)[0];
-    return `S./${firstPrice.toFixed(2)}`;
   };
 
   return (
@@ -189,154 +368,133 @@ export default function BarPage() {
               No hay bebidas disponibles en este momento
             </div>
           ) : (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-              {drinks.map((drink) => {
-                const molecular = calculateMolecularFormula(drink.ingredients || []);
-                const intensity = calculateIntensity(drink);
-                const profile = generateFlavorProfile(drink);
-                const isHovered = hoveredCard === drink.id;
-
-                return (
-                  <NeonGradientCard 
-                    key={drink.id}
-                    neonColor="#ff2975"
-                    secondaryColor="#00FFF1"
-                    className="min-h-[450px] cursor-pointer"
-                    onMouseEnter={() => setHoveredCard(drink.id)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                  >
-                    <div className="flex flex-col gap-4 w-full h-full">
-                      {/* Drink Image */}
-                      {drink.image && (
-                        <div className="relative w-full h-32 rounded-xl overflow-hidden border border-[#ff2975]/20">
-                          <Image
-                            src={drink.image}
-                            alt={drink.name}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                          />
-                        </div>
-                      )}
-
-                      <div className="space-y-2">
-                        <h3 className="text-2xl font-black tracking-tight text-white group-hover:text-[#ff2975] transition-colors duration-300">
-                          {drink.name}
-                        </h3>
-                        <div className="h-px w-12 bg-gradient-to-r from-[#ff2975] to-transparent" />
-                      </div>
-                      
-                      <div className="space-y-3 flex-1">
-                        <p className="text-xs font-bold text-[#00FFF1] uppercase tracking-[0.4em] drop-shadow-[0_0_8px_rgba(0,255,241,0.5)]">
-                          {formatPrice(drink.price)}
-                        </p>
-                        
-                        <p className="text-sm text-zinc-400 font-medium leading-relaxed line-clamp-2">
-                          {drink.description}
-                        </p>
-
-                        {/* Molecular Profile on Hover */}
-                        {isHovered && (
-                          <div className="space-y-2 pt-4 border-t border-zinc-800 animate-fade-in">
-                            <div className="text-[10px] font-bold text-[#ff2975] uppercase tracking-[0.3em]">
-                              Molecular Formula
-                            </div>
-                            <div className="text-xs font-mono text-[#00FFF1]">
-                              {molecular}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="text-[10px] text-zinc-500 uppercase">Intensity</div>
-                              <div className="flex-1 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-gradient-to-r from-[#ff2975] to-[#00FFF1] transition-all duration-500"
-                                  style={{ width: `${intensity}%` }}
-                                />
-                              </div>
-                              <div className="text-[10px] text-zinc-400">{intensity}%</div>
-                            </div>
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {profile.slice(0, 3).map((tag) => (
-                                <span 
-                                  key={tag}
-                                  className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] rounded-full border border-[#ff2975]/30 bg-[#ff2975]/10 text-[#ff2975]"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex gap-3 mt-6 flex-wrap">
-                        <button 
-                          onClick={() => handleAddToCart(drink)}
-                          className="group/btn relative px-6 py-2 rounded-full overflow-hidden transition-all duration-300 flex-1 min-w-[140px]"
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-[#ff2975] to-[#00FFF1] opacity-20 group-hover/btn:opacity-40 transition-opacity" />
-                          <div className="absolute inset-px rounded-full bg-black z-0" />
-                          <span className="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                            Añadir
-                          </span>
-                        </button>
-                        
-                        <button
-                          onClick={() => setSelectedDrinkId(selectedDrinkId === drink.id ? null : drink.id)}
-                          className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors border border-zinc-800 rounded-full hover:border-[#00FFF1]"
-                        >
-                          {selectedDrinkId === drink.id ? "Cerrar" : "Detalles"}
-                        </button>
-                      </div>
-                    </div>
-                  </NeonGradientCard>
-                );
-              })}
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4" style={{ isolation: "isolate" }}>
+              {drinks.map((drink) => (
+                <div 
+                  key={drink.id} 
+                  style={{ 
+                    isolation: "isolate", 
+                    contain: "layout style paint",
+                    width: "100%",
+                    height: "450px",
+                  }}
+                >
+                        <DrinkCard
+                          drink={drink}
+                          onAddToCart={handleAddToCart}
+                        />
+                </div>
+              ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* Neural Sets / DJ Section */}
+      {/* Bento Gallery Section */}
       <section className="px-6 py-20 border-t border-zinc-900">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-4 bg-gradient-to-r from-[#00FFF1] to-[#ff2975] bg-clip-text text-transparent">
-              NEURAL SETS
+              GALERÍA DEL BAR
             </h2>
             <p className="text-zinc-400 text-sm uppercase tracking-[0.3em]">
-              Live Electronic Sessions
+              Experiencia Visual Cyberpunk
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            {neuralSets.map((set) => (
-              <NeonGradientCard 
-                key={set.name}
-                neonColor="#00FFF1"
-                secondaryColor="#9b00ff"
-                className="min-h-[200px]"
-              >
-                <div className="flex flex-col gap-4 w-full">
-                  <div className="space-y-2">
-                    <div className="text-[10px] font-bold text-[#00FFF1] uppercase tracking-[0.3em]">
-                      {set.time}
-                    </div>
-                    <h3 className="text-2xl font-black text-white">
-                      {set.name}
-                    </h3>
-                    <div className="text-sm text-zinc-400 font-medium">
-                      {set.dj}
-                    </div>
-                  </div>
-                  <Link
-                    href="/reservas"
-                    className="mt-4 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white border border-[#00FFF1]/30 rounded-full hover:bg-[#00FFF1]/10 transition-colors text-center"
+          {/* Bento Grid Gallery */}
+          <div 
+            className="bento-gallery grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-4"
+            style={{
+              gridAutoRows: "200px",
+            }}
+          >
+            {barGalleryImages.map((item, index) => {
+              const [rowSpan = 1, colSpan = 1] = item.span || [1, 1];
+              return (
+                <div
+                  key={index}
+                  className="group relative overflow-hidden cursor-pointer"
+                  style={{
+                    gridRowEnd: `span ${rowSpan}`,
+                    gridColumnEnd: `span ${colSpan}`,
+                  }}
+                  data-col-span={colSpan}
+                >
+                  <NeonGradientCard
+                    cardId={`gallery-${index}`}
+                    neonColor={index % 2 === 0 ? "#ff2975" : "#00FFF1"}
+                    secondaryColor={index % 2 === 0 ? "#00FFF1" : "#9b00ff"}
+                    className="h-full w-full"
                   >
-                    Reservar Mesa
-                  </Link>
+                    <div className="relative w-full h-full overflow-hidden">
+                      <Image
+                        src={item.src}
+                        alt={item.alt}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      />
+                      {/* Overlay Gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                      
+                      {/* Content Overlay */}
+                      <div className="absolute inset-0 flex flex-col justify-end p-6 z-30">
+                        <div className="space-y-2">
+                          <h3 
+                            className="text-xl md:text-2xl font-black text-white transition-all duration-500 group-hover:drop-shadow-[0_0_20px_rgba(255,41,117,1)]"
+                            style={{
+                              textShadow: `0 0 10px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, 0 0 20px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, 0 0 30px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}`,
+                            }}
+                          >
+                            {item.title}
+                          </h3>
+                          <p 
+                            className="text-xs md:text-sm font-medium uppercase tracking-[0.2em] transition-all duration-500"
+                            style={{
+                              color: index % 2 === 0 ? '#ff2975' : '#00FFF1',
+                              textShadow: `0 0 10px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}`,
+                            }}
+                          >
+                            {item.subtitle}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Enhanced Neon Glow Effect on Hover */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20">
+                        {/* Outer Glow */}
+                        <div 
+                          className="absolute -inset-4 blur-2xl"
+                          style={{
+                            background: `linear-gradient(135deg, ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, ${index % 2 === 0 ? '#00FFF1' : '#9b00ff'})`,
+                            opacity: 0.6,
+                            filter: 'blur(30px)',
+                          }}
+                        />
+                        {/* Inner Glow */}
+                        <div 
+                          className="absolute inset-0 blur-xl"
+                          style={{
+                            background: `linear-gradient(135deg, ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, ${index % 2 === 0 ? '#00FFF1' : '#9b00ff'})`,
+                            opacity: 0.4,
+                          }}
+                        />
+                        {/* Edge Glow */}
+                        <div 
+                          className="absolute inset-0 border-2 rounded-xl"
+                          style={{
+                            borderColor: index % 2 === 0 ? '#ff2975' : '#00FFF1',
+                            boxShadow: `0 0 20px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, 0 0 40px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, inset 0 0 20px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}`,
+                            opacity: 0.8,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </NeonGradientCard>
                 </div>
-              </NeonGradientCard>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -345,6 +503,7 @@ export default function BarPage() {
       <section className="px-6 py-20">
         <div className="max-w-[1400px] mx-auto">
           <NeonGradientCard 
+            cardId="reservation-panel"
             neonColor="#9b00ff"
             secondaryColor="#ff2975"
             className="min-h-[300px]"
@@ -402,165 +561,6 @@ export default function BarPage() {
         </div>
       </footer>
 
-      {/* Drink Detail Modal */}
-      {selectedDrink && (
-        <ModalBody
-          open={!!selectedDrink}
-          onClose={() => setSelectedDrinkId(null)}
-          className="md:max-w-[50%] bg-zinc-900 dark:bg-zinc-900 border-[#ff2975]/30"
-        >
-          <ModalContent className="p-8">
-            <h3 className="text-3xl font-black text-white mb-6">
-              {selectedDrink.name}
-            </h3>
-            
-            <div className="space-y-6">
-              {/* Image Gallery */}
-              {(selectedDrink.image || (selectedDrink.gallery && selectedDrink.gallery.length > 0)) && (
-                <div className="relative w-full h-64 rounded-2xl overflow-hidden border border-[#ff2975]/20">
-                  <Image
-                    src={selectedDrink.image || selectedDrink.gallery?.[0] || ""}
-                    alt={selectedDrink.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 800px"
-                  />
-                </div>
-              )}
-
-              {/* Price */}
-              <div>
-                <div className="text-xs font-bold text-[#ff2975] uppercase tracking-[0.3em] mb-2">
-                  Precio
-                </div>
-                <div className="text-2xl font-black text-[#00FFF1]">
-                  {formatPrice(selectedDrink.price)}
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <div className="text-xs font-bold text-[#ff2975] uppercase tracking-[0.3em] mb-2">
-                  Descripción
-                </div>
-                <p className="text-zinc-300 leading-relaxed">
-                  {selectedDrink.description}
-                </p>
-              </div>
-
-              {/* Ingredients */}
-              {selectedDrink.ingredients && selectedDrink.ingredients.length > 0 && (
-                <div>
-                  <div className="text-xs font-bold text-[#ff2975] uppercase tracking-[0.3em] mb-2">
-                    Ingredientes
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedDrink.ingredients.map((ingredient, idx) => (
-                      <span 
-                        key={idx}
-                        className="px-3 py-1 text-xs font-medium rounded-full border border-zinc-700 bg-zinc-800 text-zinc-300"
-                      >
-                        {ingredient}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Molecular Formula */}
-              <div>
-                <div className="text-xs font-bold text-[#ff2975] uppercase tracking-[0.3em] mb-2">
-                  Fórmula Molecular
-                </div>
-                <div className="text-lg font-mono text-[#00FFF1]">
-                  {calculateMolecularFormula(selectedDrink.ingredients || [])}
-                </div>
-              </div>
-
-              {/* Intensity */}
-              <div>
-                <div className="text-xs font-bold text-[#ff2975] uppercase tracking-[0.3em] mb-2">
-                  Intensidad
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-[#ff2975] to-[#00FFF1]"
-                      style={{ width: `${calculateIntensity(selectedDrink)}%` }}
-                    />
-                  </div>
-                  <div className="text-sm text-zinc-400">{calculateIntensity(selectedDrink)}%</div>
-                </div>
-              </div>
-
-              {/* Flavor Profile */}
-              <div>
-                <div className="text-xs font-bold text-[#ff2975] uppercase tracking-[0.3em] mb-2">
-                  Perfil de Sabor
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {generateFlavorProfile(selectedDrink).map((tag) => (
-                    <span 
-                      key={tag}
-                      className="px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] rounded-full border border-[#ff2975]/30 bg-[#ff2975]/10 text-[#ff2975]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Allergens */}
-              {selectedDrink.allergens && selectedDrink.allergens.length > 0 && (
-                <div>
-                  <div className="text-xs font-bold text-[#ff2975] uppercase tracking-[0.3em] mb-2">
-                    Alérgenos
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedDrink.allergens.map((allergen, idx) => (
-                      <span 
-                        key={idx}
-                        className="px-3 py-1 text-xs font-medium rounded-full border border-red-500/30 bg-red-500/10 text-red-400"
-                      >
-                        {allergen}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Preparation Time */}
-              {selectedDrink.preparation_time_minutes && (
-                <div>
-                  <div className="text-xs font-bold text-[#ff2975] uppercase tracking-[0.3em] mb-2">
-                    Tiempo de Preparación
-                  </div>
-                  <div className="text-sm text-zinc-300">
-                    {selectedDrink.preparation_time_minutes} minutos
-                  </div>
-                </div>
-              )}
-
-            </div>
-
-            <ModalFooter className="bg-transparent p-0 pt-4">
-              <button 
-                onClick={() => {
-                  handleAddToCart(selectedDrink);
-                  setSelectedDrinkId(null);
-                }}
-                className="group/btn relative px-8 py-3 rounded-full overflow-hidden transition-all duration-300 flex-1"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#ff2975] to-[#00FFF1] opacity-30 group-hover/btn:opacity-50 transition-opacity" />
-                <div className="absolute inset-px rounded-full bg-black z-0" />
-                <span className="relative z-10 text-xs font-black uppercase tracking-[0.2em] text-white">
-                  Añadir a Orden
-                </span>
-              </button>
-            </ModalFooter>
-          </ModalContent>
-        </ModalBody>
-      )}
     </div>
   );
 }
