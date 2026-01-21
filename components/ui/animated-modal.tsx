@@ -79,8 +79,13 @@ export const ModalBody = ({
     if (open) {
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     }
+    
+    // Cleanup: siempre restaurar el overflow cuando el componente se desmonte
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   const modalRef = useRef<HTMLDivElement>(null);
@@ -94,7 +99,12 @@ export const ModalBody = ({
   });
 
   return (
-    <AnimatePresence>
+    <AnimatePresence
+      onExitComplete={() => {
+        // Asegurar que el overflow se restaure después de que termine la animación
+        document.body.style.overflow = "";
+      }}
+    >
       {open && (
         <motion.div
           initial={{
@@ -107,6 +117,12 @@ export const ModalBody = ({
           exit={{
             opacity: 0,
             backdropFilter: "blur(0px)",
+          }}
+          onAnimationComplete={(definition: any) => {
+            // Restaurar overflow cuando termine la animación de salida
+            if (definition === "exit" && !open) {
+              document.body.style.overflow = "";
+            }
           }}
           className="fixed [perspective:800px] [transform-style:preserve-3d] inset-0 h-full w-full  flex items-center justify-center z-50"
         >
