@@ -164,7 +164,7 @@ export default function ReservationPage() {
 
   if (confirmation) {
     return (
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-background-dark transition-colors duration-300">
         <Navbar showSearch={false} />
         <div className="pt-20 pb-16 flex items-center justify-center min-h-[calc(100vh-80px)]">
           <div className="max-w-md w-full px-4 text-center animate-fade-in-up space-y-6">
@@ -189,7 +189,7 @@ export default function ReservationPage() {
               persona{formData.guests === 1 ? "" : "s"}.
             </p>
             {confirmation.code && (
-              <p className="text-white font-semibold tracking-wide">
+              <p className="text-text-primary font-semibold tracking-wide">
                 Código: {confirmation.code}
               </p>
             )}
@@ -214,7 +214,7 @@ export default function ReservationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-background-dark transition-colors duration-300">
       <Navbar showSearch={false} />
       <div className="pt-8 pb-16">
         <div className="max-w-lg mx-auto px-4 sm:px-8">
@@ -232,7 +232,7 @@ export default function ReservationPage() {
 
           <form
             onSubmit={handleSubmit}
-            className="bg-surface-dark p-8 rounded-3xl shadow-xl border border-zinc-800 space-y-5"
+            className="bg-surface-dark p-8 rounded-3xl shadow-xl border border-zinc-800 space-y-5 transition-colors duration-300"
           >
             <div className="grid grid-cols-2 gap-5">
               <div className="col-span-2">
@@ -245,7 +245,7 @@ export default function ReservationPage() {
                   value={formData.name}
                   onChange={handleChange}
                   type="text"
-                  className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                  className="w-full bg-surface-hover border border-zinc-700/50 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder-text-secondary/50"
                   placeholder="Juan Pérez"
                 />
               </div>
@@ -262,7 +262,7 @@ export default function ReservationPage() {
                   dateFormat="dd 'de' MMMM 'de' yyyy"
                   placeholderText="Selecciona una fecha"
                   locale="es"
-                  className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                  className="w-full bg-surface-hover border border-zinc-700/50 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder-text-secondary/50"
                 />
               </div>
 
@@ -275,7 +275,7 @@ export default function ReservationPage() {
                   name="time"
                   value={formData.time}
                   onChange={handleChange}
-                  className="w-full bg-background-light dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                  className="w-full bg-surface-hover border border-zinc-700/50 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                 >
                   <option value="">Elegir hora</option>
                   {timeOptions.map((option) => (
@@ -298,7 +298,7 @@ export default function ReservationPage() {
                     max="12"
                     value={formData.guests}
                     onChange={handleChange}
-                    className="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-primary"
+                    className="w-full h-2 bg-surface-hover rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                   <span className="text-xl font-bold text-primary w-8 text-center">
                     {formData.guests}
@@ -316,7 +316,7 @@ export default function ReservationPage() {
                   value={formData.email}
                   onChange={handleChange}
                   type="email"
-                  className="w-full bg-background-light dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                  className="w-full bg-surface-hover border border-zinc-700/50 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder-text-secondary/50"
                   placeholder="juan@ejemplo.com"
                 />
               </div>
@@ -331,7 +331,7 @@ export default function ReservationPage() {
                   value={formData.phone}
                   onChange={handleChange}
                   type="tel"
-                  className="w-full bg-background-light dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                  className="w-full bg-surface-hover border border-zinc-700/50 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder-text-secondary/50"
                   placeholder="+51 999 999 999"
                 />
               </div>
@@ -345,7 +345,7 @@ export default function ReservationPage() {
                   value={formData.specialRequests}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full bg-background-light dark:bg-black/40 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                  className="w-full bg-surface-hover border border-zinc-700/50 rounded-xl px-4 py-3 text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder-text-secondary/50"
                   placeholder="Alérgenos, asientos, celebraciones, etc."
                 />
               </div>

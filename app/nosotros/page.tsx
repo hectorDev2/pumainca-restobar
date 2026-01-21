@@ -6,7 +6,7 @@ import Navbar from '@/components/Navbar';
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-background-dark transition-colors duration-300">
       <Navbar showSearch={false} />
       <div className="pt-8 pb-16">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-10">
@@ -31,18 +31,18 @@ export default function AboutPage() {
           </div>
           
           <div className="space-y-6">
-            <h3 className="text-3xl font-bold text-white">El Espíritu de Pumainca</h3>
-            <p className="text-gray-300 text-lg leading-relaxed">
+            <h3 className="text-3xl font-bold text-text-primary">El Espíritu de Pumainca</h3>
+            <p className="text-text-secondary text-lg leading-relaxed">
               En el corazón de nuestra cocina late una pasión milenaria. Pumainca no es solo un restaurante, es un viaje a través de los sabores, aromas y colores del Perú.
             </p>
-            <p className="text-gray-300 text-lg leading-relaxed">
+            <p className="text-text-secondary text-lg leading-relaxed">
               Fundado con la misión de honrar nuestras raíces incas, fusionamos técnicas ancestrales con toques contemporáneos para crear experiencias culinarias inolvidables. Cada plato cuenta una historia, cada ingrediente tiene un propósito.
             </p>
             
             <div className="grid grid-cols-2 gap-8 pt-6">
               <div>
                 <h4 className="text-4xl font-black text-primary mb-2">2+</h4>
-                <p className="text-white font-bold">Años de Tradición</p>
+                <p className="text-text-primary font-bold">Años de Tradición</p>
               </div>
               <div>
               </div>
@@ -50,12 +50,12 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="bg-surface-dark rounded-3xl p-12 lg:p-16 relative overflow-hidden">
+        <div className="bg-surface-dark rounded-3xl p-12 lg:p-16 relative overflow-hidden transition-colors duration-300">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
           <div className="relative z-10 text-center max-w-2xl mx-auto">
             <span className="material-symbols-outlined text-5xl text-primary mb-6">workspace_premium</span>
-            <h3 className="text-3xl font-bold text-white mb-6">Compromiso con la Calidad</h3>
-            <p className="text-white/80 text-lg mb-8">
+            <h3 className="text-3xl font-bold text-text-primary mb-6">Compromiso con la Calidad</h3>
+            <p className="text-text-secondary text-lg mb-8">
               Trabajamos directamente con agricultores locales para asegurar que solo los ingredientes más frescos lleguen a tu mesa.
             </p>
             <Link 

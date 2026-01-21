@@ -56,7 +56,7 @@ export default function Home() {
       </section>
 
       {/* History & Philosophy */}
-      <section className="py-16 md:py-24 bg-black relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-background-dark relative overflow-hidden transition-colors duration-300">
         <div className="container max-w-[1100px] mx-auto px-4 space-y-20 md:space-y-32">
           
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16" id="historia">
@@ -64,10 +64,10 @@ export default function Home() {
               <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-xs">
                 <span className="material-symbols-outlined text-sm">history_edu</span> {content?.history_label ?? "Orígenes"}
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary leading-tight">
                 {content?.history_title ?? "Raíces profundas en los Andes"}
               </h2>
-              <p className="text-gray-300 text-lg leading-relaxed">
+              <p className="text-text-secondary text-lg leading-relaxed">
                 {content?.history_description ?? "PUMAINCA nació de la pasión por rescatar los sabores ancestrales y fusionarlos con técnicas modernas. Nuestra historia comienza en los valles altos, donde los ingredientes cuentan historias de la tierra y el sol."}
               </p>
               <button className="inline-flex items-center text-primary font-bold hover:text-primary-dark transition-colors border-b-2 border-primary pb-1">
@@ -85,20 +85,20 @@ export default function Home() {
               <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-xs">
                 <span className="material-symbols-outlined text-sm">spa</span> {content?.philosophy_label ?? "Filosofía"}
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary leading-tight">
                 {content?.philosophy_title ?? "Respeto por el ingrediente"}
               </h2>
-              <p className="text-gray-300 text-lg leading-relaxed">
+              <p className="text-text-secondary text-lg leading-relaxed">
                 {content?.philosophy_description ?? "Creemos que la verdadera cocina comienza en la tierra. Trabajamos directamente con agricultores locales para asegurar la frescura y calidad en cada plato."}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 bg-surface-dark p-4 rounded-xl border border-white/10">
+                <div className="flex items-center gap-3 bg-surface-dark p-4 rounded-xl border border-zinc-800/50">
                   <span className="material-symbols-outlined text-primary">eco</span>
-                  <span className="text-sm font-semibold text-gray-200">{content?.philosophy_badge_1 ?? "100% Orgánico"}</span>
+                  <span className="text-sm font-semibold text-text-primary">{content?.philosophy_badge_1 ?? "100% Orgánico"}</span>
                 </div>
-                <div className="flex items-center gap-3 bg-surface-dark p-4 rounded-xl border border-white/10">
+                <div className="flex items-center gap-3 bg-surface-dark p-4 rounded-xl border border-zinc-800/50">
                   <span className="material-symbols-outlined text-primary">handshake</span>
-                  <span className="text-sm font-semibold text-gray-200">{content?.philosophy_badge_2 ?? "Comercio Justo"}</span>
+                  <span className="text-sm font-semibold text-text-primary">{content?.philosophy_badge_2 ?? "Comercio Justo"}</span>
                 </div>
               </div>
             </div>
