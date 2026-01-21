@@ -30,6 +30,7 @@ export interface Product {
   isChefSpecial?: boolean;
   isRecommended?: boolean;
   isAvailable?: boolean;
+  preparation_time_minutes?: number;
 }
 
 // Alias for backward compatibility during refactor
