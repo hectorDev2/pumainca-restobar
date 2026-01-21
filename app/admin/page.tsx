@@ -13,6 +13,7 @@ import {
 import { useCreateCategory } from "@/lib/queries";
 import CreateCategoryForm from "@/components/CreateCategoryForm";
 import { AdminModal } from "@/components/ui/admin-modal";
+import { Modal, ModalBody, ModalContent, ModalFooter } from "@/components/ui/animated-modal";
 import { FileUpload } from "@/components/ui/file-upload";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types";
@@ -458,20 +459,15 @@ export default function AdminPage() {
         </div>
       </main>
 
-      {/* --- Los modales se implementarían aquí con lógica similar de renderizado condicional --- */}
-      {/* Ejemplo abreviado del Modal de Edición */}
+      {/* Modal de Edición */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-8 shadow-2xl">
-            <div className="sticky w-[350px] top-0 z-30 bg-zinc-900 rounded-t-3xl px-6 py-4 flex justify-between items-center border-b border-zinc-800">
-              <h2 className="text-2xl font-black">Editar Producto</h2>
-              <button
-                onClick={() => setEditModalOpen(false)}
-                className="text-zinc-500 hover:text-white text-2xl"
-              >
-                ×
-              </button>
-            </div>
+        <ModalBody
+          open={isEditModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          className="md:max-w-[50%] bg-zinc-900 dark:bg-zinc-900 border-zinc-800"
+        >
+          <ModalContent className="p-8">
+            <h2 className="text-2xl font-black mb-6">Editar Producto</h2>
             <form onSubmit={handleEditSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -681,32 +677,29 @@ export default function AdminPage() {
                   </p>
                 )}
               </div>
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="w-full bg-blue-600 py-4 rounded-2xl font-bold uppercase tracking-widest disabled:opacity-50"
-              >
-                {isSaving ? "Guardando..." : "Actualizar Producto"}
-              </button>
+              <ModalFooter className="bg-transparent p-0 pt-4">
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="w-full bg-blue-600 py-4 rounded-2xl font-bold uppercase tracking-widest disabled:opacity-50"
+                >
+                  {isSaving ? "Guardando..." : "Actualizar Producto"}
+                </button>
+              </ModalFooter>
             </form>
-          </div>
-        </div>
+          </ModalContent>
+        </ModalBody>
       )}
 
       {/* Modal Crear Producto */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-90 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-black">Nuevo Producto</h2>
-              <button
-                onClick={() => setCreateModalOpen(false)}
-                className="text-zinc-500 hover:text-white text-2xl"
-              >
-                ×
-              </button>
-            </div>
-
+        <ModalBody
+          open={isCreateModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          className="md:max-w-[50%] bg-zinc-900 dark:bg-zinc-900 border-zinc-800"
+        >
+          <ModalContent className="p-6">
+            <h2 className="text-2xl font-black mb-6">Nuevo Producto</h2>
             <form onSubmit={handleCreateSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -914,43 +907,40 @@ export default function AdminPage() {
                 )}
               </div>
 
-              <div className="flex gap-3">
-                <button
-                  type="submit"
-                  disabled={createProductMutation.isPending}
-                  className="bg-blue-600 px-6 py-3 rounded-2xl font-bold disabled:opacity-50"
-                >
-                  {createProductMutation.isPending
-                    ? "Creando..."
-                    : "Crear producto"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCreateModalOpen(false)}
-                  className="text-zinc-400"
-                >
-                  Cancelar
-                </button>
-              </div>
+              <ModalFooter className="bg-transparent p-0 pt-4">
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    disabled={createProductMutation.isPending}
+                    className="bg-blue-600 px-6 py-3 rounded-2xl font-bold disabled:opacity-50"
+                  >
+                    {createProductMutation.isPending
+                      ? "Creando..."
+                      : "Crear producto"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCreateModalOpen(false)}
+                    className="text-zinc-400"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </ModalFooter>
             </form>
-          </div>
-        </div>
+          </ModalContent>
+        </ModalBody>
       )}
 
       {/* Modal Crear Categoría */}
       {isCreateCategoryOpen && (
-        <div className="fixed inset-0 z-[96] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-black">Nueva Categoría</h2>
-              <button
-                onClick={() => setCreateCategoryOpen(false)}
-                className="text-zinc-500 hover:text-white text-2xl"
-              >
-                ×
-              </button>
-            </div>
-
+        <ModalBody
+          open={isCreateCategoryOpen}
+          onClose={() => setCreateCategoryOpen(false)}
+          className="md:max-w-[40%] bg-zinc-900 dark:bg-zinc-900 border-zinc-800"
+        >
+          <ModalContent className="p-6">
+            <h2 className="text-2xl font-black mb-4">Nueva Categoría</h2>
             <div className="space-y-4">
               <CreateCategoryForm
                 onCreated={() => {
@@ -965,7 +955,7 @@ export default function AdminPage() {
                   }
                 }}
               />
-              <div className="flex gap-3">
+              <ModalFooter className="bg-transparent p-0 pt-4">
                 <button
                   type="button"
                   onClick={() => setCreateCategoryOpen(false)}
@@ -973,34 +963,30 @@ export default function AdminPage() {
                 >
                   Cancelar
                 </button>
-              </div>
+              </ModalFooter>
             </div>
-          </div>
-        </div>
+          </ModalContent>
+        </ModalBody>
       )}
 
       {isDetailModalOpen && detailModalProduct && (
-        <div className="fixed inset-0 z-90 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl">
+        <ModalBody
+          open={isDetailModalOpen}
+          onClose={() => setDetailModalOpen(false)}
+          className="md:max-w-[60%] bg-zinc-900 dark:bg-zinc-900 border-zinc-800"
+        >
+          <ModalContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-black">Detalle del producto</h2>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => {
-                    setDetailModalOpen(false);
-                    openEditModal(detailModalProduct);
-                  }}
-                  className="rounded-full border border-blue-600 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-500 hover:bg-blue-600/10"
-                >
-                  Editar producto
-                </button>
-                <button
-                  onClick={() => setDetailModalOpen(false)}
-                  className="text-zinc-400 hover:text-white text-2xl"
-                >
-                  ×
-                </button>
-              </div>
+              <button
+                onClick={() => {
+                  setDetailModalOpen(false);
+                  openEditModal(detailModalProduct);
+                }}
+                className="rounded-full border border-blue-600 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-500 hover:bg-blue-600/10"
+              >
+                Editar producto
+              </button>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[1.4fr,0.6fr]">
@@ -1108,8 +1094,8 @@ export default function AdminPage() {
                 ) : null}
               </aside>
             </div>
-          </div>
-        </div>
+          </ModalContent>
+        </ModalBody>
       )}
     </div>
   );

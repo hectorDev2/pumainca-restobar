@@ -63,11 +63,17 @@ export const ModalTrigger = ({
 export const ModalBody = ({
   children,
   className,
+  open: controlledOpen,
+  onClose,
 }: {
   children: ReactNode;
   className?: string;
+  open?: boolean;
+  onClose?: () => void;
 }) => {
-  const { open } = useModal();
+  const context = useContext(ModalContext);
+  const open = controlledOpen !== undefined ? controlledOpen : (context?.open ?? false);
+  const setOpen = onClose || context?.setOpen || (() => {});
 
   useEffect(() => {
     if (open) {
@@ -77,9 +83,15 @@ export const ModalBody = ({
     }
   }, [open]);
 
-  const modalRef = useRef(null);
-  const { setOpen } = useModal();
-  useOutsideClick(modalRef, () => setOpen(false));
+  const modalRef = useRef<HTMLDivElement>(null);
+  useOutsideClick(modalRef, () => {
+    if (typeof setOpen === 'function') {
+      setOpen(false);
+    }
+    if (onClose) {
+      onClose();
+    }
+  });
 
   return (
     <AnimatePresence>
@@ -129,7 +141,7 @@ export const ModalBody = ({
               damping: 15,
             }}
           >
-            <CloseIcon />
+            <CloseIcon onClose={onClose} />
             {children}
           </motion.div>
         </motion.div>
@@ -190,11 +202,18 @@ const Overlay = ({ className }: { className?: string }) => {
   );
 };
 
-const CloseIcon = () => {
-  const { setOpen } = useModal();
+const CloseIcon = ({ onClose }: { onClose?: () => void }) => {
+  const context = useContext(ModalContext);
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else if (context?.setOpen) {
+      context.setOpen(false);
+    }
+  };
   return (
     <button
-      onClick={() => setOpen(false)}
+      onClick={handleClose}
       className="absolute top-4 right-4 group"
     >
       <svg
@@ -220,7 +239,7 @@ const CloseIcon = () => {
 // Hook to detect clicks outside of a component.
 // Add it in a separate file, I've added here for simplicity
 export const useOutsideClick = (
-  ref: React.RefObject<HTMLDivElement>,
+  ref: React.RefObject<HTMLDivElement | null>,
   callback: Function
 ) => {
   useEffect(() => {
