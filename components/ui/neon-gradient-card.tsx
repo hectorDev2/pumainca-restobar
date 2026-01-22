@@ -79,11 +79,6 @@ export const NeonGradientCard = ({
         position: "relative",
         overflow: "hidden",
         zIndex: isHovered ? 20 : 10,
-        width: "100%",
-        height: "100%",
-        contain: "layout style paint",
-        minHeight: "inherit",
-        maxHeight: "inherit",
       } as React.CSSProperties}
       className={cn(
         "neon-card-container relative grid w-full h-full items-center justify-center rounded-[var(--border-radius)] bg-zinc-950 p-1 text-center",
@@ -92,36 +87,7 @@ export const NeonGradientCard = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Neon Border - Visible animated border */}
-      <div
-        className="absolute inset-0 rounded-[var(--border-radius)]"
-        style={{
-          background: `linear-gradient(0deg, ${neonColor}, ${secondaryColor}, ${neonColor})`,
-          backgroundSize: "100% 200%",
-          animation: "neon-border 3s linear infinite",
-          zIndex: 0,
-          width: "100%",
-          height: "100%",
-          maxWidth: "100%",
-          maxHeight: "100%",
-          boxSizing: "border-box",
-          pointerEvents: "none",
-          transform: "scale(1)",
-        }}
-      />
-      {/* Inner mask to create border effect */}
-      <div
-        className="absolute inset-[var(--border-size)] rounded-[calc(var(--border-radius)-var(--border-size))] bg-[#05030a]"
-        style={{
-          zIndex: 1,
-          width: `calc(100% - calc(var(--border-size) * 2))`,
-          height: `calc(100% - calc(var(--border-size) * 2))`,
-          boxSizing: "border-box",
-          pointerEvents: "none",
-        }}
-      />
-      
-      {/* Neon Glow Effect - Contained to prevent visual expansion */}
+      {/* Neon Glow Effect - Behind everything */}
       <div
         id={`${cardIdAttr}-glow`}
         className="absolute inset-0 rounded-[var(--border-radius)]"
@@ -135,46 +101,42 @@ export const NeonGradientCard = ({
           willChange: "opacity",
           filter: "blur(20px)",
           WebkitFilter: "blur(20px)",
-          zIndex: -1,
-          width: "100%",
-          height: "100%",
-          maxWidth: "100%",
-          maxHeight: "100%",
-          boxSizing: "border-box",
-          clipPath: "inset(0)",
-          transform: "scale(1)",
+          zIndex: 0,
         }}
         data-hovered={String(isHovered)}
         data-card-id={uniqueId}
+      />
+      
+      {/* Neon Border - Visible animated border */}
+      <div
+        className="absolute inset-0 rounded-[var(--border-radius)]"
+        style={{
+          background: `linear-gradient(0deg, ${neonColor}, ${secondaryColor}, ${neonColor})`,
+          backgroundSize: "100% 200%",
+          animation: "neon-border 3s linear infinite",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+      
+      {/* Inner mask to create border effect */}
+      <div
+        className="absolute inset-[var(--border-size)] rounded-[calc(var(--border-radius)-var(--border-size))] bg-[#05030a]"
+        style={{
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
       />
       
       {/* Content Container */}
       <div
         className="relative h-full w-full rounded-[calc(var(--border-radius)-var(--border-size))] bg-transparent p-6"
         style={{
-          height: "100%",
-          maxHeight: "100%",
-          minHeight: "100%",
-          boxSizing: "border-box",
-          zIndex: 2,
-          width: "100%",
-          contain: "layout style",
-          position: "relative",
+          zIndex: 3,
+          overflow: "visible",
         }}
       >
-        <div 
-          className="relative z-10 flex h-full flex-col items-center justify-center gap-4"
-          style={{
-            height: "100%",
-            maxHeight: "100%",
-            minHeight: "100%",
-            width: "100%",
-            boxSizing: "border-box",
-            overflowY: "auto",
-            overflowX: "hidden",
-            position: "relative",
-          }}
-        >
+        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4">
           {children}
         </div>
       </div>
