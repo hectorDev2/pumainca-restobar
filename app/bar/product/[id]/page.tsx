@@ -217,7 +217,6 @@ export default function DrinkDetailPage() {
             {/* Image Gallery */}
             <div className="lg:col-span-7 flex flex-col gap-6">
               <NeonGradientCard
-                cardId="main-image"
                 neonColor="#ff2975"
                 secondaryColor="#00FFF1"
                 className="w-full aspect-4/3"
@@ -427,7 +426,6 @@ export default function DrinkDetailPage() {
                     className="group"
                   >
                     <NeonGradientCard
-                      cardId={`related-${relatedDrink.id}`}
                       neonColor="#9b00ff"
                       secondaryColor="#ff2975"
                       className="h-[300px] cursor-pointer"

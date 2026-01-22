@@ -2,7 +2,7 @@
 
 import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
 import Link from "next/link";
-import { memo, useState } from "react";
+import { memo, useState, useEffect } from "react";
 import { useProducts } from "@/lib/queries";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types";
@@ -141,7 +141,6 @@ const DrinkCard = memo(function DrinkCard({
 
   return (
     <NeonGradientCard 
-      cardId={`drink-${drink.id}`}
       neonColor="#ff2975"
       secondaryColor="#00FFF1"
       className="h-[450px] cursor-pointer"
@@ -265,6 +264,7 @@ const DrinkCard = memo(function DrinkCard({
 
 export default function BarPage() {
   const { addToCart } = useCart();
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
   // Fetch drinks from backend
   const { data: drinks = [], isLoading } = useProducts({
@@ -275,6 +275,28 @@ export default function BarPage() {
   const handleAddToCart = (product: Product) => {
     addToCart(product, 1);
   };
+
+  // Handle keyboard navigation for gallery modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedImageIndex === null) return;
+
+      if (e.key === "Escape") {
+        setSelectedImageIndex(null);
+      } else if (e.key === "ArrowRight") {
+        setSelectedImageIndex((prev) => 
+          prev !== null ? (prev + 1) % barGalleryImages.length : null
+        );
+      } else if (e.key === "ArrowLeft") {
+        setSelectedImageIndex((prev) => 
+          prev !== null ? (prev - 1 + barGalleryImages.length) % barGalleryImages.length : null
+        );
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedImageIndex]);
 
   return (
     <div className="min-h-screen bg-[#020204] text-white selection:bg-[#ff2975] selection:text-white overflow-x-hidden pb-24">
@@ -411,87 +433,111 @@ export default function BarPage() {
           >
             {barGalleryImages.map((item, index) => {
               const [rowSpan = 1, colSpan = 1] = item.span || [1, 1];
+              const neonColor = index % 2 === 0 ? "#ff2975" : "#00FFF1";
+              const secondaryColor = index % 2 === 0 ? "#00FFF1" : "#9b00ff";
+              
               return (
                 <div
                   key={index}
-                  className="group relative overflow-hidden cursor-pointer"
+                  className="group relative cursor-pointer"
                   style={{
                     gridRowEnd: `span ${rowSpan}`,
                     gridColumnEnd: `span ${colSpan}`,
-                  }}
+                    "--border-size": "2px",
+                    "--border-radius": "24px",
+                    "--neon-color": neonColor,
+                    "--secondary-color": secondaryColor,
+                  } as React.CSSProperties}
                   data-col-span={colSpan}
                 >
-                  <NeonGradientCard
-                    cardId={`gallery-${index}`}
-                    neonColor={index % 2 === 0 ? "#ff2975" : "#00FFF1"}
-                    secondaryColor={index % 2 === 0 ? "#00FFF1" : "#9b00ff"}
-                    className="h-full w-full"
+                  {/* Neon Card Container */}
+                  <div
+                    className="relative w-full h-full rounded-[var(--border-radius)] bg-zinc-950 p-1 overflow-hidden"
                   >
-                    <div className="relative w-full h-full overflow-hidden">
+                    {/* Neon Glow Effect */}
+                    <div
+                      className="absolute inset-0 rounded-[var(--border-radius)]"
+                      style={{
+                        background: `linear-gradient(0deg, ${neonColor}, ${secondaryColor}, ${neonColor})`,
+                        backgroundSize: "100% 200%",
+                        animation: "neon-border 3s linear infinite",
+                        opacity: 0.4,
+                        transition: "opacity 0.5s ease",
+                        pointerEvents: "none",
+                        filter: "blur(20px)",
+                        WebkitFilter: "blur(20px)",
+                        zIndex: 0,
+                      }}
+                    />
+                    
+                    {/* Neon Border */}
+                    <div
+                      className="absolute inset-0 rounded-[var(--border-radius)]"
+                      style={{
+                        background: `linear-gradient(0deg, ${neonColor}, ${secondaryColor}, ${neonColor})`,
+                        backgroundSize: "100% 200%",
+                        animation: "neon-border 3s linear infinite",
+                        zIndex: 1,
+                        pointerEvents: "none",
+                      }}
+                    />
+                    
+                    {/* Inner border container - This is the parent for all content */}
+                    <div
+                      className="absolute inset-[var(--border-size)] rounded-[calc(var(--border-radius)-var(--border-size))] bg-[#05030a]"
+                      style={{
+                        zIndex: 2,
+                        pointerEvents: "none",
+                      }}
+                    />
+                    
+                    {/* Image Container - Directly inside border container */}
+                    <div 
+                      className="absolute inset-[var(--border-size)] rounded-[calc(var(--border-radius)-var(--border-size))] overflow-hidden"
+                      style={{
+                        zIndex: 3,
+                      }}
+                    >
                       <Image
                         src={item.src}
                         alt={item.alt}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        unoptimized
                       />
                       {/* Overlay Gradient */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
-                      
-                      {/* Content Overlay */}
-                      <div className="absolute inset-0 flex flex-col justify-end p-6 z-30">
-                        <div className="space-y-2">
-                          <h3 
-                            className="text-xl md:text-2xl font-black text-white transition-all duration-500 group-hover:drop-shadow-[0_0_20px_rgba(255,41,117,1)]"
-                            style={{
-                              textShadow: `0 0 10px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, 0 0 20px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, 0 0 30px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}`,
-                            }}
-                          >
-                            {item.title}
-                          </h3>
-                          <p 
-                            className="text-xs md:text-sm font-medium uppercase tracking-[0.2em] transition-all duration-500"
-                            style={{
-                              color: index % 2 === 0 ? '#ff2975' : '#00FFF1',
-                              textShadow: `0 0 10px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}`,
-                            }}
-                          >
-                            {item.subtitle}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Enhanced Neon Glow Effect on Hover */}
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20">
-                        {/* Outer Glow */}
-                        <div 
-                          className="absolute -inset-4 blur-2xl"
+                    </div>
+                    
+                    {/* Content Overlay */}
+                    <div 
+                      className="absolute inset-[var(--border-size)] flex flex-col justify-end z-30 p-6"
+                      style={{
+                        zIndex: 4,
+                      }}
+                    >
+                      <div className="space-y-2">
+                        <h3 
+                          className="text-xl md:text-2xl font-black text-white transition-all duration-500 group-hover:drop-shadow-[0_0_20px_rgba(255,41,117,1)]"
                           style={{
-                            background: `linear-gradient(135deg, ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, ${index % 2 === 0 ? '#00FFF1' : '#9b00ff'})`,
-                            opacity: 0.6,
-                            filter: 'blur(30px)',
+                            textShadow: `0 0 10px ${neonColor}, 0 0 20px ${neonColor}, 0 0 30px ${neonColor}`,
                           }}
-                        />
-                        {/* Inner Glow */}
-                        <div 
-                          className="absolute inset-0 blur-xl"
+                        >
+                          {item.title}
+                        </h3>
+                        <p 
+                          className="text-xs md:text-sm font-medium uppercase tracking-[0.2em] transition-all duration-500"
                           style={{
-                            background: `linear-gradient(135deg, ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, ${index % 2 === 0 ? '#00FFF1' : '#9b00ff'})`,
-                            opacity: 0.4,
+                            color: neonColor,
+                            textShadow: `0 0 10px ${neonColor}`,
                           }}
-                        />
-                        {/* Edge Glow */}
-                        <div 
-                          className="absolute inset-0 border-2 rounded-xl"
-                          style={{
-                            borderColor: index % 2 === 0 ? '#ff2975' : '#00FFF1',
-                            boxShadow: `0 0 20px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, 0 0 40px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}, inset 0 0 20px ${index % 2 === 0 ? '#ff2975' : '#00FFF1'}`,
-                            opacity: 0.8,
-                          }}
-                        />
+                        >
+                          {item.subtitle}
+                        </p>
                       </div>
                     </div>
-                  </NeonGradientCard>
+                  </div>
                 </div>
               );
             })}
@@ -499,11 +545,29 @@ export default function BarPage() {
         </div>
       </section>
 
+      {/* Gallery Modal */}
+      {selectedImageIndex !== null && (
+        <GalleryModal
+          images={barGalleryImages}
+          currentIndex={selectedImageIndex}
+          onClose={() => setSelectedImageIndex(null)}
+          onNext={() => {
+            setSelectedImageIndex((prev) => 
+              prev !== null ? (prev + 1) % barGalleryImages.length : null
+            );
+          }}
+          onPrevious={() => {
+            setSelectedImageIndex((prev) => 
+              prev !== null ? (prev - 1 + barGalleryImages.length) % barGalleryImages.length : null
+            );
+          }}
+        />
+      )}
+
       {/* Reservation Panel */}
       <section className="px-6 py-20">
         <div className="max-w-[1400px] mx-auto">
           <NeonGradientCard 
-            cardId="reservation-panel"
             neonColor="#9b00ff"
             secondaryColor="#ff2975"
             className="min-h-[300px]"
@@ -561,6 +625,163 @@ export default function BarPage() {
         </div>
       </footer>
 
+    </div>
+  );
+}
+
+// Gallery Modal Component
+function GalleryModal({
+  images,
+  currentIndex,
+  onClose,
+  onNext,
+  onPrevious,
+}: {
+  images: typeof barGalleryImages;
+  currentIndex: number;
+  onClose: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
+}) {
+  const currentImage = images[currentIndex];
+  const neonColor = currentIndex % 2 === 0 ? "#ff2975" : "#00FFF1";
+  const secondaryColor = currentIndex % 2 === 0 ? "#00FFF1" : "#9b00ff";
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md"
+      onClick={onClose}
+    >
+      {/* Close Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+        className="absolute top-6 right-6 z-50 p-3 rounded-full bg-black/50 hover:bg-black/70 border border-white/20 transition-all duration-300 hover:scale-110"
+        aria-label="Close modal"
+      >
+        <svg
+          className="w-6 h-6 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+
+      {/* Navigation Buttons */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onPrevious();
+        }}
+        className="absolute left-6 top-1/2 -translate-y-1/2 z-50 p-4 rounded-full bg-black/50 hover:bg-black/70 border border-white/20 transition-all duration-300 hover:scale-110 group"
+        aria-label="Previous image"
+      >
+        <svg
+          className="w-6 h-6 text-white group-hover:text-[#00FFF1] transition-colors"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </button>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onNext();
+        }}
+        className="absolute right-6 top-1/2 -translate-y-1/2 z-50 p-4 rounded-full bg-black/50 hover:bg-black/70 border border-white/20 transition-all duration-300 hover:scale-110 group"
+        aria-label="Next image"
+      >
+        <svg
+          className="w-6 h-6 text-white group-hover:text-[#ff2975] transition-colors"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+      </button>
+
+      {/* Image Container */}
+      <div
+        className="relative w-full h-full max-w-7xl max-h-[90vh] mx-4 flex items-center justify-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative w-full h-full rounded-2xl overflow-hidden">
+          {/* Neon Border Effect */}
+          <div
+            className="absolute inset-0 rounded-2xl"
+            style={{
+              background: `linear-gradient(0deg, ${neonColor}, ${secondaryColor}, ${neonColor})`,
+              backgroundSize: "100% 200%",
+              animation: "neon-border 3s linear infinite",
+              padding: "2px",
+            }}
+          >
+            <div className="absolute inset-[2px] rounded-[calc(1.5rem-2px)] bg-[#05030a]" />
+          </div>
+
+          {/* Image */}
+          <div className="relative w-full h-full rounded-2xl overflow-hidden">
+            <Image
+              src={currentImage.src}
+              alt={currentImage.alt}
+              fill
+              className="object-contain"
+              sizes="90vw"
+              unoptimized
+              priority
+            />
+          </div>
+
+          {/* Image Info */}
+          <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+            <div className="max-w-4xl mx-auto">
+              <h3
+                className="text-3xl md:text-4xl font-black text-white mb-2"
+                style={{
+                  textShadow: `0 0 10px ${neonColor}, 0 0 20px ${neonColor}, 0 0 30px ${neonColor}`,
+                }}
+              >
+                {currentImage.title}
+              </h3>
+              <p
+                className="text-sm md:text-base font-medium uppercase tracking-[0.2em]"
+                style={{
+                  color: neonColor,
+                  textShadow: `0 0 10px ${neonColor}`,
+                }}
+              >
+                {currentImage.subtitle}
+              </p>
+              <div className="mt-4 text-xs text-zinc-400">
+                {currentIndex + 1} / {images.length}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
