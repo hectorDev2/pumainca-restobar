@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useState, useCallback, useMemo, useRef, useEffect, useId } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 
 export const NeonGradientCard = ({
   children,
@@ -31,10 +31,10 @@ export const NeonGradientCard = ({
   const hoverStateRef = useRef(false);
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  
-  // Use React's useId for consistent server/client ID generation to prevent hydration mismatches
-  const generatedId = useId();
-  const uniqueId = useMemo(() => cardId || `card-${generatedId.replace(/:/g, '')}`, [cardId, generatedId]);
+  const uniqueId = useMemo(
+    () => cardId || `card-${Math.random().toString(36).substr(2, 9)}`,
+    [cardId],
+  );
   const cardIdAttr = `neon-card-${uniqueId}`;
 
   // Sync ref with state
@@ -42,38 +42,53 @@ export const NeonGradientCard = ({
     hoverStateRef.current = isHovered;
   }, [isHovered]);
 
-  const handleMouseEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    // Verify this is the correct card element
-    if (cardRef.current && (e.currentTarget === cardRef.current || cardRef.current.contains(e.currentTarget as Node))) {
-      e.stopPropagation();
-      e.nativeEvent.stopImmediatePropagation();
-      if (!hoverStateRef.current) {
-        setIsHovered(true);
-        onMouseEnter?.();
+  const handleMouseEnter = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      // Verify this is the correct card element
+      if (
+        cardRef.current &&
+        (e.currentTarget === cardRef.current ||
+          cardRef.current.contains(e.currentTarget as Node))
+      ) {
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
+        if (!hoverStateRef.current) {
+          setIsHovered(true);
+          onMouseEnter?.();
+        }
       }
-    }
-  }, [onMouseEnter]);
+    },
+    [onMouseEnter],
+  );
 
-  const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const relatedTarget = e.relatedTarget;
-    // Only update if truly leaving this card
-    // Check if relatedTarget is a Node to avoid "parameter 1 is not of type 'Node'" error
-    if (cardRef.current && (!relatedTarget || !(relatedTarget instanceof Node) || !cardRef.current.contains(relatedTarget))) {
-      e.stopPropagation();
-      e.nativeEvent.stopImmediatePropagation();
-      if (hoverStateRef.current) {
-        setIsHovered(false);
-        onMouseLeave?.();
+  const handleMouseLeave = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const relatedTarget = e.relatedTarget as Node;
+      // Only update if truly leaving this card
+      if (
+        cardRef.current &&
+        (!relatedTarget || !cardRef.current.contains(relatedTarget))
+      ) {
+        e.stopPropagation();
+        e.nativeEvent.stopImmediatePropagation();
+        if (hoverStateRef.current) {
+          setIsHovered(false);
+          onMouseLeave?.();
+        }
       }
-    }
-  }, [onMouseLeave]);
+    },
+    [onMouseLeave],
+  );
 
-  const cardStyles = useMemo(() => ({
-    "--border-size": `${borderSize}px`,
-    "--border-radius": `${borderRadius}px`,
-    "--neon-color": neonColor,
-    "--secondary-color": secondaryColor,
-  }), [borderSize, borderRadius, neonColor, secondaryColor]);
+  const cardStyles = useMemo(
+    () => ({
+      "--border-size": `${borderSize}px`,
+      "--border-radius": `${borderRadius}px`,
+      "--neon-color": neonColor,
+      "--secondary-color": secondaryColor,
+    }),
+    [borderSize, borderRadius, neonColor, secondaryColor],
+  );
 
   return (
     <div
@@ -81,15 +96,17 @@ export const NeonGradientCard = ({
       id={cardIdAttr}
       data-card-id={uniqueId}
       data-is-hovered={String(isHovered)}
-      style={{
-        ...cardStyles,
-        position: "relative",
-        overflow: "hidden",
-        zIndex: isHovered ? 20 : 10,
-      } as React.CSSProperties}
+      style={
+        {
+          ...cardStyles,
+          position: "relative",
+          overflow: "hidden",
+          zIndex: isHovered ? 20 : 10,
+        } as React.CSSProperties
+      }
       className={cn(
         "neon-card-container relative grid w-full h-full items-center justify-center rounded-[var(--border-radius)] bg-zinc-950 p-1 text-center",
-        className
+        className,
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -113,7 +130,7 @@ export const NeonGradientCard = ({
         data-hovered={String(isHovered)}
         data-card-id={uniqueId}
       />
-      
+
       {/* Neon Border - Visible animated border */}
       <div
         className="absolute inset-0 rounded-[var(--border-radius)]"
@@ -125,7 +142,7 @@ export const NeonGradientCard = ({
           pointerEvents: "none",
         }}
       />
-      
+
       {/* Inner mask to create border effect */}
       <div
         className="absolute inset-[var(--border-size)] rounded-[calc(var(--border-radius)-var(--border-size))] bg-[#05030a]"
@@ -134,7 +151,7 @@ export const NeonGradientCard = ({
           pointerEvents: "none",
         }}
       />
-      
+
       {/* Content Container - can be disabled so callers can provide their own container */}
       {!noInnerContainer ? (
         <div
