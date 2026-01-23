@@ -1,11 +1,13 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect, useId } from "react";
 
 export const NeonGradientCard = ({
   children,
   className,
+  // If true, do not render the built-in inner content wrapper
+  noInnerContainer = false,
   borderSize = 2,
   borderRadius = 24,
   neonColor = "#ff2975",
@@ -16,6 +18,7 @@ export const NeonGradientCard = ({
 }: {
   children: React.ReactNode;
   className?: string;
+  noInnerContainer?: boolean;
   borderSize?: number;
   borderRadius?: number;
   neonColor?: string;
@@ -28,7 +31,10 @@ export const NeonGradientCard = ({
   const hoverStateRef = useRef(false);
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const uniqueId = useMemo(() => cardId || `card-${Math.random().toString(36).substr(2, 9)}`, [cardId]);
+  
+  // Use React's useId for consistent server/client ID generation to prevent hydration mismatches
+  const generatedId = useId();
+  const uniqueId = useMemo(() => cardId || `card-${generatedId.replace(/:/g, '')}`, [cardId, generatedId]);
   const cardIdAttr = `neon-card-${uniqueId}`;
 
   // Sync ref with state
@@ -49,9 +55,10 @@ export const NeonGradientCard = ({
   }, [onMouseEnter]);
 
   const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const relatedTarget = e.relatedTarget as Node;
+    const relatedTarget = e.relatedTarget;
     // Only update if truly leaving this card
-    if (cardRef.current && (!relatedTarget || !cardRef.current.contains(relatedTarget))) {
+    // Check if relatedTarget is a Node to avoid "parameter 1 is not of type 'Node'" error
+    if (cardRef.current && (!relatedTarget || !(relatedTarget instanceof Node) || !cardRef.current.contains(relatedTarget))) {
       e.stopPropagation();
       e.nativeEvent.stopImmediatePropagation();
       if (hoverStateRef.current) {
@@ -128,18 +135,23 @@ export const NeonGradientCard = ({
         }}
       />
       
-      {/* Content Container */}
-      <div
-        className="relative h-full w-full rounded-[calc(var(--border-radius)-var(--border-size))] bg-transparent p-6"
-        style={{
-          zIndex: 3,
-          overflow: "visible",
-        }}
-      >
-        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4">
-          {children}
+      {/* Content Container - can be disabled so callers can provide their own container */}
+      {!noInnerContainer ? (
+        <div
+          className="relative h-full w-full rounded-[calc(var(--border-radius)-var(--border-size))] bg-transparent p-6"
+          style={{
+            zIndex: 3,
+            overflow: "visible",
+          }}
+        >
+          <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4">
+            {children}
+          </div>
         </div>
-      </div>
+      ) : (
+        // Render children directly when caller provides the full inner markup
+        <>{children}</>
+      )}
     </div>
   );
 };
