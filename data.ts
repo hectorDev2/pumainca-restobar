@@ -181,7 +181,7 @@ export const products: Product[] = [
     name: "Chicha Morada",
     description: "Bebida tradicional de maíz morado.",
     price: 5.0,
-    image: "https://images.unsplash.com/photo-1582236894042-32b000b95eb7?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80",
     category: "bebidas",
     subcategory: "limonadas-jugos",
     ingredients: ["Maíz morado", "piña", "limón", "canela"],
