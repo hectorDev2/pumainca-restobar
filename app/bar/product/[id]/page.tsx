@@ -15,7 +15,7 @@ const resolvePrice = (price?: number | Record<string, number>) => {
 
   if (price && typeof price === "object") {
     const values = Object.values(price).filter(
-      (value): value is number => typeof value === "number"
+      (value): value is number => typeof value === "number",
     );
     if (values.length > 0) {
       return Math.min(...values);
@@ -25,7 +25,9 @@ const resolvePrice = (price?: number | Record<string, number>) => {
   return 0;
 };
 
-const formatPrice = (price: number | { [key: string]: number } | undefined): string => {
+const formatPrice = (
+  price: number | { [key: string]: number } | undefined,
+): string => {
   if (!price) return "S./0.00";
   if (typeof price === "number") {
     return `S./${price.toFixed(2)}`;
@@ -49,20 +51,30 @@ const calculateIntensity = (drink: any): number => {
 };
 
 const generateFlavorProfile = (drink: any): string[] => {
-  const profiles = ["Cítrico", "Dulce", "Amargo", "Ácido", "Picante", "Suave", "Intenso"];
+  const profiles = [
+    "Cítrico",
+    "Dulce",
+    "Amargo",
+    "Ácido",
+    "Picante",
+    "Suave",
+    "Intenso",
+  ];
   const selected = new Set<string>();
   const name = drink.name?.toLowerCase() || "";
-  
+
   if (name.includes("sour") || name.includes("limón")) selected.add("Cítrico");
   if (name.includes("sweet") || name.includes("dulce")) selected.add("Dulce");
-  if (name.includes("bitter") || name.includes("amargo")) selected.add("Amargo");
-  if (name.includes("spicy") || name.includes("picante")) selected.add("Picante");
-  
+  if (name.includes("bitter") || name.includes("amargo"))
+    selected.add("Amargo");
+  if (name.includes("spicy") || name.includes("picante"))
+    selected.add("Picante");
+
   while (selected.size < 2 && selected.size < profiles.length) {
     const random = profiles[Math.floor(Math.random() * profiles.length)];
     selected.add(random);
   }
-  
+
   return Array.from(selected);
 };
 
@@ -80,7 +92,9 @@ export default function DrinkDetailPage() {
 
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState("");
-  const [selectedSize, setSelectedSize] = useState<string | undefined>(undefined);
+  const [selectedSize, setSelectedSize] = useState<string | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (drink) {
@@ -99,7 +113,9 @@ export default function DrinkDetailPage() {
       <div className="min-h-screen flex items-center justify-center bg-[#020204] text-white">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 border-4 border-[#ff2975] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-zinc-400 text-sm uppercase tracking-[0.3em]">Cargando...</p>
+          <p className="text-zinc-400 text-sm uppercase tracking-[0.3em]">
+            Cargando...
+          </p>
         </div>
       </div>
     );
@@ -126,7 +142,9 @@ export default function DrinkDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#020204] text-white">
         <div className="text-center space-y-4">
-          <p className="text-[#ff2975] text-xl font-bold">Bebida no encontrada</p>
+          <p className="text-[#ff2975] text-xl font-bold">
+            Bebida no encontrada
+          </p>
           <Link
             href="/bar"
             className="inline-block px-6 py-2 rounded-full border border-[#ff2975]/30 bg-[#ff2975]/10 text-[#ff2975] text-sm font-bold uppercase tracking-[0.2em] hover:bg-[#ff2975]/20 transition-colors"
@@ -149,8 +167,8 @@ export default function DrinkDetailPage() {
     hasMultipleSizes && selectedSize && priceRecord
       ? priceRecord[selectedSize]
       : typeof drink.price === "number"
-      ? drink.price
-      : undefined
+        ? drink.price
+        : undefined,
   );
 
   const gallery = drink.gallery || [];
@@ -180,14 +198,24 @@ export default function DrinkDetailPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-[#ff2975]/20">
         <div className="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/bar" className="flex items-center gap-3 group">
-            <img src="/logo.png" className="w-[100px] md:w-[120px] group-hover:scale-105 transition-transform" alt="Logo" />
+            <img
+              src="/logo.png"
+              className="w-[100px] md:w-[120px] group-hover:scale-105 transition-transform"
+              alt="Logo"
+            />
           </Link>
-          
+
           <div className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-[0.2em]">
-            <Link href="/bar" className="text-zinc-400 hover:text-[#ff2975] transition-colors">
+            <Link
+              href="/bar"
+              className="text-zinc-400 hover:text-[#ff2975] transition-colors"
+            >
               Volver
             </Link>
-            <Link href="/menu" className="text-zinc-400 hover:text-[#00FFF1] transition-colors">
+            <Link
+              href="/menu"
+              className="text-zinc-400 hover:text-[#00FFF1] transition-colors"
+            >
               Menú
             </Link>
             <div className="px-4 py-2 rounded-full border border-[#ff2975]/30 bg-[#ff2975]/10 text-[#ff2975] animate-pulse">
@@ -206,7 +234,10 @@ export default function DrinkDetailPage() {
               Inicio
             </Link>
             <span>/</span>
-            <Link href="/bar" className="hover:text-[#ff2975] transition-colors">
+            <Link
+              href="/bar"
+              className="hover:text-[#ff2975] transition-colors"
+            >
               Bar
             </Link>
             <span>/</span>
@@ -333,18 +364,22 @@ export default function DrinkDetailPage() {
                       {molecular}
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="text-xs text-zinc-500 uppercase shrink-0">Intensity</div>
+                      <div className="text-xs text-zinc-500 uppercase shrink-0">
+                        Intensity
+                      </div>
                       <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden min-w-0">
-                        <div 
+                        <div
                           className="h-full bg-gradient-to-r from-[#ff2975] to-[#00FFF1] transition-all duration-500"
                           style={{ width: `${intensity}%` }}
                         />
                       </div>
-                      <div className="text-xs text-zinc-400 shrink-0">{intensity}%</div>
+                      <div className="text-xs text-zinc-400 shrink-0">
+                        {intensity}%
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
                       {profile.map((tag) => (
-                        <span 
+                        <span
                           key={tag}
                           className="px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] rounded-full border border-[#ff2975]/30 bg-[#ff2975]/10 text-[#ff2975]"
                         >
@@ -475,16 +510,20 @@ export default function DrinkDetailPage() {
               <div>22:00 - 03:00</div>
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/bar" className="text-zinc-400 hover:text-[#ff2975] transition-colors">
+              <Link
+                href="/bar"
+                className="text-zinc-400 hover:text-[#ff2975] transition-colors"
+              >
                 Bar
               </Link>
-              <Link href="/menu" className="text-zinc-400 hover:text-[#00FFF1] transition-colors">
+              <Link
+                href="/menu"
+                className="text-zinc-400 hover:text-[#00FFF1] transition-colors"
+              >
                 Menu
               </Link>
             </div>
-            <div className="text-[#00FFF1]">
-              Pumainca Bar
-            </div>
+            <div className="text-[#00FFF1]">Pumainca Bar</div>
           </div>
         </div>
       </footer>
