@@ -50,11 +50,21 @@
     0% { opacity: 0; transform: translateY(20px); }
     100% { opacity: 1; transform: translateY(0); }
   }
+}
 
-  @keyframes neon-border {
-    0% { background-position: 0% 0%; }
-    50% { background-position: 0% 100%; }
-    100% { background-position: 0% 0%; }
+/* Neon Border Animation - Must be outside @theme to work with inline styles */
+@keyframes neon-border {
+  0% { 
+    background-position: 0% 0%; 
+    filter: brightness(1);
+  }
+  50% { 
+    background-position: 0% 100%; 
+    filter: brightness(1.3);
+  }
+  100% { 
+    background-position: 0% 0%; 
+    filter: brightness(1);
   }
 }
 
@@ -82,5 +92,12 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+/* Bento Gallery Responsive Styles */
+@media (max-width: 767px) {
+  .bento-gallery > div {
+    grid-column-end: span 1 !important;
   }
 }

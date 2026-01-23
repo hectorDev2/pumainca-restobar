@@ -3,6 +3,40 @@
 import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import Image from "next/image";
+
+// Helper component to handle image errors
+const MenuImage = ({ 
+  src, 
+  alt, 
+  className = "", 
+  containerClassName = "" 
+}: { 
+  src: string; 
+  alt: string; 
+  className?: string; 
+  containerClassName?: string;
+}) => {
+  const [imgSrc, setImgSrc] = useState(src || '/no-found.png');
+
+  useEffect(() => {
+    setImgSrc(src || '/no-found.png');
+  }, [src]);
+
+  return (
+    <div className={`relative overflow-hidden ${containerClassName}`}>
+      <Image
+        src={imgSrc}
+        alt={alt}
+        fill
+        className={`object-cover ${className}`}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        onError={() => setImgSrc('/no-found.png')}
+      />
+    </div>
+  );
+};
+
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -180,11 +214,11 @@ function MenuContent() {
                 >
                   <div className="absolute inset-0 bg-linear-to-r from-background-dark/90 via-background-dark/40 to-transparent z-10" />
 
-                  <div
-                    className="h-[400px] bg-cover bg-center w-full transition-transform duration-700 group-hover:scale-105"
-                    style={{
-                      backgroundImage: `url('${resolveDishImage(heroDish)}')`,
-                    }}
+                  <MenuImage
+                    src={resolveDishImage(heroDish)}
+                    alt={heroDish.name}
+                    containerClassName="h-[400px] w-full"
+                    className="transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute bottom-0 left-0 p-8 md:p-12 z-20 flex flex-col gap-4 max-w-2xl">
                     <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider backdrop-blur-sm w-fit border border-primary/20">
@@ -354,13 +388,11 @@ function MenuContent() {
                             className="relative h-48 sm:h-56 md:h-64 overflow-hidden cursor-pointer shrink-0"
                             onClick={() => navigateToDish(dish.id)}
                           >
-                            <div
-                              className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                              style={{
-                                backgroundImage: `url('${resolveDishImage(
-                                  dish
-                                )}')`,
-                              }}
+                            <MenuImage
+                              src={resolveDishImage(dish)}
+                              alt={dish.name}
+                              containerClassName="absolute inset-0"
+                              className="transition-transform duration-500 group-hover:scale-110"
                             />
                             {dish.isVegetarian && (
                               <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
@@ -448,11 +480,11 @@ function MenuContent() {
                       className="group cursor-pointer text-left"
                       onClick={() => navigateToDish(dish.id)}
                     >
-                      <div
-                        className="w-full aspect-square rounded-2xl bg-cover bg-center mb-4 transition-all group-hover:scale-[1.02] shadow-xl"
-                        style={{
-                          backgroundImage: `url('${resolveDishImage(dish)}')`,
-                        }}
+                      <MenuImage
+                        src={resolveDishImage(dish)}
+                        alt={dish.name}
+                        containerClassName="w-full aspect-square rounded-2xl mb-4 shadow-xl"
+                        className="transition-transform duration-500 group-hover:scale-[1.02]"
                       />
                       <h4 className="text-text-primary font-bold text-lg group-hover:text-primary transition-colors">
                         {dish.name}

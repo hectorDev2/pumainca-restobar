@@ -1,10 +1,124 @@
 "use client";
 
-import React from 'react';
+import React, { memo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { useSettings } from '@/lib/queries';
+import { useSettings, useProducts } from '@/lib/queries';
+import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
+import Carousel3D from "@/components/ui/carousel-3d";
+import type { Product } from "@/types";
+
+// Helper function to format price
+function formatPrice(price: number | { [key: string]: number } | undefined): string {
+  if (!price) return "S./0.00";
+  if (typeof price === "number") {
+    return `S./${price.toFixed(2)}`;
+  }
+  const firstPrice = Object.values(price)[0];
+  return `S./${firstPrice.toFixed(2)}`;
+}
+
+const RecommendedCard = memo(function RecommendedCard({ product }: { product: Product }) {
+  const [isCardHovered, setIsCardHovered] = useState(false);
+  const [imgSrc, setImgSrc] = useState(product.image || '/no-found.png');
+
+  // Update image if product changes
+  React.useEffect(() => {
+     setImgSrc(product.image || '/no-found.png');
+  }, [product.image]);
+
+  return (
+    <NeonGradientCard 
+      neonColor="#FF0000"
+      secondaryColor="#cc0000"
+      className="h-[450px] cursor-pointer !p-0"
+      noInnerContainer
+      onMouseEnter={() => setIsCardHovered(true)}
+      onMouseLeave={() => setIsCardHovered(false)}
+    >
+      <div className="flex flex-col gap-4 w-full h-full overflow-hidden relative z-[3] box-border p-6">
+        <div className="relative w-full h-48 rounded-xl overflow-hidden border border-[#FF0000]/20 shrink-0 group/image">
+          <Image
+            src={imgSrc}
+            alt={product.name}
+            fill
+            className="object-cover group-hover/image:scale-110 transition-transform duration-500"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            onError={() => setImgSrc('/no-found.png')}
+          />
+        </div>
+
+        <div className="space-y-2 shrink-0">
+          <h3 className={`text-2xl font-black tracking-tight transition-colors duration-300 ${isCardHovered ? 'text-[#FF0000]' : 'text-white'}`}>
+            {product.name}
+          </h3>
+          <div className="h-px w-12 bg-gradient-to-r from-[#FF0000] to-transparent" />
+        </div>
+        
+        <div className="space-y-3 flex-1 min-h-0 flex flex-col overflow-hidden">
+          <p className="text-xs font-bold text-white uppercase tracking-[0.4em] drop-shadow-[0_0_8px_rgba(255,0,0,0.5)]">
+            {formatPrice(product.price)}
+          </p>
+          <p className="text-sm text-zinc-400 font-medium leading-relaxed line-clamp-3">
+            {product.description}
+          </p>
+        </div>
+
+        <div className="mt-auto">
+          <Link
+            href="/menu"
+            className="block w-full px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors border border-zinc-800 rounded-full hover:border-[#FF0000] text-center"
+          >
+            Ver Detalles
+          </Link>
+        </div>
+      </div>
+    </NeonGradientCard>
+  );
+});
+
+function RecommendationsSection() {
+  const { data: products = [] } = useProducts({ sort: "recommended" });
+  
+  // Filter only recommended products (if the API doesn't do it strictly or we want to be sure)
+  // Assuming the API returns a mix or we just take the first N.
+  // Ideally use the backend filter, but let's slice for now if needed.
+  const recommendedProducts = products.slice(0, 5); 
+
+  if (recommendedProducts.length === 0) return null;
+
+  return (
+    <section className="py-20 bg-[#020204] relative overflow-hidden">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-4 bg-gradient-to-r from-[#FF0000] to-[#cc0000] bg-clip-text text-transparent">
+            RECOMENDADOS
+          </h2>
+          <p className="text-zinc-400 text-sm uppercase tracking-[0.3em]">
+            Favoritos de la Casa
+          </p>
+        </div>
+
+        <div className="w-full relative">
+          <Carousel3D 
+            items={recommendedProducts.map((product) => (
+              <div className="w-full h-full p-4" key={product.id}>
+                <RecommendedCard product={product} />
+              </div>
+            ))}
+            itemWidth={320}
+            curve={900}
+          />
+        </div>
+      </div>
+      
+      {/* Background ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FF0000]/5 rounded-full blur-[150px] pointer-events-none -z-0" />
+    </section>
+  );
+}
 
 export default function Home() {
   const { data: content } = useSettings();
@@ -54,6 +168,9 @@ export default function Home() {
           <span className="material-symbols-outlined text-4xl">expand_more</span>
         </div>
       </section>
+
+      {/* Recommendations Section */}
+      <RecommendationsSection />
 
       {/* History & Philosophy */}
       <section className="py-16 md:py-24 bg-background-dark relative overflow-hidden transition-colors duration-300">
