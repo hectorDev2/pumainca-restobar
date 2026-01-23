@@ -220,6 +220,7 @@ export default function DrinkDetailPage() {
                 neonColor="#ff2975"
                 secondaryColor="#00FFF1"
                 className="w-full aspect-4/3"
+                noInnerContainer
               >
                 <div className="relative w-full h-full rounded-xl overflow-hidden">
                   {activeImage && (
@@ -266,6 +267,7 @@ export default function DrinkDetailPage() {
                 neonColor="#ff2975"
                 secondaryColor="#00FFF1"
                 className="min-h-[500px]"
+                noInnerContainer
               >
                 <div className="space-y-6">
                   {/* Title */}
@@ -429,6 +431,7 @@ export default function DrinkDetailPage() {
                       neonColor="#9b00ff"
                       secondaryColor="#ff2975"
                       className="h-[300px] cursor-pointer"
+                      noInnerContainer
                     >
                       <div className="flex flex-col gap-4 h-full">
                         {relatedDrink.image && (

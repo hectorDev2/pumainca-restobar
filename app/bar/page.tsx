@@ -65,22 +65,26 @@ const barGalleryImages = [
 const calculateMolecularFormula = (ingredients: string[]): string => {
   if (!ingredients || ingredients.length === 0) return "C2H5OH";
   const formulas: Record<string, string> = {
-    "pisco": "C2H5OH",
-    "vodka": "C2H6O",
-    "ron": "C2H5OH",
-    "gin": "C2H6O",
-    "lima": "C6H8O7",
-    "limón": "C6H8O7",
-    "lychee": "C6H12O6",
-    "maracuyá": "C10H18O",
-    "pepino": "C3H6O",
+    pisco: "C2H5OH",
+    vodka: "C2H6O",
+    ron: "C2H5OH",
+    gin: "C2H6O",
+    lima: "C6H8O7",
+    limón: "C6H8O7",
+    lychee: "C6H12O6",
+    maracuyá: "C10H18O",
+    pepino: "C3H6O",
     "agua tónica": "H2O + CO2",
   };
-  
-  const found = ingredients.find(ing => 
-    Object.keys(formulas).some(key => ing.toLowerCase().includes(key))
+
+  const found = ingredients.find((ing) =>
+    Object.keys(formulas).some((key) => ing.toLowerCase().includes(key)),
   );
-  return found ? formulas[Object.keys(formulas).find(key => found.toLowerCase().includes(key))!] || "C2H5OH" : "C2H5OH";
+  return found
+    ? formulas[
+        Object.keys(formulas).find((key) => found.toLowerCase().includes(key))!
+      ] || "C2H5OH"
+    : "C2H5OH";
 };
 
 // Helper function to calculate intensity based on product flags
@@ -100,24 +104,41 @@ const generateFlavorProfile = (product: Product): string[] => {
   if (product.isGlutenFree) profile.push("Sin Gluten");
   if (product.isChefSpecial) profile.push("Chef Special");
   if (product.isRecommended) profile.push("Recomendado");
-  
+
   // Add based on ingredients
   const ingredients = product.ingredients || [];
-  if (ingredients.some(i => i.toLowerCase().includes("limón") || i.toLowerCase().includes("lima"))) {
+  if (
+    ingredients.some(
+      (i) =>
+        i.toLowerCase().includes("limón") || i.toLowerCase().includes("lima"),
+    )
+  ) {
     profile.push("Cítrico");
   }
-  if (ingredients.some(i => i.toLowerCase().includes("azúcar") || i.toLowerCase().includes("miel"))) {
+  if (
+    ingredients.some(
+      (i) =>
+        i.toLowerCase().includes("azúcar") || i.toLowerCase().includes("miel"),
+    )
+  ) {
     profile.push("Dulce");
   }
-  if (ingredients.some(i => i.toLowerCase().includes("menta") || i.toLowerCase().includes("hierba"))) {
+  if (
+    ingredients.some(
+      (i) =>
+        i.toLowerCase().includes("menta") || i.toLowerCase().includes("hierba"),
+    )
+  ) {
     profile.push("Refrescante");
   }
-  
+
   return profile.length > 0 ? profile : ["Clásico"];
 };
 
 // Helper function to format price
-function formatPrice(price: number | { [key: string]: number } | undefined): string {
+function formatPrice(
+  price: number | { [key: string]: number } | undefined,
+): string {
   if (!price) return "S./0.00";
   if (typeof price === "number") {
     return `S./${price.toFixed(2)}`;
@@ -140,10 +161,11 @@ const DrinkCard = memo(function DrinkCard({
   const profile = generateFlavorProfile(drink);
 
   return (
-    <NeonGradientCard 
+    <NeonGradientCard
       neonColor="#ff2975"
       secondaryColor="#00FFF1"
       className="h-[450px] cursor-pointer"
+      noInnerContainer
       onMouseEnter={() => {
         setIsCardHovered(true);
       }}
@@ -151,10 +173,10 @@ const DrinkCard = memo(function DrinkCard({
         setIsCardHovered(false);
       }}
     >
-      <div 
-        className="flex flex-col gap-4 w-full h-full overflow-hidden" 
-        style={{ 
-          height: "100%", 
+      <div
+        className="flex flex-col gap-4 w-full h-full overflow-hidden"
+        style={{
+          height: "100%",
           maxHeight: "100%",
           minHeight: "100%",
           width: "100%",
@@ -164,7 +186,7 @@ const DrinkCard = memo(function DrinkCard({
       >
         {/* Drink Image - Clickable */}
         {drink.image && (
-          <Link 
+          <Link
             href={`/bar/product/${drink.id}`}
             className="relative w-full h-32 rounded-xl overflow-hidden border border-[#ff2975]/20 shrink-0 group/image cursor-pointer"
           >
@@ -179,31 +201,34 @@ const DrinkCard = memo(function DrinkCard({
         )}
 
         <div className="space-y-2 shrink-0">
-          <h3 className={`text-2xl font-black tracking-tight transition-colors duration-300 ${isCardHovered ? 'text-[#ff2975]' : 'text-white'}`}>
+          <h3
+            className={`text-2xl font-black tracking-tight transition-colors duration-300 ${isCardHovered ? "text-[#ff2975]" : "text-white"}`}
+          >
             {drink.name}
           </h3>
           <div className="h-px w-12 bg-gradient-to-r from-[#ff2975] to-transparent" />
         </div>
-        
+
         <div className="space-y-3 flex-1 min-h-0 flex flex-col overflow-hidden">
           <div className="shrink-0">
             <p className="text-xs font-bold text-[#00FFF1] uppercase tracking-[0.4em] drop-shadow-[0_0_8px_rgba(0,255,241,0.5)]">
               {formatPrice(drink.price)}
             </p>
-            
+
             <p className="text-sm text-zinc-400 font-medium leading-relaxed line-clamp-2 mt-2">
               {drink.description}
             </p>
           </div>
 
           {/* Molecular Profile on Hover - Always rendered but hidden to prevent layout shift */}
-          <div 
+          <div
             className="pt-4 border-t border-zinc-800 overflow-hidden shrink-0"
-            style={{ 
+            style={{
               height: isCardHovered ? "auto" : "0px",
               maxHeight: isCardHovered ? "180px" : "0px",
               opacity: isCardHovered ? 1 : 0,
-              transition: "opacity 0.3s ease, max-height 0.3s ease, height 0.3s ease",
+              transition:
+                "opacity 0.3s ease, max-height 0.3s ease, height 0.3s ease",
               visibility: isCardHovered ? "visible" : "hidden",
             }}
           >
@@ -215,18 +240,22 @@ const DrinkCard = memo(function DrinkCard({
                 {molecular}
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-[10px] text-zinc-500 uppercase shrink-0">Intensity</div>
+                <div className="text-[10px] text-zinc-500 uppercase shrink-0">
+                  Intensity
+                </div>
                 <div className="flex-1 h-1 bg-zinc-800 rounded-full overflow-hidden min-w-0">
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-[#ff2975] to-[#00FFF1] transition-all duration-500"
                     style={{ width: `${intensity}%` }}
                   />
                 </div>
-                <div className="text-[10px] text-zinc-400 shrink-0">{intensity}%</div>
+                <div className="text-[10px] text-zinc-400 shrink-0">
+                  {intensity}%
+                </div>
               </div>
               <div className="flex flex-wrap gap-1 mt-2">
                 {profile.slice(0, 3).map((tag) => (
-                  <span 
+                  <span
                     key={tag}
                     className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] rounded-full border border-[#ff2975]/30 bg-[#ff2975]/10 text-[#ff2975]"
                   >
@@ -239,7 +268,7 @@ const DrinkCard = memo(function DrinkCard({
         </div>
 
         <div className="flex gap-3 mt-auto flex-wrap shrink-0">
-          <button 
+          <button
             onClick={() => onAddToCart(drink)}
             className="group/btn relative px-6 py-2 rounded-full overflow-hidden transition-all duration-300 flex-1 min-w-[140px]"
           >
@@ -249,7 +278,7 @@ const DrinkCard = memo(function DrinkCard({
               Añadir
             </span>
           </button>
-          
+
           <Link
             href={`/bar/product/${drink.id}`}
             className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors border border-zinc-800 rounded-full hover:border-[#00FFF1] text-center"
@@ -264,7 +293,9 @@ const DrinkCard = memo(function DrinkCard({
 
 export default function BarPage() {
   const { addToCart } = useCart();
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null,
+  );
 
   // Fetch drinks from backend
   const { data: drinks = [], isLoading } = useProducts({
@@ -284,12 +315,14 @@ export default function BarPage() {
       if (e.key === "Escape") {
         setSelectedImageIndex(null);
       } else if (e.key === "ArrowRight") {
-        setSelectedImageIndex((prev) => 
-          prev !== null ? (prev + 1) % barGalleryImages.length : null
+        setSelectedImageIndex((prev) =>
+          prev !== null ? (prev + 1) % barGalleryImages.length : null,
         );
       } else if (e.key === "ArrowLeft") {
-        setSelectedImageIndex((prev) => 
-          prev !== null ? (prev - 1 + barGalleryImages.length) % barGalleryImages.length : null
+        setSelectedImageIndex((prev) =>
+          prev !== null
+            ? (prev - 1 + barGalleryImages.length) % barGalleryImages.length
+            : null,
         );
       }
     };
@@ -311,17 +344,30 @@ export default function BarPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-[#ff2975]/20">
         <div className="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <img src="/logo.png" className="w-[100px] md:w-[120px] group-hover:scale-105 transition-transform" alt="Logo" />
+            <img
+              src="/logo.png"
+              className="w-[100px] md:w-[120px] group-hover:scale-105 transition-transform"
+              alt="Logo"
+            />
           </Link>
-          
+
           <div className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-[0.2em]">
-            <Link href="/menu" className="text-zinc-400 hover:text-[#ff2975] transition-colors">
+            <Link
+              href="/menu"
+              className="text-zinc-400 hover:text-[#ff2975] transition-colors"
+            >
               Menú
             </Link>
-            <Link href="/reservas" className="text-zinc-400 hover:text-[#00FFF1] transition-colors">
+            <Link
+              href="/reservas"
+              className="text-zinc-400 hover:text-[#00FFF1] transition-colors"
+            >
               Reservas
             </Link>
-            <Link href="/nosotros" className="text-zinc-400 hover:text-[#ff2975] transition-colors">
+            <Link
+              href="/nosotros"
+              className="text-zinc-400 hover:text-[#ff2975] transition-colors"
+            >
               Nosotros
             </Link>
             <div className="px-4 py-2 rounded-full border border-[#ff2975]/30 bg-[#ff2975]/10 text-[#ff2975] animate-pulse">
@@ -342,17 +388,18 @@ export default function BarPage() {
               NEON NIGHTS
             </h1>
             <p className="text-zinc-400 max-w-2xl mx-auto text-sm md:text-base leading-relaxed font-medium">
-              Sintetizamos sabores ancestrales con la vibrante energía de la noche. 
-              Cócteles diseñados para brillar en la oscuridad del Pumainca Bar.
+              Sintetizamos sabores ancestrales con la vibrante energía de la
+              noche. Cócteles diseñados para brillar en la oscuridad del
+              Pumainca Bar.
             </p>
           </div>
 
           {/* Hero Image Background */}
           <div className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden mb-20 border border-[#ff2975]/20">
-            <div 
+            <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
-                backgroundImage: `linear-gradient(to bottom, rgba(2,2,4,0.7) 0%, rgba(2,2,4,0.9) 100%), url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=2000&q=80')`
+                backgroundImage: `linear-gradient(to bottom, rgba(2,2,4,0.7) 0%, rgba(2,2,4,0.9) 100%), url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=2000&q=80')`,
               }}
             />
             <div className="absolute inset-0 flex items-center justify-center">
@@ -390,21 +437,21 @@ export default function BarPage() {
               No hay bebidas disponibles en este momento
             </div>
           ) : (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4" style={{ isolation: "isolate" }}>
+            <div
+              className="grid gap-8 md:grid-cols-2 lg:grid-cols-4"
+              style={{ isolation: "isolate" }}
+            >
               {drinks.map((drink) => (
-                <div 
-                  key={drink.id} 
-                  style={{ 
-                    isolation: "isolate", 
+                <div
+                  key={drink.id}
+                  style={{
+                    isolation: "isolate",
                     contain: "layout style paint",
                     width: "100%",
                     height: "450px",
                   }}
                 >
-                        <DrinkCard
-                          drink={drink}
-                          onAddToCart={handleAddToCart}
-                        />
+                  <DrinkCard drink={drink} onAddToCart={handleAddToCart} />
                 </div>
               ))}
             </div>
@@ -425,7 +472,7 @@ export default function BarPage() {
           </div>
 
           {/* Bento Grid Gallery */}
-          <div 
+          <div
             className="bento-gallery grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-4"
             style={{
               gridAutoRows: "200px",
@@ -435,25 +482,25 @@ export default function BarPage() {
               const [rowSpan = 1, colSpan = 1] = item.span || [1, 1];
               const neonColor = index % 2 === 0 ? "#ff2975" : "#00FFF1";
               const secondaryColor = index % 2 === 0 ? "#00FFF1" : "#9b00ff";
-              
+
               return (
                 <div
                   key={index}
                   className="group relative cursor-pointer"
-                  style={{
-                    gridRowEnd: `span ${rowSpan}`,
-                    gridColumnEnd: `span ${colSpan}`,
-                    "--border-size": "2px",
-                    "--border-radius": "24px",
-                    "--neon-color": neonColor,
-                    "--secondary-color": secondaryColor,
-                  } as React.CSSProperties}
+                  style={
+                    {
+                      gridRowEnd: `span ${rowSpan}`,
+                      gridColumnEnd: `span ${colSpan}`,
+                      "--border-size": "2px",
+                      "--border-radius": "24px",
+                      "--neon-color": neonColor,
+                      "--secondary-color": secondaryColor,
+                    } as React.CSSProperties
+                  }
                   data-col-span={colSpan}
                 >
                   {/* Neon Card Container */}
-                  <div
-                    className="relative w-full h-full rounded-[var(--border-radius)] bg-zinc-950 p-1 overflow-hidden"
-                  >
+                  <div className="relative w-full h-full rounded-[var(--border-radius)] bg-zinc-950 p-1 overflow-hidden">
                     {/* Neon Glow Effect */}
                     <div
                       className="absolute inset-0 rounded-[var(--border-radius)]"
@@ -469,7 +516,7 @@ export default function BarPage() {
                         zIndex: 0,
                       }}
                     />
-                    
+
                     {/* Neon Border */}
                     <div
                       className="absolute inset-0 rounded-[var(--border-radius)]"
@@ -481,7 +528,7 @@ export default function BarPage() {
                         pointerEvents: "none",
                       }}
                     />
-                    
+
                     {/* Inner border container - This is the parent for all content */}
                     <div
                       className="absolute inset-[var(--border-size)] rounded-[calc(var(--border-radius)-var(--border-size))] bg-[#05030a]"
@@ -490,9 +537,9 @@ export default function BarPage() {
                         pointerEvents: "none",
                       }}
                     />
-                    
+
                     {/* Image Container - Directly inside border container */}
-                    <div 
+                    <div
                       className="absolute inset-[var(--border-size)] rounded-[calc(var(--border-radius)-var(--border-size))] overflow-hidden"
                       style={{
                         zIndex: 3,
@@ -509,16 +556,16 @@ export default function BarPage() {
                       {/* Overlay Gradient */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
-                    
+
                     {/* Content Overlay */}
-                    <div 
+                    <div
                       className="absolute inset-[var(--border-size)] flex flex-col justify-end z-30 p-6"
                       style={{
                         zIndex: 4,
                       }}
                     >
                       <div className="space-y-2">
-                        <h3 
+                        <h3
                           className="text-xl md:text-2xl font-black text-white transition-all duration-500 group-hover:drop-shadow-[0_0_20px_rgba(255,41,117,1)]"
                           style={{
                             textShadow: `0 0 10px ${neonColor}, 0 0 20px ${neonColor}, 0 0 30px ${neonColor}`,
@@ -526,7 +573,7 @@ export default function BarPage() {
                         >
                           {item.title}
                         </h3>
-                        <p 
+                        <p
                           className="text-xs md:text-sm font-medium uppercase tracking-[0.2em] transition-all duration-500"
                           style={{
                             color: neonColor,
@@ -552,13 +599,15 @@ export default function BarPage() {
           currentIndex={selectedImageIndex}
           onClose={() => setSelectedImageIndex(null)}
           onNext={() => {
-            setSelectedImageIndex((prev) => 
-              prev !== null ? (prev + 1) % barGalleryImages.length : null
+            setSelectedImageIndex((prev) =>
+              prev !== null ? (prev + 1) % barGalleryImages.length : null,
             );
           }}
           onPrevious={() => {
-            setSelectedImageIndex((prev) => 
-              prev !== null ? (prev - 1 + barGalleryImages.length) % barGalleryImages.length : null
+            setSelectedImageIndex((prev) =>
+              prev !== null
+                ? (prev - 1 + barGalleryImages.length) % barGalleryImages.length
+                : null,
             );
           }}
         />
@@ -567,10 +616,11 @@ export default function BarPage() {
       {/* Reservation Panel */}
       <section className="px-6 py-20">
         <div className="max-w-[1400px] mx-auto">
-          <NeonGradientCard 
+          <NeonGradientCard
             neonColor="#9b00ff"
             secondaryColor="#ff2975"
             className="min-h-[300px]"
+            noInnerContainer
           >
             <div className="flex flex-col md:flex-row items-center justify-between gap-8 w-full">
               <div className="space-y-4 flex-1">
@@ -578,7 +628,8 @@ export default function BarPage() {
                   Reserve Your Table
                 </h3>
                 <p className="text-zinc-400 text-sm leading-relaxed max-w-md">
-                  Secure your spot in the void. Experience molecular mixology and neural beats in an exclusive atmosphere.
+                  Secure your spot in the void. Experience molecular mixology
+                  and neural beats in an exclusive atmosphere.
                 </p>
               </div>
               <Link
@@ -608,23 +659,29 @@ export default function BarPage() {
               <div>22:00 - 03:00</div>
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/menu" className="text-zinc-400 hover:text-[#ff2975] transition-colors">
+              <Link
+                href="/menu"
+                className="text-zinc-400 hover:text-[#ff2975] transition-colors"
+              >
                 Menu
               </Link>
-              <Link href="/reservas" className="text-zinc-400 hover:text-[#00FFF1] transition-colors">
+              <Link
+                href="/reservas"
+                className="text-zinc-400 hover:text-[#00FFF1] transition-colors"
+              >
                 Reservas
               </Link>
-              <Link href="/nosotros" className="text-zinc-400 hover:text-[#ff2975] transition-colors">
+              <Link
+                href="/nosotros"
+                className="text-zinc-400 hover:text-[#ff2975] transition-colors"
+              >
                 About
               </Link>
             </div>
-            <div className="text-[#00FFF1]">
-              Pumainca Bar
-            </div>
+            <div className="text-[#00FFF1]">Pumainca Bar</div>
           </div>
         </div>
       </footer>
-
     </div>
   );
 }
