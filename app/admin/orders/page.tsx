@@ -9,6 +9,7 @@ import {
   useOrdersSummary,
   useUpdateOrderStatus,
 } from "@/lib/queries";
+import { Loader } from "@/components/ui/loader";
 
 export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string | undefined>(
@@ -87,7 +88,9 @@ export default function AdminOrdersPage() {
               </button>
             </div>
             {isLoading ? (
-              <p className="text-zinc-400">Cargando pedidos...</p>
+              <div className="flex justify-center py-20">
+                <Loader text="Cargando pedidos..." />
+              </div>
             ) : isError ? (
               <p className="text-red-400">Error cargando pedidos</p>
             ) : !ordersResp ||

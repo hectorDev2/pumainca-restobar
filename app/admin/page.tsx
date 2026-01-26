@@ -17,6 +17,7 @@ import { Modal, ModalBody, ModalContent, ModalFooter } from "@/components/ui/ani
 import { FileUpload } from "@/components/ui/file-upload";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types";
+import { Loader } from "@/components/ui/loader";
 
 type ProductFormState = {
   name: string;
@@ -409,9 +410,9 @@ export default function AdminPage() {
         {/* Lista de Productos */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {isFetching ? (
-            <p className="col-span-full text-center py-20 text-zinc-500">
-              Cargando catálogo...
-            </p>
+            <div className="col-span-full flex justify-center py-20">
+              <Loader text="Cargando catálogo..." />
+            </div>
           ) : (
             filteredProducts.map((product) => (
               <div
