@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, PanInfo, animate } from "framer-motion";
+import { motion, useMotionValue, PanInfo, animate, useTransform } from "framer-motion";
 
 interface Carousel3DProps {
   items: React.ReactNode[];
@@ -115,7 +115,7 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
   }, [items, maxItems]);
 
   // Create transform from motion value
-  const pivotTransform = useMotionValueProp(rotationValue, (r) => `translateZ(-${curve}px) rotateY(${r}deg)`);
+  const pivotTransform = useTransform(rotationValue, (r) => `translateZ(-${curve}px) rotateY(${r}deg)`);
 
   return (
     <div 
@@ -171,20 +171,5 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
     </div>
   );
 };
-
-// Helper for useTransform if not imported
-function useMotionValueProp(value: any, transform: (v: any) => any) {
-    const [state, setState] = useState(transform(value.get()));
-    useEffect(() => {
-        const unsub = value.on("change", (v: any) => {
-             setState(transform(v));
-        });
-        return unsub;
-    }, [value, transform]);
-    // Actually we should return a MotionValue if we want to pass it to style
-    // But since we want to avoid re-renders, we should use framer-motion's useTransform
-    // However, I need to make sure useTransform is imported.
-    return state;
-}
 
 export default Carousel3D;
