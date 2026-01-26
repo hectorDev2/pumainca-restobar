@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useCart } from "@/context/CartContext";
+import { Loader } from "@/components/ui/loader";
 import { useProduct, useProducts } from "@/lib/queries";
 import { MenuImage } from "@/components/ui/menu-image";
 
@@ -56,10 +57,12 @@ export default function DishDetailPage() {
     }
   }, [dish]);
 
+
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background-dark text-white">
-        Cargando plato...
+      <div className="min-h-screen flex items-center justify-center bg-background-dark">
+        <Loader text="Preparando plato..." />
       </div>
     );
   }

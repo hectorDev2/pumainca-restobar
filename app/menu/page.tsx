@@ -6,6 +6,7 @@ import { useCart } from "@/context/CartContext";
 
 
 import { MenuImage } from "@/components/ui/menu-image";
+import { Loader } from "@/components/ui/loader";
 
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
@@ -327,16 +328,9 @@ function MenuContent() {
               )}
 
               {loadingProducts ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="py-20 text-center text-text-primary"
-                >
-                  <span className="material-symbols-outlined text-6xl text-zinc-700 mb-4">
-                    hourglass_top
-                  </span>
-                  <p className="text-zinc-500 text-sm">Cargando platos...</p>
-                </motion.div>
+                <div className="py-20 flex justify-center">
+                  <Loader text="Preparando el menú..." />
+                </div>
               ) : filteredDishes.length > 0 ? (
                 <motion.div
                   layout
@@ -489,7 +483,7 @@ function MenuContent() {
 
 export default function MenuPage() {
   return (
-    <Suspense fallback={<div className="h-screen bg-black flex items-center justify-center text-white">Cargando menú...</div>}>
+    <Suspense fallback={<div className="h-screen bg-black flex items-center justify-center"><Loader text="Cargando menú..." /></div>}>
       <MenuContent />
     </Suspense>
   );
