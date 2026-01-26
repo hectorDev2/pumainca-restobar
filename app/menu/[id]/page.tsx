@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useCart } from "@/context/CartContext";
 import { useProduct, useProducts } from "@/lib/queries";
+import { MenuImage } from "@/components/ui/menu-image";
 
 const resolvePrice = (price?: number | Record<string, number>) => {
   if (typeof price === "number") {
@@ -126,10 +127,12 @@ export default function DishDetailPage() {
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="w-full aspect-4/3 rounded-2xl overflow-hidden shadow-2xl relative group">
               <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent z-10" />
-              <img
+              <MenuImage
                 src={activeImage || dish.image}
                 alt={dish.name}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                containerClassName="absolute inset-0"
+                className="transition-transform duration-700 group-hover:scale-105"
+                priority
               />
               <button className="absolute top-4 right-4 z-20 p-3 bg-black/50 backdrop-blur-md rounded-full text-white hover:text-primary transition-all">
                 <span className="material-symbols-outlined">favorite</span>
@@ -148,10 +151,10 @@ export default function DishDetailPage() {
                         : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img
+                    <MenuImage
                       src={img}
-                      alt=""
-                      className="w-full h-full object-cover"
+                      alt={`Vista ${i + 1}`}
+                      containerClassName="w-full h-full"
                     />
                   </button>
                 ))}
@@ -345,11 +348,10 @@ export default function DishDetailPage() {
                   className="group cursor-pointer"
                   onClick={() => router.push(`/menu/${related.id}`)}
                 >
-                  <div
-                    className="w-full aspect-square rounded-2xl bg-cover bg-center mb-4 transition-all group-hover:scale-[1.02] shadow-xl"
-                    style={{
-                      backgroundImage: `url('${related.image}')`,
-                    }}
+                  <MenuImage
+                    src={related.image}
+                    alt={related.name}
+                    containerClassName="w-full aspect-square rounded-2xl mb-4 shadow-xl transition-transform duration-500 group-hover:scale-[1.02]"
                   />
                   <h4 className="text-white font-bold text-lg group-hover:text-primary transition-colors">
                     {related.name}

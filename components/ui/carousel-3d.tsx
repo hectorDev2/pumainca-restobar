@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, PanInfo, animate } from "framer-motion";
+import { motion, useMotionValue, PanInfo, animate, useTransform } from "framer-motion";
 
 interface Carousel3DProps {
   items: React.ReactNode[];
@@ -19,7 +19,6 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
   itemWidth = 300,
   gap = 20,
 }) => {
-  const [rotation, setRotation] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const rotationValue = useMotionValue(0);
   const dragging = useRef(false);
@@ -43,7 +42,6 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
     const deltaRotation = (info.delta.x / window.innerWidth) * 25;
     const current = rotationValue.get();
     rotationValue.set(current + deltaRotation);
-    setRotation(current + deltaRotation);
   };
 
   const onDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -62,7 +60,7 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
         stiffness: 50,
         damping: 20,
         mass: 1,
-        onUpdate: (v) => setRotation(v),
+        onUpdate: (v) => {}, // No external state update needed
         onComplete: () => {
              dragging.current = false;
         }
@@ -80,9 +78,8 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
           if (delta > 0) {
               const current = rotationValue.get();
               // Smooth slow rotation
-              const nextRot = current - 0.05; 
+              const nextRot = current - 0.1; 
               rotationValue.set(nextRot);
-              setRotation(nextRot);
           }
       }
       lastTimeTime.current = time;
@@ -117,6 +114,9 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
     return items;
   }, [items, maxItems]);
 
+  // Create transform from motion value
+  const pivotTransform = useTransform(rotationValue, (r) => `translateZ(-${curve}px) rotateY(${r}deg)`);
+
   return (
     <div 
         className="carousel-container relative w-full h-[600px] overflow-hidden flex items-center justify-center cursor-grab active:cursor-grabbing"
@@ -133,11 +133,11 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
          onPan={onDrag}
          onPanEnd={onDragEnd}
       >
-        <div 
+        <motion.div 
             className="pivot absolute w-0 h-0"
             style={{ 
                 transformStyle: "preserve-3d",
-                transform: `translateZ(-${curve}px) rotateY(${rotation}deg)`,
+                transform: pivotTransform,
             }}
         >
             {renderItems.map((item, index) => {
@@ -164,7 +164,7 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
                     </div>
                 );
             })}
-        </div>
+        </motion.div>
       </motion.div>
       
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-black/90 via-transparent to-black/90 z-30" />

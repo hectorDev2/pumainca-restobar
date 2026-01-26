@@ -3,39 +3,9 @@
 import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import Image from "next/image";
 
-// Helper component to handle image errors
-const MenuImage = ({ 
-  src, 
-  alt, 
-  className = "", 
-  containerClassName = "" 
-}: { 
-  src: string; 
-  alt: string; 
-  className?: string; 
-  containerClassName?: string;
-}) => {
-  const [imgSrc, setImgSrc] = useState(src || '/no-found.png');
 
-  useEffect(() => {
-    setImgSrc(src || '/no-found.png');
-  }, [src]);
-
-  return (
-    <div className={`relative overflow-hidden ${containerClassName}`}>
-      <Image
-        src={imgSrc}
-        alt={alt}
-        fill
-        className={`object-cover ${className}`}
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        onError={() => setImgSrc('/no-found.png')}
-      />
-    </div>
-  );
-};
+import { MenuImage } from "@/components/ui/menu-image";
 
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
@@ -239,7 +209,7 @@ function MenuContent() {
                           e.stopPropagation();
                           addToCart(heroDish);
                         }}
-                        className="flex items-center gap-2 h-12 px-6 bg-primary hover:bg-red-500 text-white text-base font-bold rounded-lg transition-all shadow-lg shadow-red-500/20"
+                        className="flex items-center justify-center gap-2 h-12 px-6 bg-primary hover:bg-red-500 text-white text-base font-bold rounded-lg transition-all shadow-lg shadow-red-500/20 w-full sm:w-auto"
                       >
                         <span className="material-symbols-outlined">add</span>
                         Agregar al Pedido — {priceLabel(heroDish)}
@@ -383,7 +353,7 @@ function MenuContent() {
                         transition={{ duration: 0.3 }}
                         className="group relative h-full"
                       >
-                        <GlareCard className="flex flex-col bg-surface-dark h-full min-h-[440px] shadow-2xl">
+                        <GlareCard className="flex flex-col bg-surface-dark h-full min-h-[380px] sm:min-h-[440px] shadow-2xl">
                           <div
                             className="relative h-48 sm:h-56 md:h-64 overflow-hidden cursor-pointer shrink-0"
                             onClick={() => navigateToDish(dish.id)}
@@ -428,7 +398,7 @@ function MenuContent() {
                                   e.stopPropagation();
                                   addToCart(dish);
                                 }}
-                                className="bg-primary hover:bg-primary-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-1 flex-1 shadow-lg shadow-red-900/20 z-20 relative"
+                                  className="bg-primary hover:bg-primary-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-1 flex-1 shadow-lg shadow-red-900/20 z-20 relative w-full sm:w-auto"
                               >
                                 <span className="material-symbols-outlined text-sm">
                                   add_shopping_cart
