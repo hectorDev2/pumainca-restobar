@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminHeader from "@/components/AdminHeader";
 import { useReservations, useReservationByCode, Reservation } from "@/lib/queries";
+import { Loader } from "@/components/ui/loader";
 
 export default function AdminReservationsPage() {
   const [emailFilter, setEmailFilter] = useState("");
@@ -47,7 +48,9 @@ export default function AdminReservationsPage() {
             <h2 className="text-lg font-semibold mb-4">Resultados</h2>
 
             {loadingList || loadingCode ? (
-              <p className="text-zinc-400">Cargando...</p>
+              <div className="flex justify-center py-20">
+                <Loader text="Buscando reservas..." />
+              </div>
             ) : results.length === 0 ? (
               <p className="text-zinc-500">No se encontraron reservas.</p>
             ) : (

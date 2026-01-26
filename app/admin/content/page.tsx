@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminHeader from "@/components/AdminHeader";
 import { useSettings, useUpdateSettings } from "@/lib/queries";
+import { Loader } from "@/components/ui/loader";
 
 export default function AdminContentPage() {
   const { data: content, isLoading: isContentLoading } = useSettings();
@@ -121,7 +122,9 @@ export default function AdminContentPage() {
 
           <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl">
             {isContentLoading ? (
-              <div className="py-8 text-center text-zinc-400">Cargando contenido...</div>
+              <div className="flex justify-center py-20">
+                <Loader text="Cargando configuración..." />
+              </div>
             ) : (
               <form onSubmit={handleSave} className="space-y-6">
                 
