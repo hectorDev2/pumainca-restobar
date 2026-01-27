@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface MenuImageProps {
   src?: string;
@@ -25,16 +26,15 @@ export const MenuImage = ({
   }, [src]);
 
   return (
-    <div className={`relative overflow-hidden ${containerClassName}`}>
+    <div className={cn("relative overflow-hidden", containerClassName)}>
       <Image
         src={imgSrc}
         alt={alt}
         fill
         priority={priority}
-        className={`object-cover ${className}`}
+        className={cn("object-cover", className)}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         onError={() => setImgSrc('/no-found.png')}
-        unoptimized={true}
       />
     </div>
   );
