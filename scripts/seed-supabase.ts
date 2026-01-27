@@ -3,7 +3,9 @@ import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 import fs from 'fs';
-import { products, categories as dataCategories } from '../data';
+// import { products, categories as dataCategories } from '../data';
+const products: any[] = [];
+const dataCategories: any[] = [];
 
 // Load env vars
 dotenv.config({ path: '.env.local' });
@@ -76,7 +78,7 @@ async function seedProducts() {
     } else if (typeof price === 'object') {
        isVariableToken = true;
        const values = Object.values(price);
-       finalPrice = values.length > 0 ? Number(Math.min(...values)) : 0;
+       finalPrice = values.length > 0 ? Number(Math.min(...(values as number[]))) : 0;
     }
 
     const { error: prodError } = await supabase.from('products').upsert({

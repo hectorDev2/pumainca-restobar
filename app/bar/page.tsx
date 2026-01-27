@@ -185,13 +185,13 @@ const DrinkCard = memo(function DrinkCard({
         }}
       >
         {/* Drink Image - Clickable */}
-        {drink.image && (
+        {drink.image_url && (
           <Link
             href={`/bar/product/${drink.id}`}
             className="relative w-full h-32 rounded-xl overflow-hidden border border-[#ff2975]/20 shrink-0 group/image cursor-pointer"
           >
             <Image
-              src={drink.image}
+              src={drink.image_url}
               alt={drink.name}
               fill
               className="object-cover group-hover/image:scale-110 transition-transform duration-500"

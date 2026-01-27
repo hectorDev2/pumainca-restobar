@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useCart } from "@/context/CartContext";
+import { Loader } from "@/components/ui/loader";
 import { useProduct, useProducts } from "@/lib/queries";
 import { MenuImage } from "@/components/ui/menu-image";
 
@@ -46,7 +47,8 @@ export default function DishDetailPage() {
 
   useEffect(() => {
     if (dish) {
-      setActiveImage(dish.image);
+      console.table(dish);
+      setActiveImage(dish.image_url);
       if (dish.price && typeof dish.price === "object") {
         const sizes = Object.keys(dish.price as Record<string, number>);
         setSelectedSize(sizes[0]);
@@ -56,10 +58,12 @@ export default function DishDetailPage() {
     }
   }, [dish]);
 
+
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background-dark text-white">
-        Cargando plato...
+      <div className="min-h-screen flex items-center justify-center bg-background-dark">
+        <Loader text="Preparando plato..." />
       </div>
     );
   }
@@ -128,7 +132,7 @@ export default function DishDetailPage() {
             <div className="w-full aspect-4/3 rounded-2xl overflow-hidden shadow-2xl relative group">
               <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent z-10" />
               <MenuImage
-                src={activeImage || dish.image}
+                src={dish.image_url}
                 alt={dish.name}
                 containerClassName="absolute inset-0"
                 className="transition-transform duration-700 group-hover:scale-105"
@@ -141,7 +145,7 @@ export default function DishDetailPage() {
 
             {gallery.length > 0 && (
               <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
-                {[dish.image, ...gallery].map((img, i) => (
+                {[dish.image_url, ...gallery].map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(img)}
@@ -349,9 +353,9 @@ export default function DishDetailPage() {
                   onClick={() => router.push(`/menu/${related.id}`)}
                 >
                   <MenuImage
-                    src={related.image}
+                    src={related.image_url}
                     alt={related.name}
-                    containerClassName="w-full aspect-square rounded-2xl mb-4 shadow-xl transition-transform duration-500 group-hover:scale-[1.02]"
+                    containerClassName="relative overflow-hidden w-full aspect-square rounded-2xl mb-4 shadow-xl transition-transform duration-500 group-hover:scale-[1.02]"
                   />
                   <h4 className="text-white font-bold text-lg group-hover:text-primary transition-colors">
                     {related.name}

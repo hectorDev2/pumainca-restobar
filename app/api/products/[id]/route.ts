@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { uploadImage } from "@/lib/imagekit";
+
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-z0-9.-]/gi, "_");
@@ -51,20 +51,12 @@ export async function GET(
     preparation_time_minutes: p.preparation_time_minutes,
     display_order: p.display_order,
     category: p.category,
-    image: p.image_url,
-    imageUrl: p.image_url,
     prices: p.prices,
     ingredients: p.ingredients.map((i: any) => i.ingredient_name),
     allergens: p.allergens.map((a: any) => a.allergen_name),
     gallery: p.gallery,
     created_at: p.created_at,
-    updated_at: p.updated_at,
-    // CamelCase aliases
-    isVegetarian: p.is_vegetarian,
-    isSpicy: p.is_spicy,
-    isGlutenFree: p.is_gluten_free,
-    isChefSpecial: p.is_chef_special,
-    isRecommended: p.is_recommended
+    updated_at: p.updated_at
   };
 
   return NextResponse.json(mappedData);
@@ -136,14 +128,27 @@ export async function PUT(
     const imageField = formData.get("image") as File | null;
     if (imageField && (imageField as any).size) {
         const file = imageField as File;
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
         const ext = file.name.split(".").pop() || "jpg";
-        const fileName = `${sanitizeFileName(updates.name || id)}.${ext}`;
         
-        let folder = "products";
-        let targetCategoryId = category_id; // From form data if present
+        // Fetch current product name if not provided in updates, to use for filename
+        let productName = updates.name;
+        if (!productName) {
+             const { data: prod } = await supabase
+                .from('products')
+                .select('name')
+                .eq('id', id)
+                .single();
+             productName = prod?.name || id;
+        }
+
+        const fileName = `${sanitizeFileName(productName)}.${ext}`;
+        
+        let folderName = "uncategorized";
+        let targetCategoryId = category_id; 
 
         if (!targetCategoryId) {
-            // Fetch current category if not updating it
              const { data: prod } = await supabase
                 .from('products')
                 .select('category_id')
@@ -159,11 +164,28 @@ export async function PUT(
                 .eq('id', targetCategoryId)
                 .single();
             if (cat?.name) {
-                folder = `products/${sanitizeFileName(cat.name)}`;
+                folderName = sanitizeFileName(cat.name);
             }
         }
         
-        updates.image_url = await uploadImage(file, fileName, folder);
+        const filePath = `products/${folderName}/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+            .from("menu")
+            .upload(filePath, buffer, {
+                contentType: file.type,
+                upsert: false
+            });
+
+        if (uploadError) {
+             throw uploadError;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+            .from("menu")
+            .getPublicUrl(filePath);
+
+        updates.image_url = publicUrlData.publicUrl;
     }
 
     const { data: updated, error: updateError } = await supabase

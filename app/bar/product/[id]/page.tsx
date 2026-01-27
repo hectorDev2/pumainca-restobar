@@ -98,7 +98,7 @@ export default function DrinkDetailPage() {
 
   useEffect(() => {
     if (drink) {
-      setActiveImage(drink.image || "");
+      setActiveImage(drink.image_url || "");
       if (drink.price && typeof drink.price === "object") {
         const sizes = Object.keys(drink.price as Record<string, number>);
         setSelectedSize(sizes[0]);
@@ -172,7 +172,7 @@ export default function DrinkDetailPage() {
   );
 
   const gallery = drink.gallery || [];
-  const allImages = drink.image ? [drink.image, ...gallery] : gallery;
+  const allImages = drink.image_url ? [drink.image_url, ...gallery] : gallery;
 
   const relatedDrinksList = (relatedDrinks ?? [])
     .filter((related) => related.id !== drink.id)
@@ -469,10 +469,10 @@ export default function DrinkDetailPage() {
                       noInnerContainer
                     >
                       <div className="flex flex-col gap-4 h-full">
-                        {relatedDrink.image && (
+                        {relatedDrink.image_url && (
                           <div className="relative w-full h-32 rounded-xl overflow-hidden border border-[#9b00ff]/20 shrink-0">
                             <Image
-                              src={relatedDrink.image}
+                              src={relatedDrink.image_url}
                               alt={relatedDrink.name}
                               fill
                               className="object-cover group-hover:scale-110 transition-transform duration-500"

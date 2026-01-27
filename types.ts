@@ -19,8 +19,7 @@ export interface Product {
   price: number | { [key: string]: number };
   category: string;
   subcategory?: string;
-  image: string;
-  image_url?: string;
+  image_url: string;
   gallery?: string[];
   ingredients?: string[];
   allergens?: string[];

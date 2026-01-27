@@ -18,6 +18,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'ik.imagekit.io',
       },
+      {
+        protocol: 'https',
+        hostname: 'bhzcukhjlmlvasumnwkg.supabase.co',
+      },
     ],
     unoptimized: false,
   },
