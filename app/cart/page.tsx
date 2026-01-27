@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { products } from '@/data';
+import { useProducts } from '@/lib/queries';
 import Navbar from '@/components/Navbar';
 import { CartItem } from '@/types';
 
@@ -12,7 +12,8 @@ export default function CartPage() {
   const router = useRouter();
   const { cart, cartTotal: totals, removeFromCart, updateQuantity, cartCount } = useCart();
   
-  const upsellDishes = products.filter(d => !cart.some(item => item.dish.id === d.id)).slice(0, 3);
+  const { data: productsData } = useProducts({});
+  const upsellDishes = (productsData || []).filter(d => !cart.some(item => item.dish.id === d.id)).slice(0, 3);
 
   const getItemPrice = (item: CartItem) => {
     if (typeof item.dish.price === 'number') return item.dish.price;
@@ -46,7 +47,7 @@ export default function CartPage() {
                     <div key={index} className="flex flex-col sm:flex-row gap-6 bg-surface-dark rounded-2xl p-4 border border-zinc-800 hover:border-primary/40 transition-all group">
                       <div className="flex items-start gap-4 flex-1">
                         <div className="w-24 h-24 rounded-xl bg-cover bg-center shrink-0 shadow-lg" 
-                          style={{ backgroundImage: `url('${item.dish.image}')` }}></div>
+                          style={{ backgroundImage: `url('${item.dish.image_url}')` }}></div>
                         <div className="flex flex-col justify-between py-1">
                           <div>
                             <h3 className="text-white group-hover:text-primary transition-colors text-lg font-bold mb-1">{item.dish.name}</h3>
@@ -92,7 +93,7 @@ export default function CartPage() {
                         const price = typeof d.price === 'number' ? d.price : Math.min(...Object.values(d.price));
                         return (
                           <div key={d.id} className="bg-surface-dark rounded-xl p-3 border border-zinc-800 hover:border-primary/50 transition-all cursor-pointer group" onClick={() => navigateToDish(d.id)}>
-                            <div className="h-24 w-full bg-cover bg-center rounded-lg mb-3 shadow-inner" style={{ backgroundImage: `url('${d.image}')` }}></div>
+                            <div className="h-24 w-full bg-cover bg-center rounded-lg mb-3 shadow-inner" style={{ backgroundImage: `url('${d.image_url}')` }}></div>
                             <h4 className="text-white group-hover:text-primary transition-colors font-bold text-sm truncate">{d.name}</h4>
                             <div className="flex justify-between items-center mt-2">
                               <span className="text-primary text-sm font-bold">S./{price.toFixed(2)}</span>
