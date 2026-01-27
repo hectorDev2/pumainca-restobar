@@ -88,7 +88,7 @@ const resolveProductPrice = (
 };
 
 const resolveImage = (product?: Product) =>
-  product?.image || product?.image_url || product?.gallery?.[0] || "/logo.png";
+  product?.image_url || product?.gallery?.[0] || "/logo.png";
 
 const buildProductFormState = (product: Product): ProductFormState => ({
   name: product.name,
@@ -467,7 +467,7 @@ export default function AdminPage() {
           onClose={() => setEditModalOpen(false)}
           className="md:max-w-[50%] bg-zinc-900 dark:bg-zinc-900 border-zinc-800"
         >
-          <ModalContent className="p-8">
+          <ModalContent className="p-8 overflow-y-auto">
             <h2 className="text-2xl font-black mb-6">Editar Producto</h2>
             <form onSubmit={handleEditSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -699,7 +699,7 @@ export default function AdminPage() {
           onClose={() => setCreateModalOpen(false)}
           className="md:max-w-[50%] bg-zinc-900 dark:bg-zinc-900 border-zinc-800"
         >
-          <ModalContent className="p-6">
+          <ModalContent className="p-6 overflow-y-auto">
             <h2 className="text-2xl font-black mb-6">Nuevo Producto</h2>
             <form onSubmit={handleCreateSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -976,7 +976,7 @@ export default function AdminPage() {
           onClose={() => setDetailModalOpen(false)}
           className="md:max-w-[60%] bg-zinc-900 dark:bg-zinc-900 border-zinc-800"
         >
-          <ModalContent className="p-6">
+          <ModalContent className="p-6 overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-black">Detalle del producto</h2>
               <button
