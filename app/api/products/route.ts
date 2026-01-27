@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { uploadImage } from "@/lib/imagekit";
+
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-z0-9.-]/gi, "_");
@@ -78,19 +78,12 @@ export async function GET(req: Request) {
     preparation_time_minutes: p.preparation_time_minutes,
     display_order: p.display_order,
     category: p.category,
-    image: p.image_url, // Legacy field
-    imageUrl: p.image_url, // Legacy field
     prices: p.prices, // [{size_name, price}]
     ingredients: p.ingredients.map((i: any) => i.ingredient_name), // Flatten to array of strings
     allergens: p.allergens.map((a: any) => a.allergen_name),
     gallery: p.gallery,
     created_at: p.created_at,
-    updated_at: p.updated_at,
-    isVegetarian: p.is_vegetarian, // CamelCase alias
-    isSpicy: p.is_spicy,
-    isGlutenFree: p.is_gluten_free,
-    isChefSpecial: p.is_chef_special,
-    isRecommended: p.is_recommended
+    updated_at: p.updated_at
   }));
 
   return NextResponse.json(mappedData);
@@ -130,10 +123,12 @@ export async function POST(req: Request) {
     
     if (imageField && (imageField as any).size) {
         const file = imageField as File;
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
         const ext = file.name.split(".").pop() || "jpg";
-        const fileName = `${sanitizeFileName(name)}.${ext}`;
         
-        let folder = "products";
+        // Determinar carpeta basada en categoría o default 'uncategorized'
+        let folderName = "uncategorized";
         if (categoryId) {
             const { data: cat } = await supabase
                 .from('categories')
@@ -141,11 +136,29 @@ export async function POST(req: Request) {
                 .eq('id', categoryId)
                 .single();
             if (cat?.name) {
-                folder = `products/${sanitizeFileName(cat.name)}`;
+                folderName = sanitizeFileName(cat.name);
             }
         }
         
-        savedImageUrl = await uploadImage(file, fileName, folder);
+        const fileName = `${sanitizeFileName(name)}.${ext}`;
+        const filePath = `products/${folderName}/${fileName}`;
+        
+        const { error: uploadError } = await supabase.storage
+            .from("menu")
+            .upload(filePath, buffer, {
+                contentType: file.type,
+                upsert: false
+            });
+
+        if (uploadError) {
+             throw uploadError;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+            .from("menu")
+            .getPublicUrl(filePath);
+
+        savedImageUrl = publicUrlData.publicUrl;
     }
 
     const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || `prod-${Date.now()}`;
