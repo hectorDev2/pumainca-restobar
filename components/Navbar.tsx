@@ -167,7 +167,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                                     className="w-full text-left p-3 hover:bg-surface-hover flex items-center gap-3 transition-colors border-b border-zinc-800/50 last:border-0"
                                 >
                                     <div className="size-10 rounded-lg bg-surface-dark bg-cover bg-center shrink-0" 
-                                         style={{ backgroundImage: `url('${product.image || product.image_url || '/placeholder.png'}')` }} 
+                                         style={{ backgroundImage: `url('${product.image_url || '/placeholder.png'}')` }} 
                                     />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-text-primary text-sm font-bold truncate">{product.name}</p>
@@ -226,7 +226,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
 
       {/* Mobile Menu Overlay */}
       <div className={`lg:hidden fixed inset-0 z-40 bg-background-dark/95 backdrop-blur-xl transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} pt-24 px-6`}>
-        <div className="flex flex-col gap-6 text-center">
+        <div className="flex flex-col gap-6 text-center bg-black">
             <Link 
                 href="/menu" 
                 onClick={() => setIsMenuOpen(false)}

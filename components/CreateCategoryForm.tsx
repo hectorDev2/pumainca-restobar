@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useCreateCategory } from "@/lib/queries";
+import { FileUpload } from "@/components/ui/file-upload";
 
 type Props = {
   onCreated?: (category: any) => void;
@@ -24,6 +25,17 @@ export default function CreateCategoryForm({ onCreated }: Props) {
     return () => clearTimeout(t);
   }, [errorMessage]);
 
+  const [preview, setPreview] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setPreview(null);
+  }, [file]);
+
   const mutation = useCreateCategory();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,6 +54,7 @@ export default function CreateCategoryForm({ onCreated }: Props) {
         setName("");
         setDescription("");
         setFile(null);
+        setPreview(null);
         setDisplayOrder(0);
         setErrorMessage(null);
         if (onCreated) onCreated(created);
@@ -82,14 +95,27 @@ export default function CreateCategoryForm({ onCreated }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-zinc-400">
-          Imagen (opcional)
+        <label className="block text-xs font-bold text-zinc-400 mb-2">
+            Imagen (opcional)
         </label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          className="mt-2"
+        <div className="h-40 w-full rounded-2xl overflow-hidden border border-zinc-800 bg-black/20 mb-2">
+            {preview ? (
+                <img
+                    src={preview}
+                    alt="Previsualización"
+                    className="h-full w-full object-cover"
+                />
+            ) : (
+                <div className="flex h-full items-center justify-center text-zinc-500">
+                   Sin imagen
+                </div>
+            )}
+        </div>
+        <FileUpload
+            label="Seleccionar imagen"
+            description="Máx. 5MB, JPG/PNG"
+            accept="image/*"
+            onChange={(files) => setFile(files[0] ?? null)}
         />
       </div>
 
