@@ -22,7 +22,7 @@ export const RecommendedCard = memo(function RecommendedCard({ product }: { prod
       <div className="flex flex-col gap-4 w-full h-full overflow-hidden relative z-[3] box-border p-6">
         <div className="relative w-full h-48 rounded-xl overflow-hidden border border-[#FF0000]/20 shrink-0 group/image">
           <MenuImage
-            src={product.image}
+            src={product.image_url}
             alt={product.name}
             containerClassName="w-full h-full"
             className="group-hover/image:scale-110 transition-transform duration-500"
