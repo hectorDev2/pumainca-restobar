@@ -126,8 +126,7 @@ function MenuContent() {
     return 0;
   };
 
-  const resolveDishImage = (dish?: Product) =>
-      dish?.image_url || dish?.gallery?.[0] || "";
+  const resolveDishImage = (dish?: Product) => dish?.image_url;
 
   const priceLabel = (dish: any) => {
     const numericPrice = resolvePrice(dish?.price);
