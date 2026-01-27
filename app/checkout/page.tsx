@@ -467,7 +467,7 @@ export default function CheckoutPage() {
                           <div
                             className="w-12 h-12 rounded-lg bg-cover bg-center shrink-0 border border-zinc-800"
                             style={{
-                              backgroundImage: `url('${item.dish.image}')`,
+                              backgroundImage: `url('${item.dish.image_url}')`,
                             }}
                           />
                           <div className="flex flex-col">
