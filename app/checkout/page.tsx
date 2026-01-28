@@ -199,7 +199,7 @@ export default function CheckoutPage() {
       setOrderConfirmation({
         number: data?.number ?? data?.orderNumber ?? data?.id?.toString(),
         message:
-          data?.message ?? "Tu pedido fue registrado y está en preparación.",
+          data?.message ?? "Tu pedido fue registrado y en breve te contactaremos.",
       });
 
       clearCart();
@@ -240,8 +240,7 @@ export default function CheckoutPage() {
             </h2>
             <p className="text-text-secondary">
               {orderConfirmation.message} Puedes pasar por PUMAINCA RESTOBAR{" "}
-              <strong>{pickupLabel.toLowerCase()}</strong> y traer el correo de
-              confirmación al número <strong>{contactInfo.phone}</strong>.
+              <strong>{pickupLabel.toLowerCase()}</strong> despues de que reciba la llamada al número <strong>{contactInfo.phone}</strong>.
             </p>
             {orderConfirmation.number && (
               <p className="text-white font-semibold tracking-wide">
