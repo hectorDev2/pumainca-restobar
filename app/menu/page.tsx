@@ -39,6 +39,24 @@ function MenuContent() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [sortOrder, setSortOrder] = useState<SortOption>("recommended");
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('favorites');
+    if (saved) setFavorites(JSON.parse(saved));
+  }, []);
+
+  const toggleFavorite = (e: React.MouseEvent, dishId: string) => {
+    e.stopPropagation();
+    let newFavs;
+    if (favorites.includes(dishId)) {
+      newFavs = favorites.filter(id => id !== dishId);
+    } else {
+      newFavs = [...favorites, dishId];
+    }
+    setFavorites(newFavs);
+    localStorage.setItem('favorites', JSON.stringify(newFavs));
+  };
 
   const { data: categories } = useCategories();
   const { data: categoryDetail } = useCategoryDetail(
@@ -221,12 +239,14 @@ function MenuContent() {
             )}
 
             <section className="space-y-6">
-              <div className="flex flex-col sm:flex-row items-end justify-between border-b border-zinc-800 pb-4 gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-zinc-800 pb-4 gap-4">
                 <motion.div
                   key={selectedCategory}
+                  layout
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4 }}
+                  className="w-full sm:w-auto"
                 >
                   <h2 className="text-primary text-2xl font-bold tracking-tight">
                     {displayCategoryName}
@@ -236,20 +256,20 @@ function MenuContent() {
                   </p>
                 </motion.div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="relative">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                  <div className="relative w-full sm:w-auto">
                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-sm">
                       search
                     </span>
                     <input
                       type="text"
                       placeholder="Buscar plato..."
-                      className="hidden md:block bg-surface-dark border-none rounded-full pl-10 pr-4 py-2 text-sm text-text-primary focus:ring-2 focus:ring-primary/50 placeholder-text-secondary/50"
+                      className="w-full sm:w-60 bg-surface-dark border-none rounded-full pl-10 pr-4 py-2 text-sm text-text-primary focus:ring-2 focus:ring-primary/50 placeholder-text-secondary/50"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-text-secondary">
+                  <div className="flex items-center justify-between sm:justify-start gap-2 text-xs uppercase tracking-wide text-text-secondary">
                     <span className="text-text-primary text-[10px]">Ordenar por</span>
                     <select
                       value={sortOrder}
@@ -357,6 +377,16 @@ function MenuContent() {
                               containerClassName="absolute inset-0"
                               className="transition-transform duration-500 group-hover:scale-110"
                             />
+                            
+                            <button 
+                                onClick={(e) => toggleFavorite(e, dish.id)}
+                                className="absolute top-3 right-3 md:top-4 md:right-4 z-20 p-2 md:p-3 bg-black/50 backdrop-blur-md rounded-full text-white hover:text-primary transition-all group/fav"
+                            >
+                                <span className={`material-symbols-outlined transition-colors ${favorites.includes(dish.id) ? 'text-primary' : 'text-white'}`}>
+                                    {favorites.includes(dish.id) ? 'favorite' : 'favorite_border'}
+                                </span>
+                            </button>
+
                             {dish.isVegetarian && (
                               <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
                                 <span className="material-symbols-outlined text-[14px] text-green-500">
@@ -365,7 +395,7 @@ function MenuContent() {
                               </div>
                             )}
                             {dish.isSpicy && (
-                              <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
+                              <div className="absolute top-3 right-14 md:top-4 md:right-16 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
                                 <span className="material-symbols-outlined text-[14px] text-orange-400">
                                   local_fire_department
                                 </span>
