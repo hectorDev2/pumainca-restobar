@@ -3,47 +3,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { CartItem } from "@/types";
+import { CartItem, ContactInfo, OrderItemPayload, OrderPayload, OrderConfirmation } from "@/types";
 import { API_BASE_URL } from "@/lib/api";
 
 // --- Types ---
 
-type ContactInfo = {
-  name: string;
-  email: string;
-  phone: string;
-  specialInstructions: string;
-};
 
-type OrderItemPayload = {
-  product_id: string;
-  product_name: string;
-  quantity: number;
-  unit_price: number;
-  subtotal: number;
-  selected_size?: string;
-  cooking_point?: string;
-  special_instructions?: string;
-};
-
-type OrderPayload = {
-  customer_email: string;
-  customer_phone: string;
-  payment_method: string;
-  items: OrderItemPayload[];
-  subtotal: number;
-  tax_amount: number;
-  service_fee: number;
-  total_amount: number;
-  customer_name?: string;
-  pickup_time_estimate?: string;
-  special_instructions?: string;
-};
-
-type OrderConfirmation = {
-  number?: string;
-  message?: string;
-};
 
 // --- Utilities & Constants ---
 
