@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use 'standalone' output ONLY when explicitly building for Docker.
-  // This ensures Vercel deployments (where this var is unset) use the default output.
-  ...(process.env.DOCKER_BUILD === 'true' && { output: 'standalone' }),
+  // Configuración de imágenes
   images: {
     remotePatterns: [
       {
