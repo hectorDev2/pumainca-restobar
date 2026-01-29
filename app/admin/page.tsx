@@ -362,7 +362,7 @@ export default function AdminPage() {
 
   const handleDeleteConfirm = () => {
     if (!productToDelete) return;
-    
+
     deleteProductMutation.mutate(productToDelete.id, {
       onSuccess: (data) => {
         setDeleteModalOpen(false);
@@ -375,7 +375,7 @@ export default function AdminPage() {
       },
       onError: (error) => {
         alert(`Error al eliminar: ${error.message}`);
-      }
+      },
     });
   };
 
@@ -1172,13 +1172,20 @@ export default function AdminPage() {
                   ¿Eliminar producto?
                 </h2>
                 <p className="text-zinc-400 mb-4">
-                  Estás a punto de eliminar <span className="font-bold text-white">{productToDelete.name}</span>
+                  Estás a punto de eliminar{" "}
+                  <span className="font-bold text-white">
+                    {productToDelete.name}
+                  </span>
                 </p>
                 <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-sm text-yellow-200">
-                  <p className="font-bold mb-2">⚠️ Esta acción es irreversible</p>
+                  <p className="font-bold mb-2">
+                    ⚠️ Esta acción es irreversible
+                  </p>
                   <ul className="text-left space-y-1 text-xs">
                     <li>• Se eliminará el producto de la base de datos</li>
-                    <li>• Se borrarán todas las imágenes asociadas del servidor</li>
+                    <li>
+                      • Se borrarán todas las imágenes asociadas del servidor
+                    </li>
                     <li>• No se podrá recuperar esta información</li>
                   </ul>
                 </div>
@@ -1197,7 +1204,9 @@ export default function AdminPage() {
                   disabled={deleteProductMutation.isPending}
                   className="flex-1 bg-red-600 hover:bg-red-700 py-3 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50"
                 >
-                  {deleteProductMutation.isPending ? "Eliminando..." : "Eliminar"}
+                  {deleteProductMutation.isPending
+                    ? "Eliminando..."
+                    : "Eliminar"}
                 </button>
               </div>
             </div>
