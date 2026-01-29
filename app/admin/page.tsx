@@ -9,6 +9,7 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useUploadProductImage,
+  useDeleteProduct,
 } from "@/lib/queries";
 import { useCreateCategory } from "@/lib/queries";
 import CreateCategoryForm from "@/components/CreateCategoryForm";
@@ -164,16 +165,21 @@ export default function AdminPage() {
     null,
   );
 
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+
   // --- Mutations ---
   const createProductMutation = useCreateProduct();
   const updateProductMutation = useUpdateProduct();
   const uploadImageMutation = useUploadProductImage();
+  const deleteProductMutation = useDeleteProduct();
   // createCategory handled inside CreateCategoryForm
 
   const isSaving =
     createProductMutation.isPending ||
     updateProductMutation.isPending ||
-    uploadImageMutation.isPending;
+    uploadImageMutation.isPending ||
+    deleteProductMutation.isPending;
 
   // --- Memos & Effects ---
   const selectedProduct = useMemo(
@@ -354,6 +360,30 @@ export default function AdminPage() {
     );
   };
 
+  const handleDeleteConfirm = () => {
+    if (!productToDelete) return;
+    
+    deleteProductMutation.mutate(productToDelete.id, {
+      onSuccess: (data) => {
+        setDeleteModalOpen(false);
+        setProductToDelete(null);
+        try {
+          router.refresh();
+        } catch (err) {
+          /* ignore */
+        }
+      },
+      onError: (error) => {
+        alert(`Error al eliminar: ${error.message}`);
+      }
+    });
+  };
+
+  const openDeleteModal = (product: Product) => {
+    setProductToDelete(product);
+    setDeleteModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <AdminHeader />
@@ -452,12 +482,20 @@ export default function AdminPage() {
                   >
                     Detalles
                   </button>
-                  <button
-                    onClick={() => openEditModal(product)}
-                    className="text-xs font-bold uppercase tracking-widest text-blue-500"
-                  >
-                    Editar
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => openEditModal(product)}
+                      className="text-xs font-bold uppercase tracking-widest text-blue-500 hover:text-blue-400"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => openDeleteModal(product)}
+                      className="text-xs font-bold uppercase tracking-widest text-red-500 hover:text-red-400"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
@@ -1099,6 +1137,69 @@ export default function AdminPage() {
                   </div>
                 ) : null}
               </aside>
+            </div>
+          </ModalContent>
+        </ModalBody>
+      )}
+
+      {/* Modal de Confirmación de Eliminación */}
+      {isDeleteModalOpen && productToDelete && (
+        <ModalBody
+          open={isDeleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          className="md:max-w-125 bg-zinc-900 dark:bg-zinc-900 border-zinc-800"
+        >
+          <ModalContent className="p-8">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center">
+                <svg
+                  className="w-10 h-10 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-black mb-2">
+                  ¿Eliminar producto?
+                </h2>
+                <p className="text-zinc-400 mb-4">
+                  Estás a punto de eliminar <span className="font-bold text-white">{productToDelete.name}</span>
+                </p>
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-sm text-yellow-200">
+                  <p className="font-bold mb-2">⚠️ Esta acción es irreversible</p>
+                  <ul className="text-left space-y-1 text-xs">
+                    <li>• Se eliminará el producto de la base de datos</li>
+                    <li>• Se borrarán todas las imágenes asociadas del servidor</li>
+                    <li>• No se podrá recuperar esta información</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex gap-3 w-full pt-4">
+                <button
+                  onClick={() => setDeleteModalOpen(false)}
+                  disabled={deleteProductMutation.isPending}
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 py-3 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={deleteProductMutation.isPending}
+                  className="flex-1 bg-red-600 hover:bg-red-700 py-3 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50"
+                >
+                  {deleteProductMutation.isPending ? "Eliminando..." : "Eliminar"}
+                </button>
+              </div>
             </div>
           </ModalContent>
         </ModalBody>
