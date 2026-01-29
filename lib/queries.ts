@@ -187,6 +187,28 @@ export const useCreateCategory = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] }),
   });
 };
+
+type UpdateCategoryInput = {
+  categoryId: string;
+  formData: FormData;
+};
+
+const updateCategory = ({ categoryId, formData }: UpdateCategoryInput) =>
+  apiFetch<any>(`/api/categories/${categoryId}`, {
+    method: "PUT",
+    body: formData,
+  });
+
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation<any, Error, UpdateCategoryInput>({
+    mutationFn: updateCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+};
+
 const deleteCategory = (categoryId: string) =>
   apiFetch<{ message: string; id: string }>(`/api/categories/${categoryId}`, {
     method: "DELETE",
