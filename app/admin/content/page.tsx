@@ -499,6 +499,85 @@ export default function AdminContentPage() {
                   </div>
                 </div>
 
+                {/* Horario Section */}
+                <div className="space-y-4 pt-6 border-t border-zinc-800">
+                  <h3 className="text-xl font-bold text-primary">Horario de Atención</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-zinc-400 mb-2">
+                        Días entre semana
+                      </label>
+                      <input
+                        name="schedule_weekday"
+                        value={formData.schedule_weekday}
+                        onChange={handleChange}
+                        className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 focus:border-primary focus:outline-none transition-colors"
+                        type="text"
+                        placeholder="Ej: Mar - Jue"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs text-zinc-400 mb-2">
+                        Horario entre semana
+                      </label>
+                      <input
+                        name="schedule_weekday_hours"
+                        value={formData.schedule_weekday_hours}
+                        onChange={handleChange}
+                        className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 focus:border-primary focus:outline-none transition-colors"
+                        type="text"
+                        placeholder="Ej: 12:30 - 23:00"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-zinc-400 mb-2">
+                        Días fin de semana
+                      </label>
+                      <input
+                        name="schedule_weekend"
+                        value={formData.schedule_weekend}
+                        onChange={handleChange}
+                        className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 focus:border-primary focus:outline-none transition-colors"
+                        type="text"
+                        placeholder="Ej: Vie - Sáb"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs text-zinc-400 mb-2">
+                        Horario fin de semana
+                      </label>
+                      <input
+                        name="schedule_weekend_hours"
+                        value={formData.schedule_weekend_hours}
+                        onChange={handleChange}
+                        className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 focus:border-primary focus:outline-none transition-colors"
+                        type="text"
+                        placeholder="Ej: 12:30 - 00:00"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Día cerrado
+                    </label>
+                    <input
+                      name="schedule_closed_day"
+                      value={formData.schedule_closed_day}
+                      onChange={handleChange}
+                      className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-3 focus:border-primary focus:outline-none transition-colors"
+                      type="text"
+                      placeholder="Ej: Lunes"
+                    />
+                  </div>
+                </div>
+
                 <div className="pt-4 border-t border-zinc-800 flex items-center gap-4">
                   <button
                     type="submit"

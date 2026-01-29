@@ -39,7 +39,7 @@ export async function PUT(req: Request) {
       .single();
 
     let result;
-    
+
     if (existing?.id) {
       // Update existing record
       const { data, error } = await supabase
@@ -48,7 +48,7 @@ export async function PUT(req: Request) {
         .eq("id", existing.id)
         .select()
         .single();
-      
+
       if (error) {
         console.error("PUT /api/settings update error", error.message || error);
         return NextResponse.json(
@@ -64,7 +64,7 @@ export async function PUT(req: Request) {
         .insert({ ...body, id: 1 })
         .select()
         .single();
-      
+
       if (error) {
         console.error("PUT /api/settings insert error", error.message || error);
         return NextResponse.json(
@@ -78,6 +78,9 @@ export async function PUT(req: Request) {
     return NextResponse.json(result ?? {});
   } catch (err: any) {
     console.error("PUT /api/settings unexpected error", err?.message ?? err);
-    return NextResponse.json({ error: "Unexpected error", details: err?.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unexpected error", details: err?.message },
+      { status: 500 },
+    );
   }
 }
