@@ -501,8 +501,10 @@ export default function AdminContentPage() {
 
                 {/* Horario Section */}
                 <div className="space-y-4 pt-6 border-t border-zinc-800">
-                  <h3 className="text-xl font-bold text-primary">Horario de Atención</h3>
-                  
+                  <h3 className="text-xl font-bold text-primary">
+                    Horario de Atención
+                  </h3>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs text-zinc-400 mb-2">
@@ -517,7 +519,7 @@ export default function AdminContentPage() {
                         placeholder="Ej: Mar - Jue"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-xs text-zinc-400 mb-2">
                         Horario entre semana
@@ -547,7 +549,7 @@ export default function AdminContentPage() {
                         placeholder="Ej: Vie - Sáb"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-xs text-zinc-400 mb-2">
                         Horario fin de semana
