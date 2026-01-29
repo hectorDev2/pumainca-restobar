@@ -102,6 +102,10 @@ export default function AdminContentPage() {
     updateMutation.mutate(formData, {
       onSuccess: () => {
         setMessage("Contenido actualizado correctamente.");
+        // Limpiar mensaje después de 3 segundos
+        setTimeout(() => {
+          setMessage(null);
+        }, 3000);
       },
       onError: (err) => {
         setMessage("Error al actualizar: " + err.message);

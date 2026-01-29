@@ -40,7 +40,6 @@ type ProductFormState = {
   isGlutenFree: boolean;
   isVariablePrice: boolean;
   preparationTimeMinutes: string;
-  displayOrder: string;
 };
 
 const initialFormState: ProductFormState = {
@@ -58,7 +57,6 @@ const initialFormState: ProductFormState = {
   isGlutenFree: false,
   isVariablePrice: false,
   preparationTimeMinutes: "",
-  displayOrder: "",
 };
 
 const booleanFlagOptions: Array<{
@@ -117,9 +115,6 @@ const buildProductFormState = (product: Product): ProductFormState => ({
     (product as any).preparation_time_minutes ??
       (product as any).preparationTimeMinutes ??
       "",
-  ),
-  displayOrder: String(
-    (product as any).display_order ?? (product as any).displayOrder ?? "",
   ),
 });
 
@@ -288,8 +283,6 @@ export default function AdminPage() {
         "preparation_time_minutes",
         createFormState.preparationTimeMinutes,
       );
-    if (createFormState.displayOrder)
-      formPayload.append("display_order", createFormState.displayOrder);
 
     if (createMainImage) formPayload.append("image", createMainImage);
 
@@ -337,8 +330,6 @@ export default function AdminPage() {
         "preparation_time_minutes",
         editFormState.preparationTimeMinutes,
       );
-    if (editFormState.displayOrder)
-      formPayload.append("display_order", editFormState.displayOrder);
 
     // Adjuntamos la imagen al PUT si existe
     if (editMainImage) {
@@ -672,23 +663,6 @@ export default function AdminPage() {
                     }
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-zinc-500 uppercase font-bold">
-                    Orden de despliegue
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2"
-                    value={editFormState.displayOrder}
-                    onChange={(e) =>
-                      setEditFormState({
-                        ...editFormState,
-                        displayOrder: e.target.value,
-                      })
-                    }
-                  />
-                </div>
               </div>
 
               {/* Imagen principal */}
@@ -867,41 +841,22 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-zinc-500 uppercase font-bold">
-                    Tiempo preparación (min)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2"
-                    value={createFormState.preparationTimeMinutes}
-                    onChange={(e) =>
-                      setCreateFormState({
-                        ...createFormState,
-                        preparationTimeMinutes: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-zinc-500 uppercase font-bold">
-                    Orden de despliegue
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2"
-                    value={createFormState.displayOrder}
-                    onChange={(e) =>
-                      setCreateFormState({
-                        ...createFormState,
-                        displayOrder: e.target.value,
-                      })
-                    }
-                  />
-                </div>
+              <div>
+                <label className="text-xs text-zinc-500 uppercase font-bold">
+                  Tiempo preparación (min)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2"
+                  value={createFormState.preparationTimeMinutes}
+                  onChange={(e) =>
+                    setCreateFormState({
+                      ...createFormState,
+                      preparationTimeMinutes: e.target.value,
+                    })
+                  }
+                />
               </div>
 
               <div>
