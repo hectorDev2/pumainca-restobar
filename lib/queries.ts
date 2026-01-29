@@ -187,7 +187,21 @@ export const useCreateCategory = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] }),
   });
 };
+const deleteCategory = (categoryId: string) =>
+  apiFetch<{ message: string; id: string }>(
+    `/api/categories/${categoryId}`,
+    { method: "DELETE" }
+  );
 
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation<{ message: string; id: string }, Error, string>({
+    mutationFn: deleteCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+};
 export const useCategories = () =>
   useQuery<Category[], Error>({
     queryKey: ["categories"],
@@ -292,6 +306,23 @@ export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation<Product, Error, UpdateProductInput>({
     mutationFn: updateProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
+    },
+  });
+};
+
+const deleteProduct = (productId: string) =>
+  apiFetch<{ message: string; id: string; deletedImages: number }>(
+    `/api/products/${productId}`,
+    { method: "DELETE" }
+  );
+
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation<{ message: string; id: string; deletedImages: number }, Error, string>({
+    mutationFn: deleteProduct,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product"] });
