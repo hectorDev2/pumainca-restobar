@@ -221,7 +221,7 @@ export default function AdminOrdersPage() {
           </section>
 
           {selected && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80">
+            <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/80">
               <div className="bg-zinc-900 border border-zinc-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-black">

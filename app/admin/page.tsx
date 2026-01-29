@@ -353,7 +353,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-zinc-950 text-white">
       <AdminHeader />
       {isSaving && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60">
+        <div className="fixed inset-0 z-120 flex items-center justify-center bg-black/60">
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 rounded-full border-4 border-t-transparent border-white animate-spin" />
             <p className="text-white font-bold">Guardando cambios...</p>
