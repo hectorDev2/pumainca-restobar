@@ -221,10 +221,10 @@ export async function DELETE(
   const { id } = await params;
 
   try {
-    // Get product info to retrieve image URL before deletion
+    // Get product info including main image and gallery images
     const { data: product, error: fetchError } = await supabase
       .from("products")
-      .select("image_url")
+      .select("image_url, gallery:product_gallery(image_url)")
       .eq("id", id)
       .single();
 
@@ -235,17 +235,34 @@ export async function DELETE(
       );
     }
 
-    // Delete associated image from storage if exists
+    const imagesToDelete: string[] = [];
+
+    // Add main image to deletion list
     if (product.image_url) {
-      try {
-        const imageUrl = product.image_url;
-        const urlParts = imageUrl.split("/storage/v1/object/public/menu/");
-        if (urlParts.length > 1) {
-          const filePath = urlParts[1];
-          await supabase.storage.from("menu").remove([filePath]);
+      const urlParts = product.image_url.split("/storage/v1/object/public/menu/");
+      if (urlParts.length > 1) {
+        imagesToDelete.push(urlParts[1]);
+      }
+    }
+
+    // Add gallery images to deletion list
+    if (product.gallery && Array.isArray(product.gallery)) {
+      for (const galleryImage of product.gallery) {
+        if (galleryImage.image_url) {
+          const urlParts = galleryImage.image_url.split("/storage/v1/object/public/menu/");
+          if (urlParts.length > 1) {
+            imagesToDelete.push(urlParts[1]);
+          }
         }
+      }
+    }
+
+    // Delete all images from storage
+    if (imagesToDelete.length > 0) {
+      try {
+        await supabase.storage.from("menu").remove(imagesToDelete);
       } catch (storageError) {
-        console.error("Error deleting product image:", storageError);
+        console.error("Error deleting product images:", storageError);
         // Continue with product deletion even if image deletion fails
       }
     }
@@ -263,6 +280,7 @@ export async function DELETE(
     return NextResponse.json({
       message: "Product deleted successfully",
       id,
+      deletedImages: imagesToDelete.length,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
