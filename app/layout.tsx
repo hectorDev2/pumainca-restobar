@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; // Or standard font import in next/font
+import { Inter, Manrope, Noto_Sans } from "next/font/google"; 
 import "./globals.css";
 
 import Providers from "@/lib/Providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
+const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-noto-sans" });
 
 export const metadata: Metadata = {
   title: "Pumainca Restobar - Sabores Auténticos",
@@ -17,9 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="mdl-js dark">
+    <html lang="es" className={`${inter.variable} ${manrope.variable} ${notoSans.variable} mdl-js dark`}>
       <body className={inter.className}>
-        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Noto+Sans:wght@300..800&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
         <Providers>
           {children}
