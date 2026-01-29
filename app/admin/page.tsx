@@ -13,7 +13,12 @@ import {
 import { useCreateCategory } from "@/lib/queries";
 import CreateCategoryForm from "@/components/CreateCategoryForm";
 import { AdminModal } from "@/components/ui/admin-modal";
-import { Modal, ModalBody, ModalContent, ModalFooter } from "@/components/ui/animated-modal";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+} from "@/components/ui/animated-modal";
 import { FileUpload } from "@/components/ui/file-upload";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types";
@@ -74,7 +79,7 @@ const parsePriceValue = (value?: number | string) => {
 };
 
 const resolveProductPrice = (
-  price?: number | string | Record<string, number | string>
+  price?: number | string | Record<string, number | string>,
 ) => {
   if (typeof price === "number") return price;
   if (typeof price === "string") return parsePriceValue(price) ?? 0;
@@ -110,10 +115,10 @@ const buildProductFormState = (product: Product): ProductFormState => ({
   preparationTimeMinutes: String(
     (product as any).preparation_time_minutes ??
       (product as any).preparationTimeMinutes ??
-      ""
+      "",
   ),
   displayOrder: String(
-    (product as any).display_order ?? (product as any).displayOrder ?? ""
+    (product as any).display_order ?? (product as any).displayOrder ?? "",
   ),
 });
 
@@ -125,7 +130,7 @@ export default function AdminPage() {
 
   // --- States ---
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
-    null
+    null,
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -140,7 +145,7 @@ export default function AdminPage() {
   const [createFormState, setCreateFormState] = useState(initialFormState);
   const [createMainImage, setCreateMainImage] = useState<File | null>(null);
   const [createImagePreview, setCreateImagePreview] = useState<string | null>(
-    null
+    null,
   );
   // --- Crear categoría ---
   const [isCreateCategoryOpen, setCreateCategoryOpen] = useState(false);
@@ -148,7 +153,7 @@ export default function AdminPage() {
   const [createCategoryDescription, setCreateCategoryDescription] =
     useState("");
   const [createCategoryImage, setCreateCategoryImage] = useState<File | null>(
-    null
+    null,
   );
   const [createCategoryPreview, setCreateCategoryPreview] = useState<
     string | null
@@ -156,7 +161,7 @@ export default function AdminPage() {
 
   const [isDetailModalOpen, setDetailModalOpen] = useState(false);
   const [detailModalProduct, setDetailModalProduct] = useState<Product | null>(
-    null
+    null,
   );
 
   // --- Mutations ---
@@ -176,17 +181,17 @@ export default function AdminPage() {
       products?.find((p) => p.id === selectedProductId) ??
       products?.[0] ??
       null,
-    [products, selectedProductId]
+    [products, selectedProductId],
   );
 
   const { data: createSubcategories } = useCategorySubcategories(
-    createFormState.category || undefined
+    createFormState.category || undefined,
   );
   const { data: editSubcategories } = useCategorySubcategories(
-    editFormState.category || undefined
+    editFormState.category || undefined,
   );
   const { data: detailModalSubcategories } = useCategorySubcategories(
-    detailModalProduct?.category
+    detailModalProduct?.category,
   );
 
   useEffect(() => {
@@ -231,7 +236,7 @@ export default function AdminPage() {
 
   const categoriesMap = useMemo(
     () => new Map(categories?.map((c) => [c.id, c])),
-    [categories]
+    [categories],
   );
 
   // --- Handlers ---
@@ -260,7 +265,7 @@ export default function AdminPage() {
 
     formPayload.append(
       "is_variable_price",
-      String(createFormState.isVariablePrice)
+      String(createFormState.isVariablePrice),
     );
     formPayload.append("is_available", String(createFormState.isAvailable));
     formPayload.append("is_vegetarian", String(createFormState.isVegetarian));
@@ -268,14 +273,14 @@ export default function AdminPage() {
     formPayload.append("is_gluten_free", String(createFormState.isGlutenFree));
     formPayload.append(
       "is_chef_special",
-      String(createFormState.isChefSpecial)
+      String(createFormState.isChefSpecial),
     );
     formPayload.append("is_recommended", String(createFormState.isRecommended));
 
     if (createFormState.preparationTimeMinutes)
       formPayload.append(
         "preparation_time_minutes",
-        createFormState.preparationTimeMinutes
+        createFormState.preparationTimeMinutes,
       );
     if (createFormState.displayOrder)
       formPayload.append("display_order", createFormState.displayOrder);
@@ -312,7 +317,7 @@ export default function AdminPage() {
 
     formPayload.append(
       "is_variable_price",
-      String(editFormState.isVariablePrice)
+      String(editFormState.isVariablePrice),
     );
     formPayload.append("is_available", String(editFormState.isAvailable));
     formPayload.append("is_vegetarian", String(editFormState.isVegetarian));
@@ -324,7 +329,7 @@ export default function AdminPage() {
     if (editFormState.preparationTimeMinutes)
       formPayload.append(
         "preparation_time_minutes",
-        editFormState.preparationTimeMinutes
+        editFormState.preparationTimeMinutes,
       );
     if (editFormState.displayOrder)
       formPayload.append("display_order", editFormState.displayOrder);
@@ -345,7 +350,7 @@ export default function AdminPage() {
             /* ignore */
           }
         },
-      }
+      },
     );
   };
 
@@ -1056,7 +1061,7 @@ export default function AdminPage() {
                   {detailModalProduct.subcategory && (
                     <p className="text-xs text-zinc-500 uppercase mt-1">
                       {detailModalSubcategories?.find(
-                        (s) => s.id === detailModalProduct.subcategory
+                        (s) => s.id === detailModalProduct.subcategory,
                       )?.name || detailModalProduct.subcategory}
                     </p>
                   )}
