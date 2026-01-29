@@ -239,7 +239,9 @@ export async function DELETE(
 
     // Add main image to deletion list
     if (product.image_url) {
-      const urlParts = product.image_url.split("/storage/v1/object/public/menu/");
+      const urlParts = product.image_url.split(
+        "/storage/v1/object/public/menu/",
+      );
       if (urlParts.length > 1) {
         imagesToDelete.push(urlParts[1]);
       }
@@ -249,7 +251,9 @@ export async function DELETE(
     if (product.gallery && Array.isArray(product.gallery)) {
       for (const galleryImage of product.gallery) {
         if (galleryImage.image_url) {
-          const urlParts = galleryImage.image_url.split("/storage/v1/object/public/menu/");
+          const urlParts = galleryImage.image_url.split(
+            "/storage/v1/object/public/menu/",
+          );
           if (urlParts.length > 1) {
             imagesToDelete.push(urlParts[1]);
           }
