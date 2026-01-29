@@ -184,9 +184,7 @@ export default function CategoriesPage() {
         <header className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-black">Gestión de Categorías</h1>
-            <p className="text-zinc-400">
-              Administra las categorías del menú
-            </p>
+            <p className="text-zinc-400">Administra las categorías del menú</p>
           </div>
           <button
             onClick={() => setCreateModalOpen(true)}
@@ -480,13 +478,13 @@ export default function CategoriesPage() {
                   </span>
                 </p>
                 <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-sm text-yellow-200">
-                  <p className="font-bold mb-2">⚠️ Esta acción es irreversible</p>
+                  <p className="font-bold mb-2">
+                    ⚠️ Esta acción es irreversible
+                  </p>
                   <ul className="text-left space-y-1 text-xs">
                     <li>• Se eliminará la categoría de la base de datos</li>
                     <li>• Se borrará la imagen asociada del servidor</li>
-                    <li>
-                      • No se puede eliminar si tiene productos asociados
-                    </li>
+                    <li>• No se puede eliminar si tiene productos asociados</li>
                     <li>• No se podrá recuperar esta información</li>
                   </ul>
                 </div>

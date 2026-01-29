@@ -10,7 +10,7 @@ export default function AdminContentPage() {
   const { data: content, isLoading: isContentLoading } = useSettings();
   const updateMutation = useUpdateSettings();
   const [uploadingField, setUploadingField] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState({
     hero_title: "",
     hero_subtitle: "",
@@ -23,6 +23,11 @@ export default function AdminContentPage() {
     footer_description: "",
     contact_address: "",
     contact_phone: "",
+    schedule_weekday: "",
+    schedule_weekday_hours: "",
+    schedule_weekend: "",
+    schedule_weekend_hours: "",
+    schedule_closed_day: "",
     philosophy_label: "",
     philosophy_title: "",
     philosophy_description: "",
@@ -48,6 +53,13 @@ export default function AdminContentPage() {
         footer_description: content.footer_description || "",
         contact_address: content.contact_address || "",
         contact_phone: content.contact_phone || "",
+        schedule_weekday: content.schedule_weekday || "Mar - Jue",
+        schedule_weekday_hours:
+          content.schedule_weekday_hours || "12:30 - 23:00",
+        schedule_weekend: content.schedule_weekend || "Vie - Sáb",
+        schedule_weekend_hours:
+          content.schedule_weekend_hours || "12:30 - 00:00",
+        schedule_closed_day: content.schedule_closed_day || "Lunes",
         philosophy_label: content.philosophy_label || "",
         philosophy_title: content.philosophy_title || "",
         philosophy_description: content.philosophy_description || "",
@@ -59,18 +71,23 @@ export default function AdminContentPage() {
     }
   }, [content]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: string,
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setUploadingField(field);
-      
+
       const uploadData = new FormData();
       uploadData.append("file", file);
       uploadData.append("folder", "site-content");
@@ -84,7 +101,7 @@ export default function AdminContentPage() {
       if (!res.ok) throw new Error("Upload failed");
 
       const { url } = await res.json();
-      
+
       setFormData((prev) => ({ ...prev, [field]: url }));
       setMessage(`Imagen para ${field} subida correctamente.`);
     } catch (err) {
@@ -121,7 +138,9 @@ export default function AdminContentPage() {
         <main className="max-w-4xl mx-auto px-4 py-8">
           <header className="mb-8">
             <h1 className="text-3xl font-black">Gestión de Contenido</h1>
-            <p className="text-zinc-400">Edita los textos principales de la página web.</p>
+            <p className="text-zinc-400">
+              Edita los textos principales de la página web.
+            </p>
           </header>
 
           <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl">
@@ -131,13 +150,16 @@ export default function AdminContentPage() {
               </div>
             ) : (
               <form onSubmit={handleSave} className="space-y-6">
-                
                 {/* Hero Section */}
                 <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-primary">Sección Principal (Hero)</h3>
-                  
+                  <h3 className="text-xl font-bold text-primary">
+                    Sección Principal (Hero)
+                  </h3>
+
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Título Principal (Línea 1)</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Título Principal (Línea 1)
+                    </label>
                     <input
                       name="hero_title"
                       value={formData.hero_title}
@@ -149,7 +171,9 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Subtítulo (Línea 2 - Color)</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Subtítulo (Línea 2 - Color)
+                    </label>
                     <input
                       name="hero_subtitle"
                       value={formData.hero_subtitle}
@@ -161,7 +185,9 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Descripción</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Descripción
+                    </label>
                     <textarea
                       name="hero_description"
                       value={formData.hero_description}
@@ -173,31 +199,46 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Imagen de Fondo (Hero)</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Imagen de Fondo (Hero)
+                    </label>
                     <div className="flex gap-4 items-start">
-                        <img 
-                            src={formData.hero_background_image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuATXk6MPNKGx57CMdde5-DdiTX5gT1k4FcksnnlebD-cSsZFtfTZkEOgg_qGAjRMBkKnN4lRmk49DGt_CkCnIJFhxgb4ErT87gcJieqE--4p4lwbdOPE_2u4PSiak7lkRXM5tG1-Rg1GaX7rKU8PVe4hgi63r5GhAuwJt4_rxs6JEmmq-BxmIeVKzoWkYRiXEjFcbdZPwWSsXPmoMFDY0TmAY9VuYan0app-qcECaPVlAWW08ArAi-n6B_nzpEYj3gAopAgZ-06bNJZ'} 
-                            alt="Hero" 
-                            className="w-24 h-16 object-cover rounded-md border border-zinc-700" 
-                        />
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, "hero_background_image")}
-                            disabled={uploadingField === "hero_background_image"}
-                            className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
-                        />
-                        {uploadingField === "hero_background_image" && <span className="text-sm text-primary animate-pulse">Subiendo...</span>}
+                      <img
+                        src={
+                          formData.hero_background_image ||
+                          "https://lh3.googleusercontent.com/aida-public/AB6AXuATXk6MPNKGx57CMdde5-DdiTX5gT1k4FcksnnlebD-cSsZFtfTZkEOgg_qGAjRMBkKnN4lRmk49DGt_CkCnIJFhxgb4ErT87gcJieqE--4p4lwbdOPE_2u4PSiak7lkRXM5tG1-Rg1GaX7rKU8PVe4hgi63r5GhAuwJt4_rxs6JEmmq-BxmIeVKzoWkYRiXEjFcbdZPwWSsXPmoMFDY0TmAY9VuYan0app-qcECaPVlAWW08ArAi-n6B_nzpEYj3gAopAgZ-06bNJZ"
+                        }
+                        alt="Hero"
+                        className="w-24 h-16 object-cover rounded-md border border-zinc-700"
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleImageUpload(e, "hero_background_image")
+                        }
+                        disabled={uploadingField === "hero_background_image"}
+                        className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
+                      />
+                      {uploadingField === "hero_background_image" && (
+                        <span className="text-sm text-primary animate-pulse">
+                          Subiendo...
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* History Section */}
                 <div className="space-y-4 pt-6 border-t border-zinc-800">
-                  <h3 className="text-xl font-bold text-primary">Sección Historia</h3>
-                  
+                  <h3 className="text-xl font-bold text-primary">
+                    Sección Historia
+                  </h3>
+
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Etiqueta (Label)</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Etiqueta (Label)
+                    </label>
                     <input
                       name="history_label"
                       value={formData.history_label}
@@ -209,7 +250,9 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Título de Historia</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Título de Historia
+                    </label>
                     <input
                       name="history_title"
                       value={formData.history_title}
@@ -221,7 +264,9 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Descripción de Historia</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Descripción de Historia
+                    </label>
                     <textarea
                       name="history_description"
                       value={formData.history_description}
@@ -233,31 +278,44 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Imagen Historia</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Imagen Historia
+                    </label>
                     <div className="flex gap-4 items-start">
-                        <img 
-                            src={formData.history_image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuC3GvdLR0O-ER0B-sxxrf96gAi13pxiiPGAtbv6w6VjPTONsilcTJTXM78DO_lmjKg7DB2uL8HHKbhHMXs-vS6khXEBXFZ2AdZ63PshtY8fBfYqUWM_PD7796N1gmnUPVOL5sdQEfprp531eehNJU17kRuf301TwQNYLclmxY8vQrGN5nTXTTwQj6gCO8eKEssD20UixEwt8kXFlD1lZZ95mNKWGIxOWnSLyIg_5ftjpfp7BzA4dXGWK9htHIfpI7c5HYmWwhpTuvaP'} 
-                            alt="History" 
-                            className="w-24 h-16 object-cover rounded-md border border-zinc-700" 
-                        />
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, "history_image")}
-                            disabled={uploadingField === "history_image"}
-                            className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
-                        />
-                         {uploadingField === "history_image" && <span className="text-sm text-primary animate-pulse">Subiendo...</span>}
+                      <img
+                        src={
+                          formData.history_image ||
+                          "https://lh3.googleusercontent.com/aida-public/AB6AXuC3GvdLR0O-ER0B-sxxrf96gAi13pxiiPGAtbv6w6VjPTONsilcTJTXM78DO_lmjKg7DB2uL8HHKbhHMXs-vS6khXEBXFZ2AdZ63PshtY8fBfYqUWM_PD7796N1gmnUPVOL5sdQEfprp531eehNJU17kRuf301TwQNYLclmxY8vQrGN5nTXTTwQj6gCO8eKEssD20UixEwt8kXFlD1lZZ95mNKWGIxOWnSLyIg_5ftjpfp7BzA4dXGWK9htHIfpI7c5HYmWwhpTuvaP"
+                        }
+                        alt="History"
+                        className="w-24 h-16 object-cover rounded-md border border-zinc-700"
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e, "history_image")}
+                        disabled={uploadingField === "history_image"}
+                        className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
+                      />
+                      {uploadingField === "history_image" && (
+                        <span className="text-sm text-primary animate-pulse">
+                          Subiendo...
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Philosophy Section */}
                 <div className="space-y-4 pt-6 border-t border-zinc-800">
-                  <h3 className="text-xl font-bold text-primary">Sección Filosofía</h3>
+                  <h3 className="text-xl font-bold text-primary">
+                    Sección Filosofía
+                  </h3>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Etiqueta (Label)</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Etiqueta (Label)
+                    </label>
                     <input
                       name="philosophy_label"
                       value={formData.philosophy_label}
@@ -269,7 +327,9 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Título</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Título
+                    </label>
                     <input
                       name="philosophy_title"
                       value={formData.philosophy_title}
@@ -281,7 +341,9 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Descripción</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Descripción
+                    </label>
                     <textarea
                       name="philosophy_description"
                       value={formData.philosophy_description}
@@ -294,7 +356,9 @@ export default function AdminContentPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-zinc-400 mb-2">Badge 1 (Texto)</label>
+                      <label className="block text-xs text-zinc-400 mb-2">
+                        Badge 1 (Texto)
+                      </label>
                       <input
                         name="philosophy_badge_1"
                         value={formData.philosophy_badge_1}
@@ -305,7 +369,9 @@ export default function AdminContentPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-zinc-400 mb-2">Badge 2 (Texto)</label>
+                      <label className="block text-xs text-zinc-400 mb-2">
+                        Badge 2 (Texto)
+                      </label>
                       <input
                         name="philosophy_badge_2"
                         value={formData.philosophy_badge_2}
@@ -318,54 +384,82 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Imagen Filosofía</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Imagen Filosofía
+                    </label>
                     <div className="flex gap-4 items-start">
-                        <img 
-                            src={formData.philosophy_image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDztdE740-TFm6yhUQ3PH1VV9KdanoNC0UmkJ0eIXv7otH1TSK87gsmbwOi2O_sVT05IwslnbE2Uw9bvlyisgCYBW1f3Hgn4Y-ADGT_SVbtQ-3jx6Xa03nzU2QEFZsdT5YpS7nMK9IiyI1NIfLVRyHxcbOrzPyyZGmgtQVf8x4r8CaBFoVZ2nb10uopliC5R8vqEE4-q8bNq2YeKGEa_O0C1db7Yn8TQUYrou8LdZ3xtdmihkOcf9gujQkTXdWCsnVX7zUI9u7FFYiZ'} 
-                            alt="Philosophy" 
-                            className="w-24 h-16 object-cover rounded-md border border-zinc-700" 
-                        />
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, "philosophy_image")}
-                            disabled={uploadingField === "philosophy_image"}
-                            className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
-                        />
-                         {uploadingField === "philosophy_image" && <span className="text-sm text-primary animate-pulse">Subiendo...</span>}
+                      <img
+                        src={
+                          formData.philosophy_image ||
+                          "https://lh3.googleusercontent.com/aida-public/AB6AXuDztdE740-TFm6yhUQ3PH1VV9KdanoNC0UmkJ0eIXv7otH1TSK87gsmbwOi2O_sVT05IwslnbE2Uw9bvlyisgCYBW1f3Hgn4Y-ADGT_SVbtQ-3jx6Xa03nzU2QEFZsdT5YpS7nMK9IiyI1NIfLVRyHxcbOrzPyyZGmgtQVf8x4r8CaBFoVZ2nb10uopliC5R8vqEE4-q8bNq2YeKGEa_O0C1db7Yn8TQUYrou8LdZ3xtdmihkOcf9gujQkTXdWCsnVX7zUI9u7FFYiZ"
+                        }
+                        alt="Philosophy"
+                        className="w-24 h-16 object-cover rounded-md border border-zinc-700"
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleImageUpload(e, "philosophy_image")
+                        }
+                        disabled={uploadingField === "philosophy_image"}
+                        className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
+                      />
+                      {uploadingField === "philosophy_image" && (
+                        <span className="text-sm text-primary animate-pulse">
+                          Subiendo...
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* CTA Section */}
                 <div className="space-y-4 pt-6 border-t border-zinc-800">
-                  <h3 className="text-xl font-bold text-primary">Sección Llamada a la Acción (CTA)</h3>
-                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Imagen de Fondo (CTA)</label>
+                  <h3 className="text-xl font-bold text-primary">
+                    Sección Llamada a la Acción (CTA)
+                  </h3>
+                  <div>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Imagen de Fondo (CTA)
+                    </label>
                     <div className="flex gap-4 items-start">
-                        <img 
-                            src={formData.cta_background_image || 'https://lh3.googleusercontent.com/aida-public/AB6AXuDfxQRQI_nY_alVkqrgyxhTercMQFH1L_JrrMiE_17KFcyOYzXgs6Hew6Jt_xIO71kyJTwmIH6nyayvR6bayj9QTk-dyQEX3lA3e2MvbQaenoeAlZ6sq9S3vUoZBWJkOIquC4jvCTRMERmgtYbjtyN4Q1wRazaeTZhvooOAk7aQ8C5MIGS0yALbovg16DglqAL6lbYMIuS45PoTT8zU5Xxj1CqNCBuKSpZfqQm6gGtG7-6ETDKmueADaq4vO7TSOt5t9uWGiipSJjw1'} 
-                            alt="CTA" 
-                            className="w-24 h-16 object-cover rounded-md border border-zinc-700" 
-                        />
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, "cta_background_image")}
-                            disabled={uploadingField === "cta_background_image"}
-                            className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
-                        />
-                         {uploadingField === "cta_background_image" && <span className="text-sm text-primary animate-pulse">Subiendo...</span>}
+                      <img
+                        src={
+                          formData.cta_background_image ||
+                          "https://lh3.googleusercontent.com/aida-public/AB6AXuDfxQRQI_nY_alVkqrgyxhTercMQFH1L_JrrMiE_17KFcyOYzXgs6Hew6Jt_xIO71kyJTwmIH6nyayvR6bayj9QTk-dyQEX3lA3e2MvbQaenoeAlZ6sq9S3vUoZBWJkOIquC4jvCTRMERmgtYbjtyN4Q1wRazaeTZhvooOAk7aQ8C5MIGS0yALbovg16DglqAL6lbYMIuS45PoTT8zU5Xxj1CqNCBuKSpZfqQm6gGtG7-6ETDKmueADaq4vO7TSOt5t9uWGiipSJjw1"
+                        }
+                        alt="CTA"
+                        className="w-24 h-16 object-cover rounded-md border border-zinc-700"
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          handleImageUpload(e, "cta_background_image")
+                        }
+                        disabled={uploadingField === "cta_background_image"}
+                        className="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer"
+                      />
+                      {uploadingField === "cta_background_image" && (
+                        <span className="text-sm text-primary animate-pulse">
+                          Subiendo...
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Footer Section */}
                 <div className="space-y-4 pt-6 border-t border-zinc-800">
-                  <h3 className="text-xl font-bold text-primary">Pie de Página (Footer)</h3>
-                  
+                  <h3 className="text-xl font-bold text-primary">
+                    Pie de Página (Footer)
+                  </h3>
+
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Descripción del Footer</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Descripción del Footer
+                    </label>
                     <textarea
                       name="footer_description"
                       value={formData.footer_description}
@@ -376,9 +470,10 @@ export default function AdminContentPage() {
                     />
                   </div>
 
-
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Dirección</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Dirección
+                    </label>
                     <input
                       name="contact_address"
                       value={formData.contact_address}
@@ -390,7 +485,9 @@ export default function AdminContentPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs text-zinc-400 mb-2">Teléfono</label>
+                    <label className="block text-xs text-zinc-400 mb-2">
+                      Teléfono
+                    </label>
                     <input
                       name="contact_phone"
                       value={formData.contact_phone}
@@ -408,16 +505,19 @@ export default function AdminContentPage() {
                     disabled={updateMutation.isPending}
                     className="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-900/20"
                   >
-                    {updateMutation.isPending ? "Guardando..." : "Guardar Cambios"}
+                    {updateMutation.isPending
+                      ? "Guardando..."
+                      : "Guardar Cambios"}
                   </button>
-                  
+
                   {message && (
-                    <span className={`text-sm font-medium ${message.includes("Error") ? "text-red-400" : "text-green-400"}`}>
+                    <span
+                      className={`text-sm font-medium ${message.includes("Error") ? "text-red-400" : "text-green-400"}`}
+                    >
                       {message}
                     </span>
                   )}
                 </div>
-
               </form>
             )}
           </div>
