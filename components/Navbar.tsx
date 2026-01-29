@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useProducts } from '@/lib/queries';
@@ -114,7 +115,14 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
               </button>
 
             <Link href="/" className="flex items-center gap-3 cursor-pointer group">
-              <img src="/logo.png" className="w-[100px] md:w-[120px] group-hover:scale-105 transition-transform" alt="Logo" />
+              <NextImage 
+  src="/logo.png" 
+  width={120} 
+  height={40} 
+  className="w-[100px] md:w-[120px] group-hover:scale-105 transition-transform h-auto" 
+  alt="Logo" 
+  priority 
+/>
             </Link>
 
             {showSearch && (
@@ -250,7 +258,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                 {/* Drawer Header */}
                 <div className="p-6 border-b border-zinc-800 flex items-center justify-between sticky top-0 bg-black z-20">
                     <div className="flex items-center gap-3">
-                        <img src="/logo.png" className="w-24" alt="Logo" />
+                        <NextImage src="/logo.png" width={96} height={32} className="w-24 h-auto" alt="Logo" />
                     </div>
                     <button 
                         onClick={() => setIsMenuOpen(false)}
