@@ -26,7 +26,10 @@ const AdminHeader: React.FC = () => {
             <Link href="/admin" className={isActive("/admin")}>
               Dashboard
             </Link>
-            <Link href="/admin/categories" className={isActive("/admin/categories")}>
+            <Link
+              href="/admin/categories"
+              className={isActive("/admin/categories")}
+            >
               Categorías
             </Link>
             <Link href="/admin/orders" className={isActive("/admin/orders")}>
