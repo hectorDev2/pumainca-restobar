@@ -78,7 +78,7 @@ const parseNumberValue = (value?: number | string | null) => {
 };
 
 const buildPriceRecord = (
-  prices?: BackendProductPrice[]
+  prices?: BackendProductPrice[],
 ): Record<string, number> | undefined => {
   if (!prices || prices.length === 0) {
     return undefined;
@@ -105,14 +105,14 @@ const normalizeProduct = (backend: BackendProduct): Product => {
     backend.is_variable_price && priceRecord ? priceRecord : fallbackPrice;
 
   const normalizeImageEntry = (
-    entry?: string | BackendImageEntry | null
+    entry?: string | BackendImageEntry | null,
   ): string | undefined => {
     if (!entry) return undefined;
     return typeof entry === "string" ? entry : entry.imageUrl;
   };
 
   const normalizeGallery = (
-    gallery?: (string | BackendImageEntry)[]
+    gallery?: (string | BackendImageEntry)[],
   ): string[] => {
     if (!gallery) return [];
     return gallery
@@ -121,12 +121,12 @@ const normalizeProduct = (backend: BackendProduct): Product => {
   };
 
   const normalizeIngredients = (
-    ingredients?: (string | BackendIngredientEntry)[]
+    ingredients?: (string | BackendIngredientEntry)[],
   ): string[] => {
     if (!ingredients) return [];
     return ingredients
       .map((item) =>
-        typeof item === "string" ? item : item.ingredient ?? undefined
+        typeof item === "string" ? item : (item.ingredient ?? undefined),
       )
       .filter((ing): ing is string => Boolean(ing));
   };
@@ -137,7 +137,7 @@ const normalizeProduct = (backend: BackendProduct): Product => {
       normalizeImageEntry(backend.image),
       backend.image_url,
       backend.imageUrl,
-      galleryImages[0]
+      galleryImages[0],
     ) ?? "";
 
   const resolvedCategoryId =
@@ -145,7 +145,7 @@ const normalizeProduct = (backend: BackendProduct): Product => {
     "";
   const resolvedSubcategoryId = coalesce(
     backend.subcategory_id,
-    backend.subcategoryId
+    backend.subcategoryId,
   );
 
   return {
@@ -159,7 +159,7 @@ const normalizeProduct = (backend: BackendProduct): Product => {
       coalesce(
         backend.image_url,
         backend.imageUrl,
-        normalizeImageEntry(backend.image)
+        normalizeImageEntry(backend.image),
       ) ?? "",
     gallery: galleryImages,
     ingredients: normalizeIngredients(backend.ingredients),
@@ -237,7 +237,7 @@ export const fetchProducts = (filters: ProductFilters) => {
   const query = params.toString();
   const path = query ? `/api/products?${query}` : "/api/products";
   return apiFetch<BackendProduct[]>(path).then((products) =>
-    products.map(normalizeProduct)
+    products.map(normalizeProduct),
   );
 };
 
@@ -428,7 +428,9 @@ export type Reservation = {
 export const fetchReservations = (params?: { email?: string }) => {
   const qs = new URLSearchParams();
   if (params?.email) qs.set("email", params.email);
-  const path = qs.toString() ? `/api/reservations?${qs.toString()}` : "/api/reservations";
+  const path = qs.toString()
+    ? `/api/reservations?${qs.toString()}`
+    : "/api/reservations";
   return apiFetch<Reservation[]>(path);
 };
 
