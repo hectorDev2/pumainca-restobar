@@ -7,15 +7,15 @@ function sanitizeFileName(name: string) {
 
 export async function PUT(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const contentType = req.headers.get("content-type") || "";
-  
+
   if (!contentType.includes("multipart/form-data")) {
     return NextResponse.json(
       { message: "Content-Type must be multipart/form-data" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -25,15 +25,15 @@ export async function PUT(
 
     // Get current category info
     const { data: currentCategory } = await supabase
-      .from('categories')
-      .select('name, image_url')
-      .eq('id', id)
+      .from("categories")
+      .select("name, image_url")
+      .eq("id", id)
       .single();
 
     if (!currentCategory) {
       return NextResponse.json(
         { message: "Category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -43,7 +43,7 @@ export async function PUT(
       if (!nameStr) {
         return NextResponse.json(
           { message: ["name should not be empty"] },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -58,7 +58,7 @@ export async function PUT(
       if (existing) {
         return NextResponse.json(
           { message: ["Ya existe una categoría con ese nombre"] },
-          { status: 409 }
+          { status: 409 },
         );
       }
 
@@ -82,7 +82,7 @@ export async function PUT(
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       const ext = file.name.split(".").pop() || "jpg";
-      
+
       const categoryName = updates.name || currentCategory.name;
       const fileName = `${Date.now()}-${sanitizeFileName(categoryName)}.${ext}`;
       const filePath = `categories/${fileName}`;
@@ -91,15 +91,13 @@ export async function PUT(
       if (currentCategory.image_url) {
         try {
           const oldImageUrl = currentCategory.image_url;
-          const urlParts = oldImageUrl.split('/storage/v1/object/public/menu/');
+          const urlParts = oldImageUrl.split("/storage/v1/object/public/menu/");
           if (urlParts.length > 1) {
             const oldFilePath = urlParts[1];
-            await supabase.storage
-              .from("menu")
-              .remove([oldFilePath]);
+            await supabase.storage.from("menu").remove([oldFilePath]);
           }
         } catch (deleteError) {
-          console.error('Error deleting old category image:', deleteError);
+          console.error("Error deleting old category image:", deleteError);
         }
       }
 
@@ -107,7 +105,7 @@ export async function PUT(
         .from("menu")
         .upload(filePath, buffer, {
           contentType: file.type,
-          upsert: true
+          upsert: true,
         });
 
       if (uploadError) {
@@ -123,9 +121,9 @@ export async function PUT(
 
     // Update category
     const { data: updated, error: updateError } = await supabase
-      .from('categories')
+      .from("categories")
       .update(updates)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -134,27 +132,23 @@ export async function PUT(
     }
 
     return NextResponse.json(updated);
-
   } catch (err: any) {
-    return NextResponse.json(
-      { error: err.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
 
   try {
     // Check if category has products
     const { data: products, error: productsError } = await supabase
-      .from('products')
-      .select('id')
-      .eq('category_id', id)
+      .from("products")
+      .select("id")
+      .eq("category_id", id)
       .limit(1);
 
     if (productsError) {
@@ -163,25 +157,25 @@ export async function DELETE(
 
     if (products && products.length > 0) {
       return NextResponse.json(
-        { 
+        {
           message: "Cannot delete category with existing products",
-          error: "Conflict" 
+          error: "Conflict",
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     // Get category info to retrieve image URL
     const { data: category, error: fetchError } = await supabase
-      .from('categories')
-      .select('image_url')
-      .eq('id', id)
+      .from("categories")
+      .select("image_url")
+      .eq("id", id)
       .single();
 
     if (fetchError || !category) {
       return NextResponse.json(
         { message: "Category not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -189,23 +183,21 @@ export async function DELETE(
     if (category.image_url) {
       try {
         const imageUrl = category.image_url;
-        const urlParts = imageUrl.split('/storage/v1/object/public/menu/');
+        const urlParts = imageUrl.split("/storage/v1/object/public/menu/");
         if (urlParts.length > 1) {
           const filePath = urlParts[1];
-          await supabase.storage
-            .from("menu")
-            .remove([filePath]);
+          await supabase.storage.from("menu").remove([filePath]);
         }
       } catch (storageError) {
-        console.error('Error deleting category image:', storageError);
+        console.error("Error deleting category image:", storageError);
       }
     }
 
     // Delete category
     const { error: deleteError } = await supabase
-      .from('categories')
+      .from("categories")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (deleteError) {
       throw deleteError;
@@ -213,13 +205,9 @@ export async function DELETE(
 
     return NextResponse.json({
       message: "Category deleted successfully",
-      id
+      id,
     });
-
   } catch (err: any) {
-    return NextResponse.json(
-      { error: err.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
