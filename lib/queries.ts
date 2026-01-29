@@ -188,10 +188,9 @@ export const useCreateCategory = () => {
   });
 };
 const deleteCategory = (categoryId: string) =>
-  apiFetch<{ message: string; id: string }>(
-    `/api/categories/${categoryId}`,
-    { method: "DELETE" }
-  );
+  apiFetch<{ message: string; id: string }>(`/api/categories/${categoryId}`, {
+    method: "DELETE",
+  });
 
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
@@ -316,12 +315,16 @@ export const useUpdateProduct = () => {
 const deleteProduct = (productId: string) =>
   apiFetch<{ message: string; id: string; deletedImages: number }>(
     `/api/products/${productId}`,
-    { method: "DELETE" }
+    { method: "DELETE" },
   );
 
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
-  return useMutation<{ message: string; id: string; deletedImages: number }, Error, string>({
+  return useMutation<
+    { message: string; id: string; deletedImages: number },
+    Error,
+    string
+  >({
     mutationFn: deleteProduct,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
