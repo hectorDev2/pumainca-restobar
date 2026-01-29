@@ -145,6 +145,92 @@ Acceso protegido mediante autenticación con Supabase Auth.
 - Configuración de notificaciones (futuro)
 - Configuración de horarios de operación (futuro)
 
+## 🛠️ Instalación y Configuración
+
+### Requisitos Previos
+- Node.js >= 20.0.0
+- npm o bun
+- Cuenta de Supabase (gratis)
+
+### Pasos de Instalación
+
+1. **Clonar el repositorio**
+```bash
+git clone <repository-url>
+cd pumainca-restobar
+```
+
+2. **Instalar dependencias**
+```bash
+npm install
+```
+
+3. **Configurar variables de entorno**
+
+Crea un archivo `.env.local` en la raíz del proyecto con las siguientes variables:
+
+```env
+# Supabase Configuration (REQUERIDO)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# API Configuration (Opcional)
+NEXT_PUBLIC_API_BASE_URL=
+
+# ImageKit Configuration (Opcional - solo si usas ImageKit)
+NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=
+NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=
+IMAGEKIT_PRIVATE_KEY=
+IMAGEKIT_FOLDER=
+```
+
+**IMPORTANTE**: Las únicas variables **REQUERIDAS** para que la app funcione son:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+4. **Ejecutar en modo desarrollo**
+```bash
+npm run dev
+```
+
+La aplicación estará disponible en `http://localhost:3000`
+
+5. **Build para producción**
+```bash
+npm run build
+npm start
+```
+
+---
+
+## 🚀 Deploy en Vercel
+
+### Opción 1: Deploy Automático
+
+1. Sube tu repositorio a GitHub
+2. Ve a [Vercel](https://vercel.com) y haz login
+3. Haz click en "New Project"
+4. Importa tu repositorio de GitHub
+5. Configura las variables de entorno en Vercel:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+6. Click en "Deploy"
+
+### Opción 2: Deploy desde CLI
+
+```bash
+# Instalar Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Deploy a producción
+vercel --prod
+```
+
+**Nota**: Asegúrate de configurar las variables de entorno en el dashboard de Vercel antes del deploy.
+
 ---
 
 ## 🛠️ Instalación y Configuración

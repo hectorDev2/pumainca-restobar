@@ -1,12 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuración de imágenes
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-        pathname: '/**',
       },
       {
         protocol: 'https',
@@ -21,7 +19,6 @@ const nextConfig = {
         hostname: 'bhzcukhjlmlvasumnwkg.supabase.co',
       },
     ],
-    unoptimized: false,
   },
 };
 

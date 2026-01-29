@@ -155,7 +155,12 @@ const normalizeProduct = (backend: BackendProduct): Product => {
     price,
     category: resolvedCategoryId,
     subcategory: resolvedSubcategoryId ?? undefined,
-    image_url: resolvedImage,
+    image_url:
+      coalesce(
+        backend.image_url,
+        backend.imageUrl,
+        normalizeImageEntry(backend.image)
+      ) ?? "",
     gallery: galleryImages,
     ingredients: normalizeIngredients(backend.ingredients),
     allergens: backend.allergens ?? [],
