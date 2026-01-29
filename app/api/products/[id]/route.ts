@@ -132,30 +132,18 @@ export async function PUT(
         const buffer = Buffer.from(arrayBuffer);
         const ext = file.name.split(".").pop() || "jpg";
         
-        // Fetch current product name if not provided in updates, to use for filename
-        let productName = updates.name;
-        if (!productName) {
-             const { data: prod } = await supabase
-                .from('products')
-                .select('name')
-                .eq('id', id)
-                .single();
-             productName = prod?.name || id;
-        }
+        // Fetch current product info to get old image URL and name
+        const { data: currentProduct } = await supabase
+            .from('products')
+            .select('name, image_url, category_id')
+            .eq('id', id)
+            .single();
 
+        let productName = updates.name || currentProduct?.name || id;
         const fileName = `${sanitizeFileName(productName)}.${ext}`;
         
         let folderName = "uncategorized";
-        let targetCategoryId = category_id; 
-
-        if (!targetCategoryId) {
-             const { data: prod } = await supabase
-                .from('products')
-                .select('category_id')
-                .eq('id', id)
-                .single();
-             targetCategoryId = prod?.category_id;
-        }
+        let targetCategoryId = category_id || currentProduct?.category_id;
 
         if (targetCategoryId) {
             const { data: cat } = await supabase
@@ -170,11 +158,29 @@ export async function PUT(
         
         const filePath = `products/${folderName}/${fileName}`;
         
+        // Delete old image from storage if it exists
+        if (currentProduct?.image_url) {
+            try {
+                const oldImageUrl = currentProduct.image_url;
+                // Extract file path from the public URL
+                const urlParts = oldImageUrl.split('/storage/v1/object/public/menu/');
+                if (urlParts.length > 1) {
+                    const oldFilePath = urlParts[1];
+                    await supabase.storage
+                        .from("menu")
+                        .remove([oldFilePath]);
+                }
+            } catch (deleteError) {
+                console.error('Error deleting old image:', deleteError);
+                // Continue with upload even if deletion fails
+            }
+        }
+        
         const { error: uploadError } = await supabase.storage
             .from("menu")
             .upload(filePath, buffer, {
                 contentType: file.type,
-                upsert: false
+                upsert: true // Changed to true to allow replacing if it exists
             });
 
         if (uploadError) {
@@ -201,5 +207,66 @@ export async function PUT(
 
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+
+  try {
+    // Get product info to retrieve image URL before deletion
+    const { data: product, error: fetchError } = await supabase
+      .from('products')
+      .select('image_url')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !product) {
+      return NextResponse.json(
+        { message: "Product not found" },
+        { status: 404 }
+      );
+    }
+
+    // Delete associated image from storage if exists
+    if (product.image_url) {
+      try {
+        const imageUrl = product.image_url;
+        const urlParts = imageUrl.split('/storage/v1/object/public/menu/');
+        if (urlParts.length > 1) {
+          const filePath = urlParts[1];
+          await supabase.storage
+            .from("menu")
+            .remove([filePath]);
+        }
+      } catch (storageError) {
+        console.error('Error deleting product image:', storageError);
+        // Continue with product deletion even if image deletion fails
+      }
+    }
+
+    // Delete product (this will cascade delete related records if FK constraints are set up properly)
+    const { error: deleteError } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      throw deleteError;
+    }
+
+    return NextResponse.json({ 
+      message: "Product deleted successfully",
+      id 
+    });
+
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: err.message },
+      { status: 500 }
+    );
   }
 }
