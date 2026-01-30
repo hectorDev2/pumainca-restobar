@@ -808,23 +808,20 @@ Para reportar bugs o solicitar funcionalidades:
    - Screenshots si es posible
    - Navegador y versión
    - Sistema operativo
-3. Envía a: [email de bugs]
+
 
 ### Equipo de Desarrollo
-- **Product Owner:** [Nombre]
-- **Tech Lead:** [Nombre]
-- **Backend Developer:** [Nombre]
-- **Frontend Developer:** [Nombre]
+- **Product Owner:** Emil Brayan Pumainca
+- **Tech Lead:** Hector Barazorda Cuellar
+- **Full stack Developer:** Hector Barazorda Cuellar
 
 ---
 
 ## 🙏 Agradecimientos
 
 Agradecemos a todos los que han contribuido al desarrollo de este proyecto:
-- Equipo de desarrollo de Pumainca
+- Pumainca restobar
 - Comunidad de Next.js y React
-- Equipo de Supabase
-- Todos los testers y colaboradores
 
 ---
 
