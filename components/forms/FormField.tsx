@@ -2,8 +2,9 @@
 
 import React from "react";
 
-interface FormFieldProps
-  extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
+interface FormFieldProps extends React.InputHTMLAttributes<
+  HTMLInputElement | HTMLTextAreaElement
+> {
   label: string;
   id: string;
   error?: string;
@@ -32,7 +33,10 @@ const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <div>
-      <label htmlFor={id} className="block text-xs font-bold text-zinc-400 mb-2">
+      <label
+        htmlFor={id}
+        className="block text-xs font-bold text-zinc-400 mb-2"
+      >
         {label}
       </label>
 

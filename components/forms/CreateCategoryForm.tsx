@@ -101,7 +101,11 @@ export default function CreateCategoryForm({ onCreated }: Props) {
         </label>
         <div className="h-40 w-full rounded-2xl overflow-hidden border border-zinc-800 bg-black/20 mb-2">
           {preview ? (
-            <img src={preview} alt="Previsualización" className="h-full w-full object-cover" />
+            <img
+              src={preview}
+              alt="Previsualización"
+              className="h-full w-full object-cover"
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-zinc-500">
               Sin imagen
