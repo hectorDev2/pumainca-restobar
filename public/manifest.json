@@ -1,0 +1,133 @@
+{
+  "name": "Pumainca Restobar - Sabores Auténticos",
+  "short_name": "Pumainca",
+  "description": "Experiencia gastronómica inolvidable con sabores auténticos de los Andes fusionados con técnicas modernas. Ordena online y reserva tu mesa.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#18181b",
+  "theme_color": "#d4af37",
+  "categories": ["food", "lifestyle", "restaurant"],
+  "lang": "es",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Página de inicio de Pumainca Restobar"
+    },
+    {
+      "src": "/screenshots/menu.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Menú digital interactivo"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ver Menú",
+      "short_name": "Menú",
+      "description": "Explora nuestro menú completo",
+      "url": "/menu",
+      "icons": [
+        {
+          "src": "/icons/shortcut-menu.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Reservar Mesa",
+      "short_name": "Reservar",
+      "description": "Reserva tu mesa ahora",
+      "url": "/reservas",
+      "icons": [
+        {
+          "src": "/icons/shortcut-reservation.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Mi Carrito",
+      "short_name": "Carrito",
+      "description": "Ver mi carrito de compras",
+      "url": "/cart",
+      "icons": [
+        {
+          "src": "/icons/shortcut-cart.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
