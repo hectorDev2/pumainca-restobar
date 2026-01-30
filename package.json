@@ -12,6 +12,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "generate:pwa-icons": "node scripts/generate-pwa-icons.mjs",
     "docker:dev": "bash scripts/docker-compose-wrapper.sh up",
     "docker:dev:build": "bash scripts/docker-compose-wrapper.sh build",
     "docker:dev:down": "bash scripts/docker-compose-wrapper.sh down",
