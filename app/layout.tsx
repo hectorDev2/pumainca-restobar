@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, Noto_Sans } from "next/font/google"; 
+import { Inter, Manrope, Noto_Sans } from "next/font/google";
 import "./globals.css";
 
 import Providers from "@/lib/Providers";
@@ -8,11 +8,15 @@ import PWARegister from "@/components/PWARegister";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
-const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-noto-sans" });
+const notoSans = Noto_Sans({
+  subsets: ["latin"],
+  variable: "--font-noto-sans",
+});
 
 export const metadata: Metadata = {
   title: "Pumainca Restobar - Sabores Auténticos",
-  description: "Experiencia gastronómica inolvidable con sabores auténticos de los Andes fusionados con técnicas modernas.",
+  description:
+    "Experiencia gastronómica inolvidable con sabores auténticos de los Andes fusionados con técnicas modernas.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -26,13 +30,15 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Pumainca Restobar",
     title: "Pumainca Restobar - Sabores Auténticos",
-    description: "Experiencia gastronómica inolvidable con sabores auténticos de los Andes fusionados con técnicas modernas.",
+    description:
+      "Experiencia gastronómica inolvidable con sabores auténticos de los Andes fusionados con técnicas modernas.",
     locale: "es_PE",
   },
   twitter: {
     card: "summary_large_image",
     title: "Pumainca Restobar - Sabores Auténticos",
-    description: "Experiencia gastronómica inolvidable con sabores auténticos de los Andes fusionados con técnicas modernas.",
+    description:
+      "Experiencia gastronómica inolvidable con sabores auténticos de los Andes fusionados con técnicas modernas.",
   },
   viewport: {
     width: "device-width",
@@ -52,7 +58,11 @@ export const metadata: Metadata = {
       { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      {
+        url: "/icons/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
     ],
   },
 };
@@ -63,12 +73,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${manrope.variable} ${notoSans.variable} mdl-js dark`}>
+    <html
+      lang="es"
+      className={`${inter.variable} ${manrope.variable} ${notoSans.variable} mdl-js dark`}
+    >
       <body className={inter.className}>
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-        <Providers>
-          {children}
-        </Providers>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet"
+        />
+        <Providers>{children}</Providers>
         <PWARegister />
         <InstallPWAPrompt />
       </body>
