@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, RefObject } from "react";
 
 /**
  * Hook para detectar clicks fuera de un elemento
@@ -7,8 +7,8 @@ import { useEffect, useRef } from "react";
 export function useClickOutside<T extends HTMLElement>(
   callback: () => void,
   enabled: boolean = true,
-): React.RefObject<T> {
-  const ref = useRef<T>(null);
+): RefObject<T> {
+  const ref = useRef<T | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
@@ -23,5 +23,5 @@ export function useClickOutside<T extends HTMLElement>(
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [callback, enabled]);
 
-  return ref;
+  return ref as RefObject<T>;
 }

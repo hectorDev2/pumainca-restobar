@@ -10,10 +10,9 @@ import { PRODUCT_CATEGORIES } from "@/constants/categories";
 import { ROUTES } from "@/constants/routes";
 import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-import NavbarSearch from "./NavbarSearch";
-import NavbarMenu from "./NavbarMenu";
-import MobileMenu from "./MobileMenu";
-
+import NavbarSearch from "@/components/layout/NavbarSearch";
+import NavbarMenu from "@/components/layout/NavbarMenu";
+import MobileMenu from "@/components/layout/MobileMenu";
 interface Props {
   showSearch?: boolean;
 }
