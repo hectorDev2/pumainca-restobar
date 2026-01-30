@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 
 /**
  * Página Offline Fallback
- * 
+ *
  * Se muestra cuando el usuario intenta acceder a una página
  * que no está en caché mientras está sin conexión.
- * 
+ *
  * Features:
  * - Detecta cuando vuelve la conexión
  * - Botón de reintentar
@@ -79,7 +79,7 @@ export default function OfflinePage() {
               className="text-red-500"
             />
           </svg>
-          
+
           {isOnline && (
             <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
               Conectando...
@@ -103,9 +103,7 @@ export default function OfflinePage() {
           <div className="flex items-center justify-center gap-2">
             <div
               className={`w-3 h-3 rounded-full ${
-                isOnline
-                  ? "bg-green-500 animate-pulse"
-                  : "bg-red-500"
+                isOnline ? "bg-green-500 animate-pulse" : "bg-red-500"
               }`}
             />
             <span className="text-sm text-zinc-300">
@@ -133,7 +131,10 @@ export default function OfflinePage() {
 
         {/* Ayuda adicional */}
         <div className="mt-8 text-xs text-zinc-500">
-          <p>💡 Tip: Algunas páginas que ya visitaste pueden estar disponibles sin conexión.</p>
+          <p>
+            💡 Tip: Algunas páginas que ya visitaste pueden estar disponibles
+            sin conexión.
+          </p>
         </div>
       </div>
     </div>
