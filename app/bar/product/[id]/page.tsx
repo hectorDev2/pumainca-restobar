@@ -7,76 +7,12 @@ import Image from "next/image";
 import { useProduct, useProducts } from "@/lib/queries";
 import { useCart } from "@/context/CartContext";
 import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
-
-const resolvePrice = (price?: number | Record<string, number>) => {
-  if (typeof price === "number") {
-    return price;
-  }
-
-  if (price && typeof price === "object") {
-    const values = Object.values(price).filter(
-      (value): value is number => typeof value === "number",
-    );
-    if (values.length > 0) {
-      return Math.min(...values);
-    }
-  }
-
-  return 0;
-};
-
-const formatPrice = (
-  price: number | { [key: string]: number } | undefined,
-): string => {
-  if (!price) return "S./0.00";
-  if (typeof price === "number") {
-    return `S./${price.toFixed(2)}`;
-  }
-  const firstPrice = Object.values(price)[0];
-  return `S./${firstPrice.toFixed(2)}`;
-};
-
-const calculateMolecularFormula = (ingredients: string[]): string => {
-  if (!ingredients || ingredients.length === 0) return "C2H5OH";
-  const first = ingredients[0]?.substring(0, 1).toUpperCase() || "C";
-  const second = ingredients[1]?.substring(0, 1).toUpperCase() || "H";
-  return `${first}2${second}5OH`;
-};
-
-const calculateIntensity = (drink: any): number => {
-  const base = 30;
-  const ingredientBonus = (drink.ingredients?.length || 0) * 5;
-  const nameLength = drink.name?.length || 0;
-  return Math.min(100, base + ingredientBonus + (nameLength % 20));
-};
-
-const generateFlavorProfile = (drink: any): string[] => {
-  const profiles = [
-    "Cítrico",
-    "Dulce",
-    "Amargo",
-    "Ácido",
-    "Picante",
-    "Suave",
-    "Intenso",
-  ];
-  const selected = new Set<string>();
-  const name = drink.name?.toLowerCase() || "";
-
-  if (name.includes("sour") || name.includes("limón")) selected.add("Cítrico");
-  if (name.includes("sweet") || name.includes("dulce")) selected.add("Dulce");
-  if (name.includes("bitter") || name.includes("amargo"))
-    selected.add("Amargo");
-  if (name.includes("spicy") || name.includes("picante"))
-    selected.add("Picante");
-
-  while (selected.size < 2 && selected.size < profiles.length) {
-    const random = profiles[Math.floor(Math.random() * profiles.length)];
-    selected.add(random);
-  }
-
-  return Array.from(selected);
-};
+import { resolvePrice, formatPrice } from "@/lib/utils/formatters";
+import {
+  calculateMolecularFormula,
+  calculateIntensity,
+  generateFlavorProfile,
+} from "@/lib/drinks";
 
 export default function DrinkDetailPage() {
   const params = useParams();
