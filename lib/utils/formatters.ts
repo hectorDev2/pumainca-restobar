@@ -7,9 +7,7 @@
  * @param price - Precio numérico o objeto con precios por tamaño
  * @returns Precio numérico (el mínimo si hay múltiples)
  */
-export function resolvePrice(
-  price?: number | Record<string, number>,
-): number {
+export function resolvePrice(price?: number | Record<string, number>): number {
   if (typeof price === "number") {
     return price;
   }

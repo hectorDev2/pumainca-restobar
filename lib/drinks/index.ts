@@ -3,15 +3,15 @@
  * Funciones especializadas para el dominio de bebidas
  */
 
-export { 
-  calculateMolecularFormula, 
-  calculateIntensity, 
-  generateFlavorProfile 
-} from './calculations'
+export {
+  calculateMolecularFormula,
+  calculateIntensity,
+  generateFlavorProfile,
+} from "./calculations";
 
-export { 
+export {
   type Drink,
   type DrinkPricing,
   type FlavorProfile,
-  type DrinkStats
-} from './types'
+  type DrinkStats,
+} from "./types";
