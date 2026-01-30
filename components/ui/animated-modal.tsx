@@ -51,7 +51,7 @@ export const ModalTrigger = ({
     <button
       className={cn(
         "px-4 py-2 rounded-md text-black dark:text-white text-center relative overflow-hidden",
-        className
+        className,
       )}
       onClick={() => setOpen(true)}
     >
@@ -72,7 +72,8 @@ export const ModalBody = ({
   onClose?: () => void;
 }) => {
   const context = useContext(ModalContext);
-  const open = controlledOpen !== undefined ? controlledOpen : (context?.open ?? false);
+  const open =
+    controlledOpen !== undefined ? controlledOpen : (context?.open ?? false);
   const setOpen = onClose || context?.setOpen || (() => {});
 
   useEffect(() => {
@@ -81,7 +82,7 @@ export const ModalBody = ({
     } else {
       document.body.style.overflow = "";
     }
-    
+
     // Cleanup: siempre restaurar el overflow cuando el componente se desmonte
     return () => {
       document.body.style.overflow = "";
@@ -90,7 +91,7 @@ export const ModalBody = ({
 
   const modalRef = useRef<HTMLDivElement>(null);
   useOutsideClick(modalRef, () => {
-    if (typeof setOpen === 'function') {
+    if (typeof setOpen === "function") {
       setOpen(false);
     }
     if (onClose) {
@@ -132,7 +133,7 @@ export const ModalBody = ({
             ref={modalRef}
             className={cn(
               "min-h-[50%] max-h-[90%] md:max-w-[40%] bg-white dark:bg-neutral-950 border border-transparent dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col flex-1 overflow-hidden",
-              className
+              className,
             )}
             initial={{
               opacity: 0,
@@ -174,7 +175,12 @@ export const ModalContent = ({
   className?: string;
 }) => {
   return (
-    <div className={cn("flex flex-col flex-1 p-8 md:p-10", className)}>
+    <div
+      className={cn(
+        "flex flex-col flex-1 p-8 md:p-10 overflow-y-auto",
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -191,7 +197,7 @@ export const ModalFooter = ({
     <div
       className={cn(
         "flex justify-end p-4 bg-gray-100 dark:bg-neutral-900",
-        className
+        className,
       )}
     >
       {children}
@@ -228,10 +234,7 @@ const CloseIcon = ({ onClose }: { onClose?: () => void }) => {
     }
   };
   return (
-    <button
-      onClick={handleClose}
-      className="absolute top-4 right-4 group"
-    >
+    <button onClick={handleClose} className="absolute top-4 right-4 group">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -242,7 +245,7 @@ const CloseIcon = ({ onClose }: { onClose?: () => void }) => {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-black dark:text-white h-4 w-4 group-hover:scale-125 group-hover:rotate-3 transition duration-200"
+        className="text-white dark:text-white h-4 w-4 group-hover:scale-125 group-hover:rotate-3 transition duration-200"
       >
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
         <path d="M18 6l-12 12" />
@@ -256,7 +259,7 @@ const CloseIcon = ({ onClose }: { onClose?: () => void }) => {
 // Add it in a separate file, I've added here for simplicity
 export const useOutsideClick = (
   ref: React.RefObject<HTMLDivElement | null>,
-  callback: Function
+  callback: Function,
 ) => {
   useEffect(() => {
     const listener = (event: any) => {

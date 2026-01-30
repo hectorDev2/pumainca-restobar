@@ -9,11 +9,17 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useUploadProductImage,
+  useDeleteProduct,
 } from "@/lib/queries";
 import { useCreateCategory } from "@/lib/queries";
 import CreateCategoryForm from "@/components/CreateCategoryForm";
 import { AdminModal } from "@/components/ui/admin-modal";
-import { Modal, ModalBody, ModalContent, ModalFooter } from "@/components/ui/animated-modal";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+} from "@/components/ui/animated-modal";
 import { FileUpload } from "@/components/ui/file-upload";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/types";
@@ -34,7 +40,6 @@ type ProductFormState = {
   isGlutenFree: boolean;
   isVariablePrice: boolean;
   preparationTimeMinutes: string;
-  displayOrder: string;
 };
 
 const initialFormState: ProductFormState = {
@@ -52,7 +57,6 @@ const initialFormState: ProductFormState = {
   isGlutenFree: false,
   isVariablePrice: false,
   preparationTimeMinutes: "",
-  displayOrder: "",
 };
 
 const booleanFlagOptions: Array<{
@@ -74,7 +78,7 @@ const parsePriceValue = (value?: number | string) => {
 };
 
 const resolveProductPrice = (
-  price?: number | string | Record<string, number | string>
+  price?: number | string | Record<string, number | string>,
 ) => {
   if (typeof price === "number") return price;
   if (typeof price === "string") return parsePriceValue(price) ?? 0;
@@ -110,10 +114,7 @@ const buildProductFormState = (product: Product): ProductFormState => ({
   preparationTimeMinutes: String(
     (product as any).preparation_time_minutes ??
       (product as any).preparationTimeMinutes ??
-      ""
-  ),
-  displayOrder: String(
-    (product as any).display_order ?? (product as any).displayOrder ?? ""
+      "",
   ),
 });
 
@@ -125,7 +126,7 @@ export default function AdminPage() {
 
   // --- States ---
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
-    null
+    null,
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -140,7 +141,7 @@ export default function AdminPage() {
   const [createFormState, setCreateFormState] = useState(initialFormState);
   const [createMainImage, setCreateMainImage] = useState<File | null>(null);
   const [createImagePreview, setCreateImagePreview] = useState<string | null>(
-    null
+    null,
   );
   // --- Crear categoría ---
   const [isCreateCategoryOpen, setCreateCategoryOpen] = useState(false);
@@ -148,7 +149,7 @@ export default function AdminPage() {
   const [createCategoryDescription, setCreateCategoryDescription] =
     useState("");
   const [createCategoryImage, setCreateCategoryImage] = useState<File | null>(
-    null
+    null,
   );
   const [createCategoryPreview, setCreateCategoryPreview] = useState<
     string | null
@@ -156,19 +157,24 @@ export default function AdminPage() {
 
   const [isDetailModalOpen, setDetailModalOpen] = useState(false);
   const [detailModalProduct, setDetailModalProduct] = useState<Product | null>(
-    null
+    null,
   );
+
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   // --- Mutations ---
   const createProductMutation = useCreateProduct();
   const updateProductMutation = useUpdateProduct();
   const uploadImageMutation = useUploadProductImage();
+  const deleteProductMutation = useDeleteProduct();
   // createCategory handled inside CreateCategoryForm
 
   const isSaving =
     createProductMutation.isPending ||
     updateProductMutation.isPending ||
-    uploadImageMutation.isPending;
+    uploadImageMutation.isPending ||
+    deleteProductMutation.isPending;
 
   // --- Memos & Effects ---
   const selectedProduct = useMemo(
@@ -176,17 +182,17 @@ export default function AdminPage() {
       products?.find((p) => p.id === selectedProductId) ??
       products?.[0] ??
       null,
-    [products, selectedProductId]
+    [products, selectedProductId],
   );
 
   const { data: createSubcategories } = useCategorySubcategories(
-    createFormState.category || undefined
+    createFormState.category || undefined,
   );
   const { data: editSubcategories } = useCategorySubcategories(
-    editFormState.category || undefined
+    editFormState.category || undefined,
   );
   const { data: detailModalSubcategories } = useCategorySubcategories(
-    detailModalProduct?.category
+    detailModalProduct?.category,
   );
 
   useEffect(() => {
@@ -231,7 +237,7 @@ export default function AdminPage() {
 
   const categoriesMap = useMemo(
     () => new Map(categories?.map((c) => [c.id, c])),
-    [categories]
+    [categories],
   );
 
   // --- Handlers ---
@@ -260,7 +266,7 @@ export default function AdminPage() {
 
     formPayload.append(
       "is_variable_price",
-      String(createFormState.isVariablePrice)
+      String(createFormState.isVariablePrice),
     );
     formPayload.append("is_available", String(createFormState.isAvailable));
     formPayload.append("is_vegetarian", String(createFormState.isVegetarian));
@@ -268,17 +274,15 @@ export default function AdminPage() {
     formPayload.append("is_gluten_free", String(createFormState.isGlutenFree));
     formPayload.append(
       "is_chef_special",
-      String(createFormState.isChefSpecial)
+      String(createFormState.isChefSpecial),
     );
     formPayload.append("is_recommended", String(createFormState.isRecommended));
 
     if (createFormState.preparationTimeMinutes)
       formPayload.append(
         "preparation_time_minutes",
-        createFormState.preparationTimeMinutes
+        createFormState.preparationTimeMinutes,
       );
-    if (createFormState.displayOrder)
-      formPayload.append("display_order", createFormState.displayOrder);
 
     if (createMainImage) formPayload.append("image", createMainImage);
 
@@ -312,7 +316,7 @@ export default function AdminPage() {
 
     formPayload.append(
       "is_variable_price",
-      String(editFormState.isVariablePrice)
+      String(editFormState.isVariablePrice),
     );
     formPayload.append("is_available", String(editFormState.isAvailable));
     formPayload.append("is_vegetarian", String(editFormState.isVegetarian));
@@ -324,10 +328,8 @@ export default function AdminPage() {
     if (editFormState.preparationTimeMinutes)
       formPayload.append(
         "preparation_time_minutes",
-        editFormState.preparationTimeMinutes
+        editFormState.preparationTimeMinutes,
       );
-    if (editFormState.displayOrder)
-      formPayload.append("display_order", editFormState.displayOrder);
 
     // Adjuntamos la imagen al PUT si existe
     if (editMainImage) {
@@ -345,15 +347,39 @@ export default function AdminPage() {
             /* ignore */
           }
         },
-      }
+      },
     );
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!productToDelete) return;
+
+    deleteProductMutation.mutate(productToDelete.id, {
+      onSuccess: (data) => {
+        setDeleteModalOpen(false);
+        setProductToDelete(null);
+        try {
+          router.refresh();
+        } catch (err) {
+          /* ignore */
+        }
+      },
+      onError: (error) => {
+        alert(`Error al eliminar: ${error.message}`);
+      },
+    });
+  };
+
+  const openDeleteModal = (product: Product) => {
+    setProductToDelete(product);
+    setDeleteModalOpen(true);
   };
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <AdminHeader />
       {isSaving && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60">
+        <div className="fixed inset-0 z-120 flex items-center justify-center bg-black/60">
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 rounded-full border-4 border-t-transparent border-white animate-spin" />
             <p className="text-white font-bold">Guardando cambios...</p>
@@ -447,12 +473,20 @@ export default function AdminPage() {
                   >
                     Detalles
                   </button>
-                  <button
-                    onClick={() => openEditModal(product)}
-                    className="text-xs font-bold uppercase tracking-widest text-blue-500"
-                  >
-                    Editar
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => openEditModal(product)}
+                      className="text-xs font-bold uppercase tracking-widest text-blue-500 hover:text-blue-400"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => openDeleteModal(product)}
+                      className="text-xs font-bold uppercase tracking-widest text-red-500 hover:text-red-400"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
@@ -625,23 +659,6 @@ export default function AdminPage() {
                       setEditFormState({
                         ...editFormState,
                         preparationTimeMinutes: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-zinc-500 uppercase font-bold">
-                    Orden de despliegue
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2"
-                    value={editFormState.displayOrder}
-                    onChange={(e) =>
-                      setEditFormState({
-                        ...editFormState,
-                        displayOrder: e.target.value,
                       })
                     }
                   />
@@ -824,41 +841,22 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-zinc-500 uppercase font-bold">
-                    Tiempo preparación (min)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2"
-                    value={createFormState.preparationTimeMinutes}
-                    onChange={(e) =>
-                      setCreateFormState({
-                        ...createFormState,
-                        preparationTimeMinutes: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-zinc-500 uppercase font-bold">
-                    Orden de despliegue
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2"
-                    value={createFormState.displayOrder}
-                    onChange={(e) =>
-                      setCreateFormState({
-                        ...createFormState,
-                        displayOrder: e.target.value,
-                      })
-                    }
-                  />
-                </div>
+              <div>
+                <label className="text-xs text-zinc-500 uppercase font-bold">
+                  Tiempo preparación (min)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2"
+                  value={createFormState.preparationTimeMinutes}
+                  onChange={(e) =>
+                    setCreateFormState({
+                      ...createFormState,
+                      preparationTimeMinutes: e.target.value,
+                    })
+                  }
+                />
               </div>
 
               <div>
@@ -1056,7 +1054,7 @@ export default function AdminPage() {
                   {detailModalProduct.subcategory && (
                     <p className="text-xs text-zinc-500 uppercase mt-1">
                       {detailModalSubcategories?.find(
-                        (s) => s.id === detailModalProduct.subcategory
+                        (s) => s.id === detailModalProduct.subcategory,
                       )?.name || detailModalProduct.subcategory}
                     </p>
                   )}
@@ -1094,6 +1092,78 @@ export default function AdminPage() {
                   </div>
                 ) : null}
               </aside>
+            </div>
+          </ModalContent>
+        </ModalBody>
+      )}
+
+      {/* Modal de Confirmación de Eliminación */}
+      {isDeleteModalOpen && productToDelete && (
+        <ModalBody
+          open={isDeleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          className="md:max-w-125 bg-zinc-900 dark:bg-zinc-900 border-zinc-800"
+        >
+          <ModalContent className="p-8">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center">
+                <svg
+                  className="w-10 h-10 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-black mb-2">
+                  ¿Eliminar producto?
+                </h2>
+                <p className="text-zinc-400 mb-4">
+                  Estás a punto de eliminar{" "}
+                  <span className="font-bold text-white">
+                    {productToDelete.name}
+                  </span>
+                </p>
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-sm text-yellow-200">
+                  <p className="font-bold mb-2">
+                    ⚠️ Esta acción es irreversible
+                  </p>
+                  <ul className="text-left space-y-1 text-xs">
+                    <li>• Se eliminará el producto de la base de datos</li>
+                    <li>
+                      • Se borrarán todas las imágenes asociadas del servidor
+                    </li>
+                    <li>• No se podrá recuperar esta información</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex gap-3 w-full pt-4">
+                <button
+                  onClick={() => setDeleteModalOpen(false)}
+                  disabled={deleteProductMutation.isPending}
+                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 py-3 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={deleteProductMutation.isPending}
+                  className="flex-1 bg-red-600 hover:bg-red-700 py-3 rounded-xl font-bold uppercase tracking-widest disabled:opacity-50"
+                >
+                  {deleteProductMutation.isPending
+                    ? "Eliminando..."
+                    : "Eliminar"}
+                </button>
+              </div>
             </div>
           </ModalContent>
         </ModalBody>

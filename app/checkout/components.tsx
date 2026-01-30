@@ -1,12 +1,13 @@
 import React from "react";
 import Link from "next/link";
+import NextImage from "next/image";
 import { OrderConfirmation, CartItem } from "@/types";
 import { getItemPrice } from "./utils";
 
 export const CheckoutHeader = () => (
   <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-background-dark/95 backdrop-blur px-6 md:px-10 py-3">
     <Link href="/" className="flex items-center gap-4 text-white">
-      <img src="/logo.png" className="w-[120px]" alt="Pumainca" />
+      <NextImage src="/logo.png" width={120} height={40} className="w-[120px] h-auto" alt="Pumainca" />
     </Link>
     <div className="flex items-center gap-6">
       <Link

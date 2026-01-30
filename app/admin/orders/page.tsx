@@ -13,10 +13,10 @@ import { Loader } from "@/components/ui/loader";
 
 export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [paymentFilter, setPaymentFilter] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [page, setPage] = useState(1);
   const limit = 20;
@@ -131,7 +131,7 @@ export default function AdminOrdersPage() {
                           </td>
                           <td className="px-6 py-4">
                             {new Date(
-                              o.created_at || o.createdAt || o.created
+                              o.created_at || o.createdAt || o.created,
                             ).toLocaleString()}
                           </td>
                           <td className="px-6 py-4">
@@ -142,11 +142,11 @@ export default function AdminOrdersPage() {
                                   : "bg-yellow-500/10 text-yellow-500"
                               }`}
                             >
-                              {o.payment_status === "completed" 
-                                ? "Pagado" 
-                                : o.payment_status === "pending" 
-                                  ? "Pendiente" 
-                                  : o.payment_status ?? "-"}
+                              {o.payment_status === "completed"
+                                ? "Pagado"
+                                : o.payment_status === "pending"
+                                  ? "Pendiente"
+                                  : (o.payment_status ?? "-")}
                             </span>
                           </td>
                           <td className="px-6 py-4 font-bold text-white">
@@ -158,10 +158,10 @@ export default function AdminOrdersPage() {
                                 o.status === "completed"
                                   ? "text-green-500"
                                   : o.status === "cancelled"
-                                  ? "text-red-500"
-                                  : o.status === "confirmed"
-                                  ? "text-blue-500"
-                                  : "text-yellow-500"
+                                    ? "text-red-500"
+                                    : o.status === "confirmed"
+                                      ? "text-blue-500"
+                                      : "text-yellow-500"
                               }`}
                               value={o.status ?? o.order_status ?? "pending"}
                               onChange={(e) =>
@@ -221,7 +221,7 @@ export default function AdminOrdersPage() {
           </section>
 
           {selected && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80">
+            <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/80">
               <div className="bg-zinc-900 border border-zinc-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-black">
@@ -238,15 +238,21 @@ export default function AdminOrdersPage() {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-zinc-400">Cliente</p>
-                      <p className="font-bold">{selected.customer_name ?? "—"}</p>
+                      <p className="font-bold">
+                        {selected.customer_name ?? "—"}
+                      </p>
                       <p className="text-zinc-400">{selected.customer_email}</p>
                       <p className="text-zinc-400">{selected.customer_phone}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-zinc-400">Fecha</p>
-                      <p className="font-bold">{new Date(selected.created_at).toLocaleString()}</p>
+                      <p className="font-bold">
+                        {new Date(selected.created_at).toLocaleString()}
+                      </p>
                       <p className="mt-2 text-zinc-400">Estado Pago</p>
-                      <p className="font-bold capitalize">{selected.payment_status}</p>
+                      <p className="font-bold capitalize">
+                        {selected.payment_status}
+                      </p>
                     </div>
                   </div>
 
@@ -265,40 +271,80 @@ export default function AdminOrdersPage() {
                           <tr key={item.id}>
                             <td className="p-3">
                               <p className="font-bold">{item.product_name}</p>
-                              {item.selected_size && <span className="text-xs text-zinc-400 mr-2">Tamaño: {item.selected_size}</span>}
-                              {item.special_instructions && <div className="text-xs text-amber-500/80 italic mt-1">Note: {item.special_instructions}</div>}
+                              {item.selected_size && (
+                                <span className="text-xs text-zinc-400 mr-2">
+                                  Tamaño: {item.selected_size}
+                                </span>
+                              )}
+                              {item.special_instructions && (
+                                <div className="text-xs text-amber-500/80 italic mt-1">
+                                  Note: {item.special_instructions}
+                                </div>
+                              )}
                             </td>
                             <td className="p-3 text-center">{item.quantity}</td>
-                            <td className="p-3 text-right">S/. {Number(item.unit_price).toFixed(2)}</td>
-                            <td className="p-3 text-right font-bold text-primary">S/. {Number(item.subtotal).toFixed(2)}</td>
+                            <td className="p-3 text-right">
+                              S/. {Number(item.unit_price).toFixed(2)}
+                            </td>
+                            <td className="p-3 text-right font-bold text-primary">
+                              S/. {Number(item.subtotal).toFixed(2)}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
                       <tfoot className="bg-white/5 font-bold">
                         <tr>
-                          <td colSpan={3} className="p-3 text-right text-zinc-400">Subtotal</td>
-                          <td className="p-3 text-right">S/. {Number(selected.subtotal).toFixed(2)}</td>
-                        </tr>
-                         <tr>
-                          <td colSpan={3} className="p-3 text-right text-zinc-400">IGV (18%)</td>
-                          <td className="p-3 text-right">S/. {Number(selected.tax_amount).toFixed(2)}</td>
+                          <td
+                            colSpan={3}
+                            className="p-3 text-right text-zinc-400"
+                          >
+                            Subtotal
+                          </td>
+                          <td className="p-3 text-right">
+                            S/. {Number(selected.subtotal).toFixed(2)}
+                          </td>
                         </tr>
                         <tr>
-                          <td colSpan={3} className="p-3 text-right text-zinc-400">Servicio</td>
-                          <td className="p-3 text-right">S/. {Number(selected.service_fee).toFixed(2)}</td>
+                          <td
+                            colSpan={3}
+                            className="p-3 text-right text-zinc-400"
+                          >
+                            IGV (18%)
+                          </td>
+                          <td className="p-3 text-right">
+                            S/. {Number(selected.tax_amount).toFixed(2)}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            colSpan={3}
+                            className="p-3 text-right text-zinc-400"
+                          >
+                            Servicio
+                          </td>
+                          <td className="p-3 text-right">
+                            S/. {Number(selected.service_fee).toFixed(2)}
+                          </td>
                         </tr>
                         <tr className="text-lg">
-                          <td colSpan={3} className="p-3 text-right">Total</td>
-                          <td className="p-3 text-right text-primary">S/. {Number(selected.total_amount).toFixed(2)}</td>
+                          <td colSpan={3} className="p-3 text-right">
+                            Total
+                          </td>
+                          <td className="p-3 text-right text-primary">
+                            S/. {Number(selected.total_amount).toFixed(2)}
+                          </td>
                         </tr>
                       </tfoot>
                     </table>
                   </div>
 
                   {selected.special_instructions && (
-                     <div className="bg-amber-900/20 border border-amber-900/50 p-3 rounded-xl text-amber-200 text-sm">
-                        <span className="font-bold">Instrucciones del pedido:</span> {selected.special_instructions}
-                     </div>
+                    <div className="bg-amber-900/20 border border-amber-900/50 p-3 rounded-xl text-amber-200 text-sm">
+                      <span className="font-bold">
+                        Instrucciones del pedido:
+                      </span>{" "}
+                      {selected.special_instructions}
+                    </div>
                   )}
                 </div>
               </div>

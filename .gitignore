@@ -27,3 +27,11 @@ bun.lockb
 # Docker
 .docker/
 docker-compose.override.yml
+
+# Agent files
+.agent/
+.agents/
+.gemini/
+.claude/
+.cursor/
+.trae/

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSettings } from '@/lib/queries';
 
 export function HeroSection() {
@@ -12,9 +13,19 @@ export function HeroSection() {
   const description = content?.hero_description ?? "Descubre la mejor cocina de autor en un ambiente único y sofisticado. Donde la tradición se encuentra con la innovación en cada plato.";
 
   return (
-      <section className="relative flex min-h-[85vh] w-full flex-col justify-center items-center">
-        <div className="absolute inset-0 z-0 w-full h-full bg-cover bg-center bg-no-repeat transition-all" 
-          style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(5,5,5,1) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuATXk6MPNKGx57CMdde5-DdiTX5gT1k4FcksnnlebD-cSsZFtfTZkEOgg_qGAjRMBkKnN4lRmk49DGt_CkCnIJFhxgb4ErT87gcJieqE--4p4lwbdOPE_2u4PSiak7lkRXM5tG1-Rg1GaX7rKU8PVe4hgi63r5GhAuwJt4_rxs6JEmmq-BxmIeVKzoWkYRiXEjFcbdZPwWSsXPmoMFDY0TmAY9VuYan0app-qcECaPVlAWW08ArAi-n6B_nzpEYj3gAopAgZ-06bNJZ')` }}>
+      <section className="relative flex min-h-[85vh] w-full flex-col justify-center items-center overflow-hidden">
+        {/* Optimized Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuATXk6MPNKGx57CMdde5-DdiTX5gT1k4FcksnnlebD-cSsZFtfTZkEOgg_qGAjRMBkKnN4lRmk49DGt_CkCnIJFhxgb4ErT87gcJieqE--4p4lwbdOPE_2u4PSiak7lkRXM5tG1-Rg1GaX7rKU8PVe4hgi63r5GhAuwJt4_rxs6JEmmq-BxmIeVKzoWkYRiXEjFcbdZPwWSsXPmoMFDY0TmAY9VuYan0app-qcECaPVlAWW08ArAi-n6B_nzpEYj3gAopAgZ-06bNJZ"
+            alt="Hero Background"
+            fill
+            className="object-cover object-center"
+            priority
+            quality={90}
+          />
+          {/* Textura gradiente superpuesta */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#050505]" />
         </div>
         
         <div className="relative z-10 container mx-auto px-4 sm:px-6 text-center max-w-4xl">
@@ -44,7 +55,7 @@ export function HeroSection() {
           </div>
         </div>
         
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-primary/70">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-primary/70 z-10">
           <span className="material-symbols-outlined text-4xl">expand_more</span>
         </div>
       </section>

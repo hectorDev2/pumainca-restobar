@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useSettings } from '@/lib/queries';
+import NextImage from 'next/image';
 
 const Footer: React.FC = () => {
   const { data: content } = useSettings();
@@ -12,7 +13,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div className="space-y-4">
             <div className="mb-4">
-              <img src="/logo.png" className="w-[150px]" alt="Pumainca" />
+              <NextImage src="/logo.png" width={150} height={50} className="w-[150px] h-auto" alt="Pumainca" />
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed">
               {content?.footer_description ?? "Cocina de autor con raíces andinas y visión contemporánea. Una experiencia culinaria diseñada para despertar los sentidos."}

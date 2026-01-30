@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 export async function GET() {
   try {
     const { data, error } = await supabase
-      .from("settings")
+      .from("site_content")
       .select("*")
       .limit(1)
       .single();
@@ -31,25 +31,56 @@ export async function PUT(req: Request) {
   }
 
   try {
-    // Try to upsert settings. If the DB/table isn't present this may fail;
-    // we catch errors and return a safe 500 with details in logs.
-    const { data, error } = await supabase
-      .from("settings")
-      .upsert(body)
-      .select()
+    // First, check if a settings record exists
+    const { data: existing, error: fetchError } = await supabase
+      .from("site_content")
+      .select("id")
+      .limit(1)
       .single();
 
-    if (error) {
-      console.error("PUT /api/settings supabase error", error.message || error);
-      return NextResponse.json(
-        { error: "Error updating settings" },
-        { status: 500 },
-      );
+    let result;
+
+    if (existing?.id) {
+      // Update existing record
+      const { data, error } = await supabase
+        .from("site_content")
+        .update(body)
+        .eq("id", existing.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("PUT /api/settings update error", error.message || error);
+        return NextResponse.json(
+          { error: "Error updating settings", details: error.message },
+          { status: 500 },
+        );
+      }
+      result = data;
+    } else {
+      // Insert new record with id = 1
+      const { data, error } = await supabase
+        .from("site_content")
+        .insert({ ...body, id: 1 })
+        .select()
+        .single();
+
+      if (error) {
+        console.error("PUT /api/settings insert error", error.message || error);
+        return NextResponse.json(
+          { error: "Error creating settings", details: error.message },
+          { status: 500 },
+        );
+      }
+      result = data;
     }
 
-    return NextResponse.json(data ?? {});
+    return NextResponse.json(result ?? {});
   } catch (err: any) {
     console.error("PUT /api/settings unexpected error", err?.message ?? err);
-    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unexpected error", details: err?.message },
+      { status: 500 },
+    );
   }
 }

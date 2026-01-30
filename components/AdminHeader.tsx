@@ -16,15 +16,21 @@ const AdminHeader: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-black/95 backdrop-blur-md">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-10 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-10 h-20 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-3">
-            <img src="/logo.png" className="w-[110px]" alt="Logo" />
+            <img src="/logo.png" className="w-27.5" alt="Logo" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/admin" className={isActive("/admin")}>
               Dashboard
+            </Link>
+            <Link
+              href="/admin/categories"
+              className={isActive("/admin/categories")}
+            >
+              Categorías
             </Link>
             <Link href="/admin/orders" className={isActive("/admin/orders")}>
               Pedidos

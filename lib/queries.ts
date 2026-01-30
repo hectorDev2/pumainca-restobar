@@ -78,7 +78,7 @@ const parseNumberValue = (value?: number | string | null) => {
 };
 
 const buildPriceRecord = (
-  prices?: BackendProductPrice[]
+  prices?: BackendProductPrice[],
 ): Record<string, number> | undefined => {
   if (!prices || prices.length === 0) {
     return undefined;
@@ -105,14 +105,14 @@ const normalizeProduct = (backend: BackendProduct): Product => {
     backend.is_variable_price && priceRecord ? priceRecord : fallbackPrice;
 
   const normalizeImageEntry = (
-    entry?: string | BackendImageEntry | null
+    entry?: string | BackendImageEntry | null,
   ): string | undefined => {
     if (!entry) return undefined;
     return typeof entry === "string" ? entry : entry.imageUrl;
   };
 
   const normalizeGallery = (
-    gallery?: (string | BackendImageEntry)[]
+    gallery?: (string | BackendImageEntry)[],
   ): string[] => {
     if (!gallery) return [];
     return gallery
@@ -121,12 +121,12 @@ const normalizeProduct = (backend: BackendProduct): Product => {
   };
 
   const normalizeIngredients = (
-    ingredients?: (string | BackendIngredientEntry)[]
+    ingredients?: (string | BackendIngredientEntry)[],
   ): string[] => {
     if (!ingredients) return [];
     return ingredients
       .map((item) =>
-        typeof item === "string" ? item : item.ingredient ?? undefined
+        typeof item === "string" ? item : (item.ingredient ?? undefined),
       )
       .filter((ing): ing is string => Boolean(ing));
   };
@@ -137,7 +137,7 @@ const normalizeProduct = (backend: BackendProduct): Product => {
       normalizeImageEntry(backend.image),
       backend.image_url,
       backend.imageUrl,
-      galleryImages[0]
+      galleryImages[0],
     ) ?? "";
 
   const resolvedCategoryId =
@@ -145,7 +145,7 @@ const normalizeProduct = (backend: BackendProduct): Product => {
     "";
   const resolvedSubcategoryId = coalesce(
     backend.subcategory_id,
-    backend.subcategoryId
+    backend.subcategoryId,
   );
 
   return {
@@ -155,7 +155,12 @@ const normalizeProduct = (backend: BackendProduct): Product => {
     price,
     category: resolvedCategoryId,
     subcategory: resolvedSubcategoryId ?? undefined,
-    image_url: resolvedImage,
+    image_url:
+      coalesce(
+        backend.image_url,
+        backend.imageUrl,
+        normalizeImageEntry(backend.image),
+      ) ?? "",
     gallery: galleryImages,
     ingredients: normalizeIngredients(backend.ingredients),
     allergens: backend.allergens ?? [],
@@ -183,6 +188,41 @@ export const useCreateCategory = () => {
   });
 };
 
+type UpdateCategoryInput = {
+  categoryId: string;
+  formData: FormData;
+};
+
+const updateCategory = ({ categoryId, formData }: UpdateCategoryInput) =>
+  apiFetch<any>(`/api/categories/${categoryId}`, {
+    method: "PUT",
+    body: formData,
+  });
+
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation<any, Error, UpdateCategoryInput>({
+    mutationFn: updateCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+};
+
+const deleteCategory = (categoryId: string) =>
+  apiFetch<{ message: string; id: string }>(`/api/categories/${categoryId}`, {
+    method: "DELETE",
+  });
+
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation<{ message: string; id: string }, Error, string>({
+    mutationFn: deleteCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+};
 export const useCategories = () =>
   useQuery<Category[], Error>({
     queryKey: ["categories"],
@@ -232,7 +272,7 @@ export const fetchProducts = (filters: ProductFilters) => {
   const query = params.toString();
   const path = query ? `/api/products?${query}` : "/api/products";
   return apiFetch<BackendProduct[]>(path).then((products) =>
-    products.map(normalizeProduct)
+    products.map(normalizeProduct),
   );
 };
 
@@ -287,6 +327,27 @@ export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation<Product, Error, UpdateProductInput>({
     mutationFn: updateProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
+    },
+  });
+};
+
+const deleteProduct = (productId: string) =>
+  apiFetch<{ message: string; id: string; deletedImages: number }>(
+    `/api/products/${productId}`,
+    { method: "DELETE" },
+  );
+
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    { message: string; id: string; deletedImages: number },
+    Error,
+    string
+  >({
+    mutationFn: deleteProduct,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product"] });
@@ -423,7 +484,9 @@ export type Reservation = {
 export const fetchReservations = (params?: { email?: string }) => {
   const qs = new URLSearchParams();
   if (params?.email) qs.set("email", params.email);
-  const path = qs.toString() ? `/api/reservations?${qs.toString()}` : "/api/reservations";
+  const path = qs.toString()
+    ? `/api/reservations?${qs.toString()}`
+    : "/api/reservations";
   return apiFetch<Reservation[]>(path);
 };
 

@@ -22,7 +22,9 @@ export default function LoginPage() {
       if (isRegistering) {
         await signup(email, password);
         // Assuming signup is successful
-        alert("Usuario registrado. Por favor verifica tu email o inicia sesión.");
+        alert(
+          "Usuario registrado. Por favor verifica tu email o inicia sesión.",
+        );
         setIsRegistering(false); // Switch back to login
       } else {
         await login(email, password);
@@ -35,7 +37,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-900 via-black to-zinc-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-zinc-900 via-black to-zinc-900 px-4">
       <div className="w-full max-w-md">
         <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-2xl shadow-2xl p-8">
           {/* Logo/Header */}
@@ -44,7 +46,9 @@ export default function LoginPage() {
               Puma Inca Restobar
             </h1>
             <p className="text-zinc-400 text-sm">
-                {isRegistering ? "Crear cuenta de administrador" : "Panel de administración"}
+              {isRegistering
+                ? "Crear cuenta de administrador"
+                : "Panel de administración"}
             </p>
           </div>
 
@@ -96,25 +100,28 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              className="w-full bg-linear-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
-              {isLoading 
-                ? "Procesando..." 
-                : isRegistering 
-                    ? "Registrarse" 
-                    : "Iniciar sesión"}
+              {isLoading
+                ? "Procesando..."
+                : isRegistering
+                  ? "Registrarse"
+                  : "Iniciar sesión"}
             </button>
           </form>
-          
+
           <div className="mt-4 text-center">
-            <button 
-                onClick={() => { setError(null); setIsRegistering(!isRegistering); }}
-                className="text-amber-500 hover:text-amber-400 text-sm hover:underline"
-                type="button"
+            <button
+              onClick={() => {
+                setError(null);
+                setIsRegistering(!isRegistering);
+              }}
+              className="text-amber-500 hover:text-amber-400 text-sm hover:underline"
+              type="button"
             >
-                {isRegistering 
-                    ? "¿Ya tienes cuenta? Inicia sesión" 
-                    : "¿No tienes cuenta? Regístrate aquí"}
+              {isRegistering
+                ? "¿Ya tienes cuenta? Inicia sesión"
+                : "¿No tienes cuenta? Regístrate aquí"}
             </button>
           </div>
 
