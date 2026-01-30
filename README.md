@@ -163,6 +163,44 @@ Acceso protegido mediante autenticación con Supabase Auth.
 - Configuración de notificaciones (futuro)
 - Configuración de horarios de operación (futuro)
 
+### 📱 Progressive Web App (PWA)
+
+Pumainca Restobar es una **Progressive Web App** completamente funcional que permite a los usuarios:
+
+#### Características PWA Implementadas
+- ✅ **Instalable:** Los usuarios pueden instalar la app directamente desde el navegador
+  - Banner automático de instalación (después de 5 segundos)
+  - Acceso desde icono en pantalla de inicio
+  - Experiencia de app nativa (sin barra de navegador)
+
+- ✅ **Funciona Offline:** Service Worker con caché inteligente
+  - Páginas visitadas disponibles sin conexión
+  - Caché de imágenes (30 días)
+  - Caché de recursos estáticos (1 año)
+  - Caché de APIs (5 minutos con Network First)
+  - Página fallback amigable cuando no hay conexión
+
+- ✅ **Optimizado:** Estrategias de caché avanzadas
+  - **Cache First:** Imágenes y recursos estáticos
+  - **Network First:** HTML y APIs (con fallback a caché)
+  - Precarga automática de recursos críticos
+
+- ✅ **Responsive:** Optimizado para todos los dispositivos
+  - Manifest con múltiples tamaños de iconos (72px - 512px)
+  - Iconos maskable para Android adaptive icons
+  - Apple Touch Icon para iOS
+  - Shortcuts personalizados (Menú, Reservas, Carrito)
+
+- ✅ **SEO & Compartible:** Meta tags para redes sociales
+  - Open Graph tags para Facebook/LinkedIn
+  - Twitter Card support
+  - Manifest linked
+  - Theme color configurable
+
+**Para más detalles:** Ver [PWA_GUIDE.md](./PWA_GUIDE.md)
+
+---
+
 ## 🛠️ Instalación y Configuración
 
 ### Requisitos Previos
@@ -256,57 +294,7 @@ npm run build
 npm start
 ```
 
-### Opción 2: Instalación con Docker (Recomendado para Desarrollo)
-
-#### Prerrequisitos
-- [Docker Desktop](https://www.docker.com/products/docker-desktop) instalado
-- Docker Compose v3.8+
-
-#### 1. Clonar el repositorio
-```bash
-git clone <repository-url>
-cd pumainca-restobar
-```
-
-#### 2. Configurar variables de entorno
-Crea `.env.local` con tus credenciales (ver Opción 1, paso 3)
-
-#### 3. Iniciar con Docker
-
-```bash
-# Desarrollo (con hot reload)
-npm run docker:dev
-
-# Ver logs en tiempo real
-npm run docker:dev:logs
-
-# Detener contenedores
-npm run docker:dev:down
-```
-
-La aplicación estará disponible en `http://localhost:3000`
-
-#### 4. Comandos Docker útiles
-
-```bash
-# Desarrollo
-npm run docker:dev              # Iniciar entorno de desarrollo
-npm run docker:dev:build        # Reconstruir imágenes
-npm run docker:dev:down         # Detener y eliminar contenedores
-npm run docker:dev:logs         # Ver logs en tiempo real
-
-# Producción
-npm run docker:build            # Construir imagen de producción
-npm run docker:prod             # Iniciar en modo producción
-npm run docker:prod:build       # Reconstruir imagen de producción
-npm run docker:prod:down        # Detener entorno de producción
-npm run docker:prod:logs        # Ver logs de producción
-
-# Utilidades
-npm run docker:check-env        # Verificar variables de entorno
-```
-
-📖 **Documentación completa de Docker**: Ver [DOCKER.md](./DOCKER.md)
+Ver [DOCKER.md](./DOCKER.md) para instrucciones de Docker
 
 ### Solución de Problemas Comunes
 
@@ -328,154 +316,7 @@ npm run docker:check-env        # Verificar variables de entorno
 "dev": "next dev -p 3001"
 ```
 
----
 
-## 📱 Estructura del Proyecto
-
-```
-pumainca-restobar/
-├── app/                          # Next.js App Router (v16)
-│   ├── layout.tsx               # Layout principal con providers
-│   ├── page.tsx                 # Página de inicio
-│   ├── loading.tsx              # Loading state global
-│   ├── globals.css              # Estilos globales Tailwind
-│   ├── datepicker.css           # Estilos del datepicker
-│   │
-│   ├── api/                     # API Routes (endpoints internos)
-│   │   ├── products/           # CRUD de productos
-│   │   ├── orders/             # Gestión de pedidos
-│   │   ├── reservations/       # Gestión de reservas
-│   │   ├── categories/         # Gestión de categorías
-│   │   ├── upload/             # Upload de archivos/imágenes
-│   │   └── content/            # Contenido del sitio
-│   │
-│   ├── admin/                   # Panel de administración (protegido)
-│   │   ├── layout.tsx          # Layout del admin con sidebar
-│   │   ├── page.tsx            # Dashboard principal
-│   │   ├── categories/         # Gestión de categorías
-│   │   ├── content/            # Editor de contenido del sitio
-│   │   ├── orders/             # Administración de pedidos
-│   │   └── reservations/       # Administración de reservas
-│   │
-│   ├── menu/                    # Menú público
-│   │   ├── page.tsx            # Lista de productos con filtros
-│   │   └── [id]/               # Detalle de producto dinámico
-│   │
-│   ├── cart/                    # Carrito de compras
-│   │   └── page.tsx            # Vista del carrito
-│   │
-│   ├── checkout/                # Proceso de checkout
-│   │   └── page.tsx            # Formulario de pedido
-│   │
-│   ├── reservas/                # Sistema de reservas
-│   │   └── page.tsx            # Formulario de reservas
-│   │
-│   ├── nosotros/                # Página "Sobre Nosotros"
-│   │   └── page.tsx
-│   │
-│   ├── login/                   # Autenticación de administrador
-│   │   └── page.tsx
-│   │
-│   └── bar/                     # Sección del bar (futuro)
-│
-├── components/                   # Componentes React reutilizables
-│   ├── Navbar.tsx               # Barra de navegación principal
-│   ├── Footer.tsx               # Pie de página
-│   ├── AdminHeader.tsx          # Header del panel admin
-│   ├── Sidebar.tsx              # Sidebar de navegación admin
-│   ├── ProtectedRoute.tsx       # HOC para rutas protegidas
-│   ├── CreateCategoryForm.tsx   # Formulario de categorías
-│   │
-│   ├── ui/                      # Componentes UI base
-│   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   ├── input.tsx
-│   │   ├── modal.tsx
-│   │   ├── animated-modal.tsx
-│   │   └── ...                  # Más componentes UI
-│   │
-│   └── home/                    # Componentes específicos de home
-│       └── ...
-│
-├── context/                      # React Context (Estado global)
-│   ├── AuthContext.tsx          # Autenticación y sesión de usuario
-│   └── CartContext.tsx          # Estado del carrito de compras
-│
-├── lib/                          # Utilidades y configuración
-│   ├── api.ts                   # Cliente HTTP y helpers de API
-│   ├── queries.ts               # React Query hooks personalizados
-│   ├── supabase.ts              # Cliente de Supabase
-│   ├── imagekit.ts              # Configuración de ImageKit CDN
-│   ├── utils.ts                 # Funciones utilitarias (cn, formatters)
-│   └── Providers.tsx            # Providers wrapper (Query, Auth, etc)
-│
-├── data/                         # Datos estáticos
-│   └── categories.json          # Categorías iniciales
-│
-├── migrations/                   # Scripts SQL para Supabase
-│   └── create_site_content_table.sql
-│
-├── scripts/                      # Scripts de utilidad
-│   ├── check-env.sh             # Verificar variables de entorno
-│   ├── docker-compose-wrapper.sh # Wrapper para Docker Compose
-│   ├── docker-entrypoint.sh     # Entrypoint para contenedor
-│   ├── docker-healthcheck.sh    # Health check del contenedor
-│   └── seed-supabase.ts         # Seed de datos iniciales
-│
-├── tests/                        # Tests E2E con Playwright (Python)
-│   ├── TC001_Homepage_Load_Performance_and_UI_Rendering.py
-│   ├── TC002_Menu_Filtering_and_Search_Functionality.py
-│   ├── TC003_Detailed_Product_View_Display.py
-│   ├── TC004_Shopping_Cart_Quantity_Management_and_Persistence.py
-│   ├── TC005_Checkout_Form_Validation_and_Submission.py
-│   ├── TC006_Order_Confirmation_Email_Delivery.py
-│   ├── TC007_Reservation_Form_Validation_and_Confirmation.py
-│   ├── TC008_Reservation_Confirmation_Email_Delivery.py
-│   ├── TC009_Admin_Authentication_and_Route_Protection.py
-│   ├── TC010_Product_CRUD_Operations_with_Image_Upload_and_Validation.py
-│   ├── TC011_Category_Management_CRUD_and_Prevent_Deletion_of_Referenced_Categories.py
-│   ├── TC012_Orders_Management_Status_Update_Filtering_and_Cancellation.py
-│   ├── TC013_Reservations_Management_Search_Validation_and_Confirmation.py
-│   ├── TC014_API_Endpoint_HTTP_Status_Codes_and_Error_Handling.py
-│   ├── TC015_Real_Time_UI_Updates_with_React_Query_for_Orders_and_Reservations.py
-│   ├── TC016_Shopping_Cart_Correct_Subtotal_and_Tax_IGV_Calculation.py
-│   ├── TC017_Checkout_Pickup_Time_Validation.py
-│   ├── TC018_Admin_Dashboard_Accessibility_and_Navigation.py
-│   ├── testsprite_frontend_test_plan.json
-│   ├── standard_prd.json
-│   └── tmp/                     # Archivos temporales de tests
-│
-├── public/                       # Archivos estáticos públicos
-│   └── vercel-test.html         # Página de test de Vercel
-│
-├── types.ts                      # Definiciones TypeScript globales
-├── package.json                  # Dependencias y scripts
-├── tsconfig.json                 # Configuración de TypeScript
-├── next.config.mjs               # Configuración de Next.js
-├── tailwind.config.ts            # Configuración de Tailwind CSS
-├── postcss.config.mjs            # Configuración de PostCSS
-├── components.json               # Configuración de componentes UI
-├── next-env.d.ts                 # Types de Next.js
-├── vercel.json                   # Configuración de Vercel
-├── docker-compose.yml            # Docker Compose para desarrollo
-├── Dockerfile.dev                # Dockerfile de desarrollo
-├── README.md                     # Este archivo
-├── PRD.md                        # Product Requirements Document
-├── DOCKER.md                     # Documentación de Docker
-├── ESTRUCTURA_BASE_DATOS.md     # Esquema de base de datos
-└── metadata.json                 # Metadata del proyecto
-```
-
-### Patrones de Diseño Utilizados
-
-- **App Router (Next.js 16):** Routing basado en archivos con layouts anidados
-- **Server Components:** Componentes de servidor por defecto para mejor rendimiento
-- **Client Components:** Marcados con `'use client'` para interactividad
-- **API Routes:** Endpoints REST en `/app/api/*`
-- **Context API:** Estado global con AuthContext y CartContext
-- **React Query:** Cache y sincronización de datos del servidor
-- **Protected Routes:** HOC ProtectedRoute para rutas admin
-- **TypeScript:** Type safety en todo el proyecto
 
 ---
 
@@ -566,6 +407,7 @@ npm run docker:prod:logs     # Muestra logs de producción
 ### Utilidades
 ```bash
 npm run docker:check-env     # Verifica variables de entorno
+npm run generate:pwa-icons   # Regenera iconos PWA desde logo.png
 ```
 
 **Nota:** Los scripts de Docker usan `scripts/docker-compose-wrapper.sh` que detecta automáticamente si el sistema usa `docker compose` (moderno) o `docker-compose` (legacy) para máxima compatibilidad.
@@ -615,69 +457,16 @@ npm run docker:check-env     # Verifica variables de entorno
 
 ---
 
-## 🌐 Compatibilidad y Dispositivos
+## 📱 Responsive & PWA
 
-### Navegadores Soportados
+- ✅ Mobile-first design con Tailwind CSS
+- ✅ Completamente responsive (mobile a desktop)
+- ✅ Progressive Web App (PWA) - instalable como app nativa
+- ✅ Service Worker con caché inteligente
+- ✅ Funciona offline
+- ✅ Accesible (WCAG 2.1)
 
-| Navegador | Versión Mínima | Estado |
-|-----------|----------------|--------|
-| Google Chrome | 90+ | ✅ Completamente soportado |
-| Microsoft Edge | 90+ | ✅ Completamente soportado |
-| Mozilla Firefox | 88+ | ✅ Completamente soportado |
-| Safari (macOS) | 14+ | ✅ Completamente soportado |
-| Safari (iOS) | 14+ | ✅ Completamente soportado |
-| Opera | 76+ | ✅ Completamente soportado |
-| Samsung Internet | 14+ | ✅ Completamente soportado |
-| Chrome Android | 90+ | ✅ Completamente soportado |
-
-### Resoluciones y Dispositivos
-
-| Tipo | Resolución | Breakpoint | Estado |
-|------|-----------|------------|--------|
-| **Desktop** | 1920x1080+ | >= 1280px | ✅ Optimizado |
-| **Laptop** | 1366x768+ | >= 1024px | ✅ Optimizado |
-| **Tablet (Landscape)** | 1024x768 | >= 768px | ✅ Optimizado |
-| **Tablet (Portrait)** | 768x1024 | >= 640px | ✅ Optimizado |
-| **Móvil (Grande)** | 414x896 | >= 375px | ✅ Optimizado |
-| **Móvil (Mediano)** | 375x667 | >= 320px | ✅ Optimizado |
-| **Móvil (Pequeño)** | 320x568 | < 320px | ⚠️ Funcional |
-
-### Características Responsive
-
-#### Breakpoints Tailwind CSS
-```typescript
-// tailwind.config.ts
-screens: {
-  'sm': '640px',   // Móvil grande
-  'md': '768px',   // Tablet
-  'lg': '1024px',  // Laptop
-  'xl': '1280px',  // Desktop
-  '2xl': '1536px', // Desktop grande
-}
-```
-
-#### Diseño Adaptativo
-- ✅ Grid layouts responsivos
-- ✅ Navegación mobile-first
-- ✅ Imágenes responsive con srcset
-- ✅ Tipografía escalable (clamp)
-- ✅ Menús hamburguesa en móvil
-- ✅ Touch-friendly buttons y controles
-- ✅ Orientación portrait y landscape
-
-### Progressive Web App (PWA)
-- 🟡 Configurado para futura implementación
-- ✅ Manifest.json preparado
-- ✅ Service Worker compatible
-- ✅ Offline-ready (con ajustes)
-
-### Accesibilidad (a11y)
-- ✅ Semantic HTML5
-- ✅ ARIA labels donde necesario
-- ✅ Navegación por teclado
-- ✅ Alto contraste
-- ✅ Focus visible
-- 🟡 Screen reader friendly (en mejora)
+**Ver detalles:** [PWA_GUIDE.md](./PWA_GUIDE.md)
 
 ---
 
@@ -916,127 +705,23 @@ El proyecto incluye Dockerfile y configuración para despliegue en cualquier pla
 # 1. Build de la imagen
 docker build -t pumainca-restobar .
 
-# 2. Ejecutar localmente para probar
-docker run -p 3000:3000 \
-  -e NEXT_PUBLIC_SUPABASE_URL=your_url \
-  -e NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key \
-  pumainca-restobar
 
-# 3. Tag para registry (Docker Hub, GitHub CR, etc.)
-docker tag pumainca-restobar your-registry/pumainca-restobar:latest
-
-# 4. Push al registry
-docker push your-registry/pumainca-restobar:latest
-```
-
-#### Docker Compose para producción:
-
+**Vercel (Recomendado para Next.js):**
 ```bash
-# Usando docker-compose.prod.yml
-npm run docker:prod
-
-# O directamente
-docker-compose -f docker-compose.prod.yml up -d
+npm i -g vercel
+vercel login
+vercel --prod
 ```
 
-📖 **Guía completa de Docker**: Ver [DOCKER.md](./DOCKER.md)
+**Docker:**
+Ver [DOCKER.md](./DOCKER.md)
 
-### Opción 3: Otros Proveedores
+**Variables de entorno requeridas:**
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT` (opcional)
 
-El proyecto puede desplegarse en cualquier plataforma que soporte Next.js:
-
-- **Netlify**
-  ```bash
-  # netlify.toml ya incluido
-  netlify deploy --prod
-  ```
-
-- **AWS Amplify**
-  - Conecta repositorio desde consola AWS
-  - Configura variables de entorno
-  - Deploy automático
-
-- **Cloudflare Pages**
-  ```bash
-  # Build command
-  npm run build
-  
-  # Output directory
-  .next
-  ```
-
-### Configuración Post-Deploy
-
-#### 1. Configurar dominio personalizado
-- En Vercel/Netlify: Domains → Add Custom Domain
-- Actualizar DNS records
-
-#### 2. Configurar SSL/HTTPS
-- Automático en Vercel, Netlify, Cloudflare
-- Para Docker: usar proxy reverso (nginx, Caddy, Traefik)
-
-#### 3. Variables de entorno de producción
-Asegúrate de configurar:
-- URLs de producción de Supabase
-- Claves de ImageKit de producción
-- `NEXT_PUBLIC_API_BASE_URL` con tu dominio
-
-#### 4. Optimizaciones recomendadas
-- Habilitar CDN y cache
-- Configurar Image Optimization
-- Habilitar Analytics (Vercel Analytics, Google Analytics)
-- Configurar Rate Limiting en Supabase
-
----
-
-## 📝 Licencia
-
-Este proyecto es propiedad de **Pumainca Restobar**. Todos los derechos reservados.
-
----
-
-## 👥 Contribución
-
-Este es un proyecto privado. Para contribuciones, contacta al equipo de desarrollo.
-
----
-
-## 📞 Soporte
-
-Para soporte técnico o consultas, contacta al equipo de desarrollo de Pumainca Restobar.
-
----
-
----
-
-## 📚 Recursos y Documentación Adicional
-
-### Documentación del Proyecto
-- [PRD.md](./PRD.md) - Product Requirements Document completo
-- [DOCKER.md](./DOCKER.md) - Guía completa de Docker y containerización
-- [ESTRUCTURA_BASE_DATOS.md](./ESTRUCTURA_BASE_DATOS.md) - Esquema detallado de la base de datos
-
-### Tecnologías Principales
-- [Next.js Documentation](https://nextjs.org/docs)
-- [React Documentation](https://react.dev)
-- [Supabase Documentation](https://supabase.com/docs)
-- [TanStack Query](https://tanstack.com/query/latest)
-- [Tailwind CSS](https://tailwindcss.com/docs)
-- [TypeScript](https://www.typescriptlang.org/docs/)
-
-### Herramientas de Desarrollo
-- [Playwright Testing](https://playwright.dev/python/)
-- [ImageKit Documentation](https://docs.imagekit.io/)
-- [Framer Motion](https://www.framer.com/motion/)
-
----
-
-## 🔧 Configuración Avanzada
-
-### Variables de Entorno Completas
-
-```env
-# === REQUERIDAS ===
+**Importante:** PWA requiere HTTPS en producción (Vercel lo proporciona automáticamente)
 
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
