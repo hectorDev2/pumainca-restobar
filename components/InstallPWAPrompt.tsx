@@ -5,13 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * Componente InstallPWAPrompt
- * 
+ *
  * Muestra un banner invitando al usuario a instalar la PWA
  * Solo se muestra si:
  * - El navegador soporta PWA (evento beforeinstallprompt)
  * - El usuario no ha instalado la app
  * - El usuario no ha rechazado la instalación previamente
- * 
+ *
  * Se puede configurar para aparecer:
  * - Inmediatamente
  * - Después de X segundos
@@ -27,7 +27,8 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function InstallPWAPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function InstallPWAPrompt() {
       e.preventDefault();
       const promptEvent = e as BeforeInstallPromptEvent;
       setDeferredPrompt(promptEvent);
-      
+
       // Mostrar el prompt después de 5 segundos (para no ser intrusivo)
       setTimeout(() => {
         setShowPrompt(true);
@@ -62,7 +63,10 @@ export default function InstallPWAPrompt() {
     });
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt,
+      );
     };
   }, []);
 
@@ -76,7 +80,7 @@ export default function InstallPWAPrompt() {
 
     // Esperar la decisión del usuario
     const { outcome } = await deferredPrompt.userChoice;
-    
+
     if (outcome === "accepted") {
       console.log("✅ Usuario aceptó instalar la PWA");
     } else {
@@ -91,7 +95,7 @@ export default function InstallPWAPrompt() {
   const handleDismiss = () => {
     setShowPrompt(false);
     localStorage.setItem("pwa-prompt-dismissed", "true");
-    
+
     // Opcional: Volver a mostrar después de 7 días
     const dismissedDate = new Date().getTime();
     localStorage.setItem("pwa-prompt-dismissed-date", dismissedDate.toString());

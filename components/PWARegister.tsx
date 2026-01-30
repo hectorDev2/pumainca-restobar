@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 /**
  * PWA Service Worker Registration
- * 
+ *
  * Este componente registra el service worker para habilitar PWA
  * Solo se ejecuta en producción y en el navegador (client-side)
  */
@@ -28,12 +28,15 @@ export default function PWARegister() {
         scope: "/",
       });
 
-      console.log("✅ Service Worker registered successfully:", registration.scope);
+      console.log(
+        "✅ Service Worker registered successfully:",
+        registration.scope,
+      );
 
       // Escuchar actualizaciones del service worker
       registration.addEventListener("updatefound", () => {
         const newWorker = registration.installing;
-        
+
         if (newWorker) {
           newWorker.addEventListener("statechange", () => {
             if (
@@ -42,9 +45,11 @@ export default function PWARegister() {
             ) {
               // Hay una nueva versión disponible
               console.log("🔄 Nueva versión de la PWA disponible");
-              
+
               // Opcionalmente mostrar notificación al usuario
-              if (confirm("Hay una nueva versión disponible. ¿Deseas actualizar?")) {
+              if (
+                confirm("Hay una nueva versión disponible. ¿Deseas actualizar?")
+              ) {
                 newWorker.postMessage({ type: "SKIP_WAITING" });
                 window.location.reload();
               }
@@ -54,10 +59,12 @@ export default function PWARegister() {
       });
 
       // Verificar actualizaciones cada hora
-      setInterval(() => {
-        registration.update();
-      }, 60 * 60 * 1000); // 1 hora
-
+      setInterval(
+        () => {
+          registration.update();
+        },
+        60 * 60 * 1000,
+      ); // 1 hora
     } catch (error) {
       console.error("❌ Service Worker registration failed:", error);
     }
