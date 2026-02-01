@@ -6,9 +6,17 @@ interface Props {
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
   categories?: Category[];
+  selectedDietaryFilters: string[];
+  onToggleDietaryFilter: (filter: string) => void;
 }
 
-const Sidebar: React.FC<Props> = ({ selectedCategory, onSelectCategory, categories }) => {
+const Sidebar: React.FC<Props> = ({ 
+  selectedCategory, 
+  onSelectCategory, 
+  categories,
+  selectedDietaryFilters,
+  onToggleDietaryFilter
+}) => {
   // Map hardcoded icons to category IDs
   const getIcon = (id: string) => {
     switch(id) {
@@ -70,8 +78,16 @@ const Sidebar: React.FC<Props> = ({ selectedCategory, onSelectCategory, categori
           <div className="space-y-3">
             {['Vegetariano', 'Vegano', 'Sin Gluten'].map((label) => (
               <label key={label} className="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" className="w-4 h-4 bg-surface-dark border-zinc-700 rounded text-primary focus:ring-0 focus:ring-offset-0" />
-                <span className="text-text-secondary text-sm font-medium group-hover:text-text-primary transition-colors">{label}</span>
+                <input 
+                  type="checkbox" 
+                  className="w-4 h-4 bg-surface-dark border-zinc-700 rounded text-primary focus:ring-0 focus:ring-offset-0" 
+                  checked={selectedDietaryFilters.includes(label)}
+                  onChange={() => onToggleDietaryFilter(label)}
+                  aria-label={label}
+                />
+                <span className={`text-sm font-medium group-hover:text-text-primary transition-colors ${selectedDietaryFilters.includes(label) ? 'text-primary' : 'text-text-secondary'}`}>
+                  {label}
+                </span>
               </label>
             ))}
           </div>
