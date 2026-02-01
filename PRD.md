@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 # Pumainca Restobar - Sistema de Gestión Digital
 
-**Versión:** 1.0  
-**Fecha:** 16 de Enero, 2026  
+**Versión:** 1.1  
+**Fecha:** 31 de Enero, 2026  
 **Autor:** Equipo Pumainca  
 **Estado:** Implementado / En Producción
 
@@ -462,7 +462,7 @@ Una aplicación web progresiva (PWA) con:
 ### 6.1 Stack Tecnológico
 
 #### Frontend
-- **Framework:** Next.js 15 (App Router)
+- **Framework:** Next.js 16 (App Router)
 - **Librería UI:** React 19
 - **Lenguaje:** TypeScript 5.8
 - **Estilos:** Tailwind CSS 4
