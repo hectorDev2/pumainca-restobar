@@ -1,0 +1,92 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "Next.js 16",
+    "React 19",
+    "Tailwind CSS 4",
+    "Supabase",
+    "PostgreSQL",
+    "React Query",
+    "Framer Motion",
+    "ImageKit",
+    "React DatePicker"
+  ],
+  "features": [
+    {
+      "name": "Home Page",
+      "description": "Main landing page with hero section, restaurant story, and call-to-actions.",
+      "files": [
+        "app/page.tsx",
+        "components/Navbar.tsx",
+        "components/Footer.tsx"
+      ]
+    },
+    {
+      "name": "Menu Page",
+      "description": "Digital menu with product filtering, searching, and detailed views.",
+      "files": [
+        "app/menu/page.tsx",
+        "app/menu/[id]/page.tsx",
+        "components/ProductCard.tsx",
+        "app/api/products/route.ts"
+      ]
+    },
+    {
+      "name": "Shopping Cart",
+      "description": "Cart management with quantity adjustments and subtotal calculations.",
+      "files": [
+        "app/cart/page.tsx",
+        "context/CartContext.tsx",
+        "components/CartSidebar.tsx"
+      ]
+    },
+    {
+      "name": "Checkout",
+      "description": "Order placement process with contact form and pickup time selection.",
+      "files": [
+        "app/checkout/page.tsx",
+        "app/api/orders/route.ts"
+      ]
+    },
+    {
+      "name": "Reservations",
+      "description": "Table reservation system with availability validation.",
+      "files": [
+        "app/reservas/page.tsx",
+        "app/api/reservations/route.ts"
+      ]
+    },
+    {
+      "name": "Admin Dashboard",
+      "description": "Protected admin area for managing orders, reservations, and products.",
+      "files": [
+        "app/admin/page.tsx",
+        "app/admin/orders/page.tsx",
+        "app/admin/reservations/page.tsx",
+        "components/Sidebar.tsx",
+        "components/AdminHeader.tsx"
+      ]
+    },
+    {
+      "name": "Authentication",
+      "description": "User authentication and route protection.",
+      "files": [
+        "app/login/page.tsx",
+        "components/ProtectedRoute.tsx",
+        "context/AuthContext.tsx",
+        "lib/supabase.ts"
+      ]
+    },
+    {
+      "name": "API Services",
+      "description": "Backend API routes for data operations.",
+      "files": [
+        "app/api/products/route.ts",
+        "app/api/categories/route.ts",
+        "app/api/orders/route.ts",
+        "app/api/reservations/route.ts",
+        "app/api/upload/route.ts"
+      ]
+    }
+  ]
+}
