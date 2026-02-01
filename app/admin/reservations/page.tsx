@@ -12,16 +12,19 @@ import {
 export default function AdminReservationsPage() {
   const [emailFilter, setEmailFilter] = useState("");
   const [codeFilter, setCodeFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
   const [selected, setSelected] = useState<Reservation | null>(null);
 
-  const { data: list, isLoading: loadingList } = useReservations(
+  const { data: list, isLoading: loadingList, refetch } = useReservations(
     emailFilter || undefined,
   );
   const { data: byCode, isLoading: loadingCode } = useReservationByCode(
     codeFilter || undefined,
   );
 
-  const results = codeFilter ? (byCode ? [byCode] : []) : (list ?? []);
+  const results = codeFilter 
+    ? (byCode ? [byCode] : []) 
+    : (list ?? []).filter(r => !statusFilter || r.status === statusFilter);
 
   return (
     <ProtectedRoute>
@@ -74,6 +77,23 @@ export default function AdminReservationsPage() {
                   Buscar
                 </button>
               </div>
+            </div>
+
+            <div className="w-48">
+               <label className="block text-sm text-zinc-400 mb-1">
+                 Filtrar por Estado
+               </label>
+               <select 
+                 value={statusFilter}
+                 onChange={(e) => setStatusFilter(e.target.value)}
+                 className="w-full bg-black/40 border border-zinc-700 rounded-xl px-3 py-2 text-white"
+               >
+                 <option value="">Todos</option>
+                 <option value="pending">Pendiente</option>
+                 <option value="confirmed">Confirmada</option>
+                 <option value="cancelled">Cancelada</option>
+                 <option value="completed">Completada</option>
+               </select>
             </div>
           </div>
 
@@ -178,6 +198,33 @@ export default function AdminReservationsPage() {
                     {selected.status ?? "—"}
                   </strong>
                 </p>
+
+                <div className="mb-4">
+                  <label className="block text-sm text-zinc-400 mb-1">Cambiar Estado</label>
+                  <select
+                    value={selected.status ?? "pending"}
+                    className="w-full bg-black/40 border border-zinc-700 rounded-lg px-3 py-2 text-white"
+                    onChange={async (e) => {
+                       // In a real app, use a mutation here. For now, simplistic optimistic update test.
+                       try {
+                           const res = await fetch(`/api/reservations/${selected.reservation_code}`, {
+                               method: 'PUT',
+                               headers: { 'Content-Type': 'application/json' },
+                               body: JSON.stringify({ status: e.target.value })
+                           });
+                           if(res.ok) {
+                               setSelected(prev => prev ? ({...prev, status: e.target.value}) : null);
+                               refetch();
+                           }
+                       } catch(err) { console.error(err); }
+                    }}
+                  >
+                    <option value="pending">Pendiente</option>
+                    <option value="confirmed">Confirmada</option>
+                    <option value="cancelled">Cancelada</option>
+                    <option value="completed">Completada</option>
+                  </select>
+                </div>
 
                 <div className="flex justify-end gap-2">
                   <button
