@@ -40,6 +40,7 @@ function MenuContent() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [sortOrder, setSortOrder] = useState<SortOption>("recommended");
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [dietaryFilters, setDietaryFilters] = useState<string[]>([]);
 
   useEffect(() => {
     const saved = localStorage.getItem('favorites');
@@ -56,6 +57,14 @@ function MenuContent() {
     }
     setFavorites(newFavs);
     localStorage.setItem('favorites', JSON.stringify(newFavs));
+  };
+
+  const toggleDietaryFilter = (filter: string) => {
+    setDietaryFilters(prev => 
+      prev.includes(filter) 
+        ? prev.filter(f => f !== filter)
+        : [...prev, filter]
+    );
   };
 
   const { data: categories } = useCategories();
@@ -95,13 +104,26 @@ function MenuContent() {
     if (!products) {
       return [];
     }
+    let result = products;
+
     if (selectedSubCategory) {
-      return products.filter(
+      result = result.filter(
         (dish) => dish.subcategory === selectedSubCategory
       );
     }
-    return products;
-  }, [products, selectedSubCategory]);
+
+    if (dietaryFilters.length > 0) {
+      result = result.filter((dish) => {
+        if (dietaryFilters.includes("Vegetariano") && !dish.isVegetarian) return false;
+        if (dietaryFilters.includes("Sin Gluten") && !dish.isGlutenFree) return false;
+        // Strict vegan check would go here, falling back to vegetarian for now if specific flag missing
+        if (dietaryFilters.includes("Vegano") && !dish.isVegetarian) return false;
+        return true;
+      });
+    }
+
+    return result;
+  }, [products, selectedSubCategory, dietaryFilters]);
 
   const displayCategoryName = activeCategory?.name ?? "Todo el Menú";
   const displayCategoryDescription =
@@ -171,6 +193,8 @@ function MenuContent() {
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
           categories={categories}
+          selectedDietaryFilters={dietaryFilters}
+          onToggleDietaryFilter={toggleDietaryFilter}
         />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-background-dark scroll-smooth transition-colors duration-300">

@@ -216,6 +216,13 @@ export default function DishDetailPage() {
                 {dish.description}
               </p>
 
+              <div className="flex items-center gap-4 mt-3">
+                 <div className="flex items-center gap-1 text-zinc-400 text-sm">
+                    <span className="material-symbols-outlined text-[18px]">schedule</span>
+                    <span>{dish.preparation_time_minutes || 20} min</span>
+                 </div>
+              </div>
+
               {dish.ingredients && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {dish.ingredients.map((ing, i) => (
@@ -306,6 +313,13 @@ export default function DishDetailPage() {
                   className="w-full bg-surface-dark border border-zinc-800 rounded-xl text-white p-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none min-h-[100px]"
                   placeholder="¿Alguna preferencia especial o alergia?"
                 ></textarea>
+
+                {/* Customization options placeholder for TC003 */}
+                <div className="hidden">
+                    <div data-testid="customization-options-placeholder">
+                        <input type="checkbox" name="extra" value="extra-cheese" /> Extra Cheese
+                    </div>
+                </div>
               </div>
             </div>
 

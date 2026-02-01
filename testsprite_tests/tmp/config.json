@@ -1,0 +1,25 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "loginUser": "polbarazorda@gmail.com",
+  "loginPassword": "reydelsol",
+  "executionArgs": {
+    "projectName": "pumainca-restobar",
+    "projectPath": "/Users/hector/Desktop/pumainca/pumainca-restobar",
+    "testIds": [
+      "TC001",
+      "TC002",
+      "TC003",
+      "TC006",
+      "TC008",
+      "TC009"
+    ],
+    "additionalInstruction": "Re-run specifically checking the fixes for menu filtering, product details (prep time/customization), reservation validation, and admin features.",
+    "envs": {
+      "API_KEY": "sk-user-l9OKsTxN2FwWujIMarwQUCCKDuZTc6klXOIIdMPn_nyEQrBLVvlex-bt5SqtXuK3Xa-v-5s4BfUGvxBqobFVhdmnL197um138V2W7c_iMw-r3DZURHh56My-6Mne5bI3R-w"
+    }
+  },
+  "proxy": "http://2cbeb0a4-9ed7-4e27-8089-eeeb5ffe06e9:MOAqaQB0DN9wt3NNtVqXf7P3TyEf0zSn@tun.testsprite.com:8080"
+}

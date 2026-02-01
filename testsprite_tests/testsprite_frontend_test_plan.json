@@ -1,0 +1,473 @@
+[
+  {
+    "id": "TC001",
+    "title": "Home Page Load and Content Verification",
+    "description": "Verify that the home page loads within 2 seconds, displays the hero section, restaurant story, and editable content correctly across devices.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the home page"
+      },
+      {
+        "type": "assertion",
+        "description": "Home page fully loads in under 2 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Hero section is present and visually correct"
+      },
+      {
+        "type": "assertion",
+        "description": "Restaurant story content is displayed and editable for admins"
+      },
+      {
+        "type": "assertion",
+        "description": "Page layout is responsive on desktop, tablet, and mobile screens"
+      },
+      {
+        "type": "assertion",
+        "description": "Animations load smoothly without jank or errors"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Menu Product List Rendering with Filters and Search",
+    "description": "Verify the menu page shows at least 20 products, supports filtering by category and dietary options, and real-time search updates the product list.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the menu page"
+      },
+      {
+        "type": "assertion",
+        "description": "At least 20 product items are displayed"
+      },
+      {
+        "type": "action",
+        "description": "Apply filter to show only vegetarian products"
+      },
+      {
+        "type": "assertion",
+        "description": "Only vegetarian products are shown and non-vegetarian items hidden"
+      },
+      {
+        "type": "action",
+        "description": "Enter a search term that matches some products"
+      },
+      {
+        "type": "assertion",
+        "description": "Product list updates in real time to match search term"
+      },
+      {
+        "type": "action",
+        "description": "Clear filters and search"
+      },
+      {
+        "type": "assertion",
+        "description": "All products are visible again"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Product Detail Page Content and Gallery Display",
+    "description": "Verify detailed product pages show full information including images, ingredients, allergens, dietary badges, and customization options with no errors.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to a product detail page from the menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Display product name, description, price, and preparation time"
+      },
+      {
+        "type": "assertion",
+        "description": "Display image gallery with multiple product images"
+      },
+      {
+        "type": "assertion",
+        "description": "Allergen and dietary preference indicators are visible and accurate"
+      },
+      {
+        "type": "assertion",
+        "description": "Customization options (e.g. size, add-ons) are selectable without errors"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to select customizations and verify UI updates accordingly"
+      },
+      {
+        "type": "assertion",
+        "description": "No broken images or missing data are present"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Shopping Cart Add, Update Quantities, and Persistence",
+    "description": "Verify items can be added to the shopping cart, quantities adjusted properly, subtotal and tax calculated correctly, and cart persists across sessions.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Add multiple items to the shopping cart from different product pages"
+      },
+      {
+        "type": "assertion",
+        "description": "Cart updates immediately showing correct items and quantities"
+      },
+      {
+        "type": "action",
+        "description": "Increase and decrease quantities for each cart item"
+      },
+      {
+        "type": "assertion",
+        "description": "Subtotals and IGV tax are recalculated correctly for each adjustment"
+      },
+      {
+        "type": "action",
+        "description": "Reload the browser or reopen the app"
+      },
+      {
+        "type": "assertion",
+        "description": "Shopping cart persists with previous items and quantities intact"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Checkout Form Validation and Order Submission",
+    "description": "Verify checkout form requires all mandatory fields, validates email and phone formats, allows pickup time selection, submits successfully, and generates unique order number with confirmation.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Proceed to checkout with a filled shopping cart"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to submit with empty required fields"
+      },
+      {
+        "type": "assertion",
+        "description": "Form shows validation errors for missing required fields"
+      },
+      {
+        "type": "action",
+        "description": "Input invalid email and phone formats"
+      },
+      {
+        "type": "assertion",
+        "description": "Form shows validation errors for incorrect email and phone"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid pickup time within allowed ranges"
+      },
+      {
+        "type": "action",
+        "description": "Fill all fields correctly and submit order"
+      },
+      {
+        "type": "assertion",
+        "description": "Order is accepted, unique order number is generated, and confirmation page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "User receives order confirmation email with details and estimated preparation time"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Reservation Form Validation and Confirmation Code Delivery",
+    "description": "Verify reservation form prevents selecting past dates, validates time against restaurant availability, accepts valid inputs, and sends confirmation code via email.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to reservation page"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to select a past date for table reservation"
+      },
+      {
+        "type": "assertion",
+        "description": "Form disables or rejects past date selection"
+      },
+      {
+        "type": "action",
+        "description": "Select a date but a time outside available hours"
+      },
+      {
+        "type": "assertion",
+        "description": "Form validation prevents submission and shows error about invalid time"
+      },
+      {
+        "type": "action",
+        "description": "Fill reservation form with valid future date, time, and required personal info"
+      },
+      {
+        "type": "action",
+        "description": "Submit reservation request"
+      },
+      {
+        "type": "assertion",
+        "description": "Reservation is accepted and confirmation page shows reservation details"
+      },
+      {
+        "type": "assertion",
+        "description": "Confirmation code is generated and sent to user's email"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Admin Authentication and Route Protection",
+    "description": "Verify administrators must authenticate via Supabase to access admin dashboard and all protected routes, with expired sessions handled gracefully.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to admin dashboard without logging in"
+      },
+      {
+        "type": "assertion",
+        "description": "User is redirected to login page"
+      },
+      {
+        "type": "action",
+        "description": "Input valid admin credentials and log in"
+      },
+      {
+        "type": "assertion",
+        "description": "Access granted to admin dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Manually expire session token or wait for session expiration"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access protected admin routes"
+      },
+      {
+        "type": "assertion",
+        "description": "User is redirected to login due to expired session"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Admin Order Management Features",
+    "description": "Verify admin can filter orders by status, update order statuses, cancel orders, and view modals with order details without page reloads.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as admin and open orders management page"
+      },
+      {
+        "type": "action",
+        "description": "Filter orders by 'Pending' status"
+      },
+      {
+        "type": "assertion",
+        "description": "Only pending orders are listed"
+      },
+      {
+        "type": "action",
+        "description": "Select an order and update its status to 'Preparing'"
+      },
+      {
+        "type": "assertion",
+        "description": "Order status updates immediately without page reload"
+      },
+      {
+        "type": "action",
+        "description": "Open order details modal for a specific order"
+      },
+      {
+        "type": "assertion",
+        "description": "Modal displays full order info and closes properly"
+      },
+      {
+        "type": "action",
+        "description": "Cancel an order and confirm cancellation"
+      },
+      {
+        "type": "assertion",
+        "description": "Order status reflects cancellation and UI updates instantly"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Admin Reservation Management Features",
+    "description": "Verify admin can search, filter, update statuses of reservations, and view status tracking modals dynamically without page reloads.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as admin and navigate to reservations management page"
+      },
+      {
+        "type": "action",
+        "description": "Search reservations by customer name or date"
+      },
+      {
+        "type": "assertion",
+        "description": "Reservation list updates to match search criteria"
+      },
+      {
+        "type": "action",
+        "description": "Filter reservations by status such as 'Confirmed' or 'Cancelled'"
+      },
+      {
+        "type": "assertion",
+        "description": "Only reservations matching the filter are visible"
+      },
+      {
+        "type": "action",
+        "description": "Update status of a reservation and save changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Status changes are reflected immediately without page reload"
+      },
+      {
+        "type": "action",
+        "description": "Open status tracking modal for a reservation"
+      },
+      {
+        "type": "assertion",
+        "description": "Modal shows current reservation status and closes correctly"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Admin Product and Category CRUD Operations with Image Handling",
+    "description": "Verify admin can create, read, update, and delete products and categories with image uploads, preview functionality, validations, and quick availability toggling.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as admin and navigate to product management section"
+      },
+      {
+        "type": "action",
+        "description": "Create a new category with required data"
+      },
+      {
+        "type": "assertion",
+        "description": "Category is added to list and available for product assignment"
+      },
+      {
+        "type": "action",
+        "description": "Create a new product including uploading multiple images"
+      },
+      {
+        "type": "assertion",
+        "description": "Image previews display correctly before submission"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to upload invalid image formats or exceed size limits"
+      },
+      {
+        "type": "assertion",
+        "description": "Validation prevents upload and shows appropriate error messages"
+      },
+      {
+        "type": "action",
+        "description": "Save the new product and verify it appears in the product list"
+      },
+      {
+        "type": "action",
+        "description": "Toggle product availability off and verify product hidden from customer menu"
+      },
+      {
+        "type": "action",
+        "description": "Edit existing product details and save changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Changes persist and reflect on customer-facing menu"
+      },
+      {
+        "type": "action",
+        "description": "Delete a product and confirm deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Product is removed from the product list and menu"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "RESTful API Endpoint Validation and Status Code Compliance",
+    "description": "Verify that API endpoints for products, categories, orders, reservations return proper HTTP status codes and follow REST conventions including success, client, and server errors.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Send GET request to products endpoint"
+      },
+      {
+        "type": "assertion",
+        "description": "Response status is 200 and product data is returned in expected format"
+      },
+      {
+        "type": "action",
+        "description": "Send POST request to orders endpoint with valid order data"
+      },
+      {
+        "type": "assertion",
+        "description": "Response status is 201 Created and order details with unique order number returned"
+      },
+      {
+        "type": "action",
+        "description": "Send PUT request to update a reservation with invalid data"
+      },
+      {
+        "type": "assertion",
+        "description": "Response status is 400 Bad Request and validation errors are detailed"
+      },
+      {
+        "type": "action",
+        "description": "Send DELETE request to remove a category with valid authorization"
+      },
+      {
+        "type": "assertion",
+        "description": "Response status is 200 OK and category is deleted"
+      },
+      {
+        "type": "action",
+        "description": "Send request to an undefined endpoint"
+      },
+      {
+        "type": "assertion",
+        "description": "Response status is 404 Not Found"
+      }
+    ]
+  }
+]
