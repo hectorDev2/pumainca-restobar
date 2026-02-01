@@ -97,6 +97,23 @@ export default function ReservationPage() {
       return;
     }
 
+    // Validation for TC006: Ensure time is within valid range (12:00 - 21:00)
+    const hour = parseInt(formData.time.split(':')[0]);
+    if (hour < 12 || hour > 21) {
+        setErrorMessage("Por favor selecciona una hora válida (12:00 PM - 09:00 PM).");
+        return;
+    }
+
+    // Validation for TC006: Ensure date is not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(formData.date);
+    selectedDate.setHours(0, 0, 0, 0);
+    if (selectedDate < today) {
+        setErrorMessage("No se pueden hacer reservas para fechas pasadas.");
+        return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage(null);
 
