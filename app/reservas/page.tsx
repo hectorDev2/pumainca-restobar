@@ -7,7 +7,7 @@ import { es } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 import "../datepicker.css";
 import Navbar from "@/components/Navbar";
-import { API_BASE_URL } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
 
 registerLocale("es", es);
 
@@ -47,7 +47,7 @@ const timeOptions = [
 
 export default function ReservationPage() {
   const [formData, setFormData] = useState<ReservationFormData>(() =>
-    createInitialFormData()
+    createInitialFormData(),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmation, setConfirmation] =
@@ -57,7 +57,7 @@ export default function ReservationPage() {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
 
@@ -98,10 +98,12 @@ export default function ReservationPage() {
     }
 
     // Validation for TC006: Ensure time is within valid range (12:00 - 21:00)
-    const hour = parseInt(formData.time.split(':')[0]);
+    const hour = parseInt(formData.time.split(":")[0]);
     if (hour < 12 || hour > 21) {
-        setErrorMessage("Por favor selecciona una hora válida (12:00 PM - 09:00 PM).");
-        return;
+      setErrorMessage(
+        "Por favor selecciona una hora válida (12:00 PM - 09:00 PM).",
+      );
+      return;
     }
 
     // Validation for TC006: Ensure date is not in the past
@@ -110,8 +112,8 @@ export default function ReservationPage() {
     const selectedDate = new Date(formData.date);
     selectedDate.setHours(0, 0, 0, 0);
     if (selectedDate < today) {
-        setErrorMessage("No se pueden hacer reservas para fechas pasadas.");
-        return;
+      setErrorMessage("No se pueden hacer reservas para fechas pasadas.");
+      return;
     }
 
     setIsSubmitting(true);
@@ -139,25 +141,10 @@ export default function ReservationPage() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/reservations`, {
+      const data = await apiFetch("/api/reservations", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        // Backend returns structure: { success: false, error: { code, message } }
-        const serverMessage = data?.error?.message ?? data?.message;
-        const serverCode = data?.error?.code ?? null;
-        const errMsg = serverMessage
-          ? serverCode
-            ? `${serverCode}: ${serverMessage}`
-            : serverMessage
-          : "No pudimos confirmar tu reserva en este momento.";
-        throw new Error(errMsg);
-      }
 
       setConfirmation({
         message:
@@ -166,7 +153,7 @@ export default function ReservationPage() {
       });
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : "Ocurrió un error inesperado."
+        error instanceof Error ? error.message : "Ocurrió un error inesperado.",
       );
     } finally {
       setIsSubmitting(false);
