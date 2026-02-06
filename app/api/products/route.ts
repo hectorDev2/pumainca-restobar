@@ -42,6 +42,8 @@ export async function GET(req: Request) {
         query = query.order("price", { ascending: false });
       } else if (sort === "newest") {
         query = query.order("created_at", { ascending: false });
+      } else if (sort === "recommended") {
+        query = query.order("is_recommended", { ascending: false }).order("display_order", { ascending: true });
       }
     } else {
       query = query.order("display_order", { ascending: true });
@@ -201,6 +203,10 @@ export async function POST(req: Request) {
     return NextResponse.json(newOk);
 
   } catch (err: any) {
-     return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("[POST /api/products] Error:", err?.message || err);
+    return NextResponse.json(
+      { error: err?.message || "Error interno del servidor" },
+      { status: 500 }
+    );
   }
 }

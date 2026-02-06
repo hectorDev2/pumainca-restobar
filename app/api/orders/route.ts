@@ -46,6 +46,13 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { items, ...orderData } = body;
     
+    if (!body.customer_email || !body.customer_phone) {
+      return NextResponse.json(
+        { error: "Email y teléfono son requeridos" },
+        { status: 400 }
+      );
+    }
+    
     // Generate Order Number
     const orderNumber = `PED${new Date().toISOString().slice(0,10).replace(/-/g, '')}${Math.floor(1000 + Math.random() * 9000)}`;
     
@@ -61,7 +68,10 @@ export async function POST(req: Request) {
       .select()
       .single();
 
-    if (orderError) throw orderError;
+    if (orderError) {
+      console.error("[POST /api/orders] Supabase order insert error:", orderError);
+      throw new Error(orderError.message || "Error al crear pedido");
+    }
 
     // Insert Items
     if (items && items.length > 0) {
@@ -72,18 +82,24 @@ export async function POST(req: Request) {
         
         const { error: itemsError } = await supabase.from("order_items").insert(itemsWithId);
         if (itemsError) {
+             console.error("[POST /api/orders] Supabase items insert error:", itemsError);
              // Rollback sort of
              await supabase.from("orders").delete().eq("id", order.id);
-             throw itemsError;
+             throw new Error(itemsError.message || "Error al insertar items");
         }
     }
 
     return NextResponse.json({
         ...order,
-        items
+        items,
+        message: "Pedido creado exitosamente"
     });
 
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("[POST /api/orders] Unexpected error:", err);
+    return NextResponse.json(
+      { error: err?.message || "Error interno del servidor" },
+      { status: 500 }
+    );
   }
 }

@@ -25,6 +25,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     
+    if (!body.email || !body.phone_number && !body.phoneNumber) {
+      return NextResponse.json(
+        { error: "Email y teléfono son requeridos" },
+        { status: 400 }
+      );
+    }
+    
     // Generate code
     const code = `RES${new Date().toISOString().slice(0,10).replace(/-/g, '')}${Math.floor(1000 + Math.random() * 9000)}`;
     
@@ -44,10 +51,23 @@ export async function POST(req: Request) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("[POST /api/reservations] Supabase insert error:", error);
+      throw new Error(error.message || "Error al crear reserva");
+    }
 
     return NextResponse.json({
         ...data,
+        message: "Reserva creada exitosamente"
+    });
+  } catch (err: any) {
+    console.error("[POST /api/reservations] Unexpected error:", err);
+    return NextResponse.json(
+      { error: err?.message || "Error interno del servidor" },
+      { status: 500 }
+    );
+  }
+}
         message: "Reserva confirmada exitosamente"
     });
 
