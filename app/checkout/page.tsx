@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { ContactInfo, OrderItemPayload, OrderPayload, OrderConfirmation } from "@/types";
-import { API_BASE_URL } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
 import { 
   createInitialContactInfo, 
   pickupEstimateLabels, 
@@ -76,17 +76,10 @@ export default function CheckoutPage() {
     if (contactInfo.specialInstructions.trim()) payload.special_instructions = contactInfo.specialInstructions.trim();
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/orders`, {
+      const data = await apiFetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data?.message ?? "No se pudo confirmar tu pedido en este momento.");
-      }
 
       setOrderConfirmation({
         number: data?.number ?? data?.orderNumber ?? data?.id?.toString(),
