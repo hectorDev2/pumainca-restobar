@@ -5,9 +5,9 @@ export function resolveApiUrl(path: string) {
   return API_BASE_URL ? `${API_BASE_URL}${path}` : path;
 }
 
-export async function apiFetch<T>(
+export async function apiFetch<T extends Record<string, any>>(
   path: string,
-  init?: RequestInit
+  init?: RequestInit,
 ): Promise<T> {
   const url = resolveApiUrl(path);
 
@@ -17,7 +17,7 @@ export async function apiFetch<T>(
 
   // Construir headers incluyendo el token si existe
   const headers: Record<string, string> = {
-    ...(init?.headers as Record<string, string> || {}),
+    ...((init?.headers as Record<string, string>) || {}),
   };
 
   if (token) {
@@ -36,7 +36,7 @@ export async function apiFetch<T>(
     headers,
   });
 
-  const payload = (await response.json().catch(() => null)) as any;
+  const payload = (await response.json().catch(() => null)) as T;
 
   if (!response.ok) {
     const message =
@@ -44,5 +44,5 @@ export async function apiFetch<T>(
     throw new Error(message);
   }
 
-  return payload as T;
+  return payload;
 }
