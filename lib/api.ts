@@ -7,7 +7,7 @@ export function resolveApiUrl(path: string) {
 
 export async function apiFetch<T extends Record<string, any>>(
   path: string,
-  init?: RequestInit
+  init?: RequestInit,
 ): Promise<T> {
   const url = resolveApiUrl(path);
 
@@ -17,7 +17,7 @@ export async function apiFetch<T extends Record<string, any>>(
 
   // Construir headers incluyendo el token si existe
   const headers: Record<string, string> = {
-    ...(init?.headers as Record<string, string> || {}),
+    ...((init?.headers as Record<string, string>) || {}),
   };
 
   if (token) {
