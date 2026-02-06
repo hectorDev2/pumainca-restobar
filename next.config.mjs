@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Optimizaciones de imagen
   images: {
     remotePatterns: [
       {
@@ -19,7 +20,12 @@ const nextConfig = {
         hostname: "bhzcukhjlmlvasumnwkg.supabase.co",
       },
     ],
+    // Optimizar formatos de imagen
+    formats: ["image/avif", "image/webp"],
   },
+  
+  // Compression
+  compress: true,
 };
 
 export default nextConfig;
