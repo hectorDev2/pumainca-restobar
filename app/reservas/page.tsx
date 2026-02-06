@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../datepicker.css";
 import Navbar from "@/components/Navbar";
 import { apiFetch } from "@/lib/api";
+import type { ReservationResponse } from "@/lib/api-types";
 
 registerLocale("es", es);
 
@@ -141,7 +142,7 @@ export default function ReservationPage() {
     }
 
     try {
-      const data = await apiFetch("/api/reservations", {
+      const data = await apiFetch<ReservationResponse>("/api/reservations", {
         method: "POST",
         body: JSON.stringify(payload),
       });
