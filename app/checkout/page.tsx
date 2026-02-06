@@ -2,30 +2,42 @@
 
 import React, { useState } from "react";
 import { useCart } from "@/context/CartContext";
-import { ContactInfo, OrderItemPayload, OrderPayload, OrderConfirmation } from "@/types";
+import {
+  ContactInfo,
+  OrderItemPayload,
+  OrderPayload,
+  OrderConfirmation,
+} from "@/types";
 import { apiFetch } from "@/lib/api";
-import { 
-  createInitialContactInfo, 
-  pickupEstimateLabels, 
-  pickupOptions, 
-  getItemPrice 
+import {
+  createInitialContactInfo,
+  pickupEstimateLabels,
+  pickupOptions,
+  getItemPrice,
 } from "./utils";
-import { 
-  CheckoutHeader, 
-  OrderConfirmationView, 
-  OrderSummary 
+import {
+  CheckoutHeader,
+  OrderConfirmationView,
+  OrderSummary,
 } from "./components";
 
 export default function CheckoutPage() {
   const { cart, cartTotal: totals, clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState<"cash">("cash");
-  const [contactInfo, setContactInfo] = useState<ContactInfo>(createInitialContactInfo);
-  const [pickupEstimate, setPickupEstimate] = useState<"20m" | "45m" | "1h">("20m");
-  const [orderConfirmation, setOrderConfirmation] = useState<OrderConfirmation | null>(null);
+  const [contactInfo, setContactInfo] = useState<ContactInfo>(
+    createInitialContactInfo,
+  );
+  const [pickupEstimate, setPickupEstimate] = useState<"20m" | "45m" | "1h">(
+    "20m",
+  );
+  const [orderConfirmation, setOrderConfirmation] =
+    useState<OrderConfirmation | null>(null);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
 
-  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleContactChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const field = e.target.name as keyof ContactInfo;
     setContactInfo((prev) => ({ ...prev, [field]: e.target.value }));
     setOrderError(null);
@@ -55,8 +67,10 @@ export default function CheckoutPage() {
         subtotal: subtotal,
       };
       if (item.selectedSize) itemPayload.selected_size = item.selectedSize;
-      if (item.options?.cookingPoint) itemPayload.cooking_point = item.options.cookingPoint;
-      if (item.options?.specialInstructions) itemPayload.special_instructions = item.options.specialInstructions;
+      if (item.options?.cookingPoint)
+        itemPayload.cooking_point = item.options.cookingPoint;
+      if (item.options?.specialInstructions)
+        itemPayload.special_instructions = item.options.specialInstructions;
       return itemPayload;
     });
 
@@ -71,9 +85,11 @@ export default function CheckoutPage() {
       total_amount: Number(totals.total.toFixed(2)),
     };
 
-    if (contactInfo.name.trim()) payload.customer_name = contactInfo.name.trim();
+    if (contactInfo.name.trim())
+      payload.customer_name = contactInfo.name.trim();
     if (pickupEstimate) payload.pickup_time_estimate = pickupEstimate;
-    if (contactInfo.specialInstructions.trim()) payload.special_instructions = contactInfo.specialInstructions.trim();
+    if (contactInfo.specialInstructions.trim())
+      payload.special_instructions = contactInfo.specialInstructions.trim();
 
     try {
       const data = await apiFetch("/api/orders", {
@@ -83,12 +99,18 @@ export default function CheckoutPage() {
 
       setOrderConfirmation({
         number: data?.number ?? data?.orderNumber ?? data?.id?.toString(),
-        message: data?.message ?? "Tu pedido fue registrado y en breve te contactaremos.",
+        message:
+          data?.message ??
+          "Tu pedido fue registrado y en breve te contactaremos.",
       });
 
       clearCart();
     } catch (error) {
-      setOrderError(error instanceof Error ? error.message : "Ocurrió un error al crear el pedido.");
+      setOrderError(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al crear el pedido.",
+      );
     } finally {
       setIsSubmittingOrder(false);
     }
@@ -120,20 +142,29 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12">
           <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-10">
             <div>
-              <h1 className="text-primary text-3xl md:text-4xl font-black mb-2">Finalizar Pedido</h1>
-              <p className="text-text-secondary">Completa los datos para que tu pedido salga del horno cuanto antes.</p>
+              <h1 className="text-primary text-3xl md:text-4xl font-black mb-2">
+                Finalizar Pedido
+              </h1>
+              <p className="text-text-secondary">
+                Completa los datos para que tu pedido salga del horno cuanto
+                antes.
+              </p>
             </div>
 
             <div className="space-y-6">
               {/* Contact Info */}
               <section className="space-y-4">
                 <h2 className="text-primary text-xl font-bold flex items-center gap-2">
-                  <span className="material-symbols-outlined">contact_page</span>
+                  <span className="material-symbols-outlined">
+                    contact_page
+                  </span>
                   Información de Contacto
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-text-secondary">Nombre completo (opcional)</label>
+                    <label className="text-sm font-medium text-text-secondary">
+                      Nombre completo (opcional)
+                    </label>
                     <input
                       name="name"
                       value={contactInfo.name}
@@ -144,7 +175,9 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-text-secondary">Correo electrónico</label>
+                    <label className="text-sm font-medium text-text-secondary">
+                      Correo electrónico
+                    </label>
                     <input
                       required
                       name="email"
@@ -156,7 +189,9 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium text-text-secondary">Teléfono</label>
+                    <label className="text-sm font-medium text-text-secondary">
+                      Teléfono
+                    </label>
                     <input
                       required
                       name="phone"
@@ -179,22 +214,36 @@ export default function CheckoutPage() {
                 <div className="bg-surface-dark border border-zinc-800 rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center gap-6">
                   <div className="flex gap-4 items-center">
                     <div className="w-12 h-12 bg-zinc-900 rounded-xl flex items-center justify-center">
-                      <span className="material-symbols-outlined">location_on</span>
+                      <span className="material-symbols-outlined">
+                        location_on
+                      </span>
                     </div>
                     <div>
-                      <h3 className="text-primary font-bold">PUMAINCA RESTOBAR</h3>
-                      <p className="text-sm text-text-secondary">Prolongacion Jaquijahuana, al frente de Astral GYM</p>
+                      <h3 className="text-primary font-bold">
+                        PUMAINCA RESTOBAR
+                      </h3>
+                      <p className="text-sm text-text-secondary">
+                        Prolongacion Jaquijahuana, al frente de Astral GYM
+                      </p>
                     </div>
                   </div>
                   <div className="w-full md:w-auto">
-                    <label className="text-xs text-text-secondary block mb-1">Hora estimada</label>
+                    <label className="text-xs text-text-secondary block mb-1">
+                      Hora estimada
+                    </label>
                     <select
                       value={pickupEstimate}
-                      onChange={(e) => setPickupEstimate(e.target.value as "20m" | "45m" | "1h")}
+                      onChange={(e) =>
+                        setPickupEstimate(
+                          e.target.value as "20m" | "45m" | "1h",
+                        )
+                      }
                       className="w-full md:w-48 bg-black border border-zinc-800 text-white rounded-lg px-3 py-2 outline-none"
                     >
                       {pickupOptions.map((option) => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -203,7 +252,9 @@ export default function CheckoutPage() {
 
               {/* Special Instructions */}
               <section className="space-y-4">
-                <label className="text-sm font-medium text-text-secondary">Instrucciones especiales (opcional)</label>
+                <label className="text-sm font-medium text-text-secondary">
+                  Instrucciones especiales (opcional)
+                </label>
                 <textarea
                   name="specialInstructions"
                   value={contactInfo.specialInstructions}
@@ -221,7 +272,9 @@ export default function CheckoutPage() {
                   Método de Pago
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {[{ id: "cash", label: "Pago en Local", icon: "payments" }].map((method) => (
+                  {[
+                    { id: "cash", label: "Pago en Local", icon: "payments" },
+                  ].map((method) => (
                     <button
                       key={method.id}
                       type="button"
@@ -232,10 +285,14 @@ export default function CheckoutPage() {
                           : "border-zinc-800 bg-surface-dark hover:bg-zinc-800"
                       }`}
                     >
-                      <span className={`material-symbols-outlined text-3xl ${paymentMethod === method.id ? "text-primary" : "text-zinc-500"}`}>
+                      <span
+                        className={`material-symbols-outlined text-3xl ${paymentMethod === method.id ? "text-primary" : "text-zinc-500"}`}
+                      >
                         {method.icon}
                       </span>
-                      <span className={`font-bold text-sm ${paymentMethod === method.id ? "text-white" : "text-zinc-500"}`}>
+                      <span
+                        className={`font-bold text-sm ${paymentMethod === method.id ? "text-white" : "text-zinc-500"}`}
+                      >
                         {method.label}
                       </span>
                     </button>
