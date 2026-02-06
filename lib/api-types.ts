@@ -4,7 +4,9 @@ export interface OrderResponse {
   id?: string;
   number?: string;
   orderNumber?: string;
+  order_number?: string;
   message?: string;
+  status?: string;
   [key: string]: any;
 }
 
@@ -14,5 +16,6 @@ export interface ReservationResponse {
   code?: string;
   message?: string;
   text?: string;
+  status?: string;
   [key: string]: any;
 }
