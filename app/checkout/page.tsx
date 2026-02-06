@@ -9,6 +9,7 @@ import {
   OrderConfirmation,
 } from "@/types";
 import { apiFetch } from "@/lib/api";
+import type { OrderResponse } from "@/lib/api-types";
 import {
   createInitialContactInfo,
   pickupEstimateLabels,
@@ -92,7 +93,7 @@ export default function CheckoutPage() {
       payload.special_instructions = contactInfo.specialInstructions.trim();
 
     try {
-      const data = await apiFetch("/api/orders", {
+      const data = await apiFetch<OrderResponse>("/api/orders", {
         method: "POST",
         body: JSON.stringify(payload),
       });
