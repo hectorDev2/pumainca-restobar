@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 
-
 import { MenuImage } from "@/components/ui/menu-image";
 import { Loader } from "@/components/ui/loader";
 
@@ -34,16 +33,18 @@ function MenuContent() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string>("todo");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(
-    null
+    null,
   );
   const searchParams = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || "",
+  );
   const [sortOrder, setSortOrder] = useState<SortOption>("recommended");
   const [favorites, setFavorites] = useState<string[]>([]);
   const [dietaryFilters, setDietaryFilters] = useState<string[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('favorites');
+    const saved = localStorage.getItem("favorites");
     if (saved) setFavorites(JSON.parse(saved));
   }, []);
 
@@ -51,28 +52,28 @@ function MenuContent() {
     e.stopPropagation();
     let newFavs;
     if (favorites.includes(dishId)) {
-      newFavs = favorites.filter(id => id !== dishId);
+      newFavs = favorites.filter((id) => id !== dishId);
     } else {
       newFavs = [...favorites, dishId];
     }
     setFavorites(newFavs);
-    localStorage.setItem('favorites', JSON.stringify(newFavs));
+    localStorage.setItem("favorites", JSON.stringify(newFavs));
   };
 
   const toggleDietaryFilter = (filter: string) => {
-    setDietaryFilters(prev => 
-      prev.includes(filter) 
-        ? prev.filter(f => f !== filter)
-        : [...prev, filter]
+    setDietaryFilters((prev) =>
+      prev.includes(filter)
+        ? prev.filter((f) => f !== filter)
+        : [...prev, filter],
     );
   };
 
   const { data: categories } = useCategories();
   const { data: categoryDetail } = useCategoryDetail(
-    selectedCategory !== "todo" ? selectedCategory : undefined
+    selectedCategory !== "todo" ? selectedCategory : undefined,
   );
   const { data: categorySubcategories } = useCategorySubcategories(
-    selectedCategory !== "todo" ? selectedCategory : undefined
+    selectedCategory !== "todo" ? selectedCategory : undefined,
   );
   const { data: products, isFetching: isProductsFetching } = useProducts({
     category: selectedCategory === "todo" ? undefined : selectedCategory,
@@ -94,8 +95,8 @@ function MenuContent() {
   const activeCategory =
     selectedCategory === "todo"
       ? undefined
-      : categoryDetail ??
-        categories?.find((category) => category.id === selectedCategory);
+      : (categoryDetail ??
+        categories?.find((category) => category.id === selectedCategory));
 
   const subcategories =
     categorySubcategories ?? activeCategory?.subcategories ?? [];
@@ -108,16 +109,19 @@ function MenuContent() {
 
     if (selectedSubCategory) {
       result = result.filter(
-        (dish) => dish.subcategory === selectedSubCategory
+        (dish) => dish.subcategory === selectedSubCategory,
       );
     }
 
     if (dietaryFilters.length > 0) {
       result = result.filter((dish) => {
-        if (dietaryFilters.includes("Vegetariano") && !dish.isVegetarian) return false;
-        if (dietaryFilters.includes("Sin Gluten") && !dish.isGlutenFree) return false;
+        if (dietaryFilters.includes("Vegetariano") && !dish.isVegetarian)
+          return false;
+        if (dietaryFilters.includes("Sin Gluten") && !dish.isGlutenFree)
+          return false;
         // Strict vegan check would go here, falling back to vegetarian for now if specific flag missing
-        if (dietaryFilters.includes("Vegano") && !dish.isVegetarian) return false;
+        if (dietaryFilters.includes("Vegano") && !dish.isVegetarian)
+          return false;
         return true;
       });
     }
@@ -141,7 +145,7 @@ function MenuContent() {
   };
 
   const resolvePrice = (
-    price?: number | string | Record<string, number | string>
+    price?: number | string | Record<string, number | string>,
   ) => {
     if (typeof price === "number") {
       return price;
@@ -294,7 +298,9 @@ function MenuContent() {
                     />
                   </div>
                   <div className="flex items-center justify-between sm:justify-start gap-2 text-xs uppercase tracking-wide text-text-secondary">
-                    <span className="text-text-primary text-[10px]">Ordenar por</span>
+                    <span className="text-text-primary text-[10px]">
+                      Ordenar por
+                    </span>
                     <select
                       value={sortOrder}
                       onChange={(event) =>
@@ -379,104 +385,116 @@ function MenuContent() {
                   layout
                   className="grid gap-6 auto-rows-auto"
                   style={{
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
                   }}
                 >
                   <AnimatePresence mode="popLayout">
                     {filteredDishes.map((dish, index) => {
                       // Layout asimétrico: cada 7mo elemento es destacado (span 2 columnas)
-                      const isFeatured = (index % 7) === 0 && index > 0;
+                      const isFeatured = index % 7 === 0 && index > 0;
                       // Cada 5to elemento es alto (más espacio vertical)
-                      const isTall = (index % 5) === 2;
-                      
+                      const isTall = index % 5 === 2;
+
                       return (
-                    <motion.div
-                        layout
-                        key={dish.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.3 }}
-                        className={`group relative h-full ${isFeatured ? 'md:col-span-2' : ''}`}
-                        style={{
-                          minHeight: isTall ? '520px' : '380px',
-                        }}
-                      >
-                        <GlareCard className={`flex ${isFeatured ? 'md:flex-row' : 'flex-col'} bg-surface-dark h-full shadow-2xl`}>
-                          <div
-                            className={`relative ${isFeatured ? 'md:w-1/2' : 'w-full'} ${isFeatured ? 'h-full' : 'h-48 sm:h-56 md:h-64'} overflow-hidden cursor-pointer shrink-0`}
-                            onClick={() => navigateToDish(dish.id)}
+                        <motion.div
+                          layout
+                          key={dish.id}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          transition={{ duration: 0.3 }}
+                          className={`group relative h-full ${isFeatured ? "md:col-span-2" : ""}`}
+                          style={{
+                            minHeight: isTall ? "520px" : "380px",
+                          }}
+                        >
+                          <GlareCard
+                            className={`flex ${isFeatured ? "md:flex-row" : "flex-col"} bg-surface-dark h-full shadow-2xl`}
                           >
-                            <MenuImage
-                              src={resolveDishImage(dish)}
-                              alt={dish.name}
-                              containerClassName="absolute inset-0"
-                              className="transition-transform duration-500 group-hover:scale-110"
-                            />
-                            
-                            <button 
+                            <div
+                              className={`relative ${isFeatured ? "md:w-1/2" : "w-full"} ${isFeatured ? "h-full" : "h-48 sm:h-56 md:h-64"} overflow-hidden cursor-pointer shrink-0`}
+                              onClick={() => navigateToDish(dish.id)}
+                            >
+                              <MenuImage
+                                src={resolveDishImage(dish)}
+                                alt={dish.name}
+                                containerClassName="absolute inset-0"
+                                className="transition-transform duration-500 group-hover:scale-110"
+                              />
+
+                              <button
                                 onClick={(e) => toggleFavorite(e, dish.id)}
                                 className="absolute top-3 right-3 md:top-4 md:right-4 z-20 p-2 md:p-3 bg-black/50 backdrop-blur-md rounded-full text-white hover:text-primary transition-all group/fav"
+                              >
+                                <span
+                                  className={`material-symbols-outlined transition-colors ${favorites.includes(dish.id) ? "text-primary" : "text-white"}`}
+                                >
+                                  {favorites.includes(dish.id)
+                                    ? "favorite"
+                                    : "favorite_border"}
+                                </span>
+                              </button>
+
+                              {dish.isVegetarian && (
+                                <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
+                                  <span className="material-symbols-outlined text-[14px] text-green-500">
+                                    eco
+                                  </span>
+                                </div>
+                              )}
+                              {dish.isSpicy && (
+                                <div className="absolute top-3 right-14 md:top-4 md:right-16 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
+                                  <span className="material-symbols-outlined text-[14px] text-orange-400">
+                                    local_fire_department
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div
+                              className={`p-5 flex flex-col flex-1 h-full ${isFeatured ? "md:w-1/2" : ""}`}
                             >
-                                <span className={`material-symbols-outlined transition-colors ${favorites.includes(dish.id) ? 'text-primary' : 'text-white'}`}>
-                                    {favorites.includes(dish.id) ? 'favorite' : 'favorite_border'}
-                                </span>
-                            </button>
-
-                            {dish.isVegetarian && (
-                              <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
-                                <span className="material-symbols-outlined text-[14px] text-green-500">
-                                  eco
-                                </span>
-                              </div>
-                            )}
-                            {dish.isSpicy && (
-                              <div className="absolute top-3 right-14 md:top-4 md:right-16 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1">
-                                <span className="material-symbols-outlined text-[14px] text-orange-400">
-                                  local_fire_department
+                              <div className="flex justify-between items-start mb-2">
+                                <h3
+                                  className={`text-text-primary font-bold leading-tight group-hover:text-primary transition-colors ${isFeatured ? "text-xl md:text-2xl" : "text-lg"}`}
+                                >
+                                  {dish.name}
+                                </h3>
+                                <span className="text-text-primary font-bold text-sm bg-surface-hover px-2 py-1 rounded ml-2 whitespace-nowrap">
+                                  {priceLabel(dish)}
                                 </span>
                               </div>
-                            )}
-                          </div>
-
-                          <div className={`p-5 flex flex-col flex-1 h-full ${isFeatured ? 'md:w-1/2' : ''}`}>
-                            <div className="flex justify-between items-start mb-2">
-                              <h3 className={`text-text-primary font-bold leading-tight group-hover:text-primary transition-colors ${isFeatured ? 'text-xl md:text-2xl' : 'text-lg'}`}>
-                                {dish.name}
-                              </h3>
-                              <span className="text-text-primary font-bold text-sm bg-surface-hover px-2 py-1 rounded ml-2 whitespace-nowrap">
-                                {priceLabel(dish)}
-                              </span>
-                            </div>
-                            <p className={`text-text-secondary leading-relaxed mb-4 ${isFeatured ? 'text-base' : 'text-sm line-clamp-3'} ${isTall ? 'line-clamp-5' : ''}`}>
-                              {dish.description}
-                            </p>
-                            <div className="mt-auto pt-4 border-t border-zinc-800 space-y-3 sm:flex sm:items-center sm:justify-between sm:space-y-0">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  addToCart(dish);
-                                }}
+                              <p
+                                className={`text-text-secondary leading-relaxed mb-4 ${isFeatured ? "text-base" : "text-sm line-clamp-3"} ${isTall ? "line-clamp-5" : ""}`}
+                              >
+                                {dish.description}
+                              </p>
+                              <div className="mt-auto pt-4 border-t border-zinc-800 space-y-3 sm:flex sm:items-center sm:justify-between sm:space-y-0">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addToCart(dish);
+                                  }}
                                   className="bg-primary hover:bg-primary-dark text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-1 flex-1 shadow-lg shadow-red-900/20 z-20 relative w-full sm:w-auto"
-                              >
-                                <span className="material-symbols-outlined text-sm">
-                                  add_shopping_cart
-                                </span>
-                                Agregar
-                              </button>
-                              <button
-                                onClick={() => navigateToDish(dish.id)}
-                                className="text-xs font-bold text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover z-20 relative w-full sm:w-auto text-center"
-                              >
-                                Detalles{" "}
-                                <span className="material-symbols-outlined text-xs">
-                                  arrow_forward
-                                </span>
-                              </button>
+                                >
+                                  <span className="material-symbols-outlined text-sm">
+                                    add_shopping_cart
+                                  </span>
+                                  Agregar
+                                </button>
+                                <button
+                                  onClick={() => navigateToDish(dish.id)}
+                                  className="text-xs font-bold text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-surface-hover z-20 relative w-full sm:w-auto text-center"
+                                >
+                                  Detalles{" "}
+                                  <span className="material-symbols-outlined text-xs">
+                                    arrow_forward
+                                  </span>
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        </GlareCard>
-                      </motion.div>
+                          </GlareCard>
+                        </motion.div>
                       );
                     })}
                   </AnimatePresence>
@@ -523,8 +541,8 @@ function MenuContent() {
                         {typeof dish.subcategory === "string"
                           ? dish.subcategory.replace(/-/g, " ")
                           : typeof dish.category === "string"
-                          ? dish.category.replace(/-/g, " ")
-                          : String(dish.category ?? "")}
+                            ? dish.category.replace(/-/g, " ")
+                            : String(dish.category ?? "")}
                       </p>
                       <p className="text-primary font-bold mt-1">
                         S./{showPrice.toFixed(2)}
@@ -549,7 +567,13 @@ function MenuContent() {
 
 export default function MenuPage() {
   return (
-    <Suspense fallback={<div className="h-screen bg-black flex items-center justify-center"><Loader text="Cargando menú..." /></div>}>
+    <Suspense
+      fallback={
+        <div className="h-screen bg-black flex items-center justify-center">
+          <Loader text="Cargando menú..." />
+        </div>
+      }
+    >
       <MenuContent />
     </Suspense>
   );
