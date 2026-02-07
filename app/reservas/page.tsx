@@ -25,6 +25,8 @@ type ReservationFormData = {
 type ReservationConfirmation = {
   message?: string;
   code?: string;
+  emailStatus?: "sent" | "failed" | "skipped";
+  emailMessage?: string;
 };
 
 const createInitialFormData = (): ReservationFormData => ({
@@ -37,14 +39,42 @@ const createInitialFormData = (): ReservationFormData => ({
   specialRequests: "",
 });
 
-const timeOptions = [
-  { value: "12:00", label: "12:00 PM" },
-  { value: "13:00", label: "01:00 PM" },
-  { value: "14:00", label: "02:00 PM" },
-  { value: "19:00", label: "07:00 PM" },
-  { value: "20:00", label: "08:00 PM" },
-  { value: "21:00", label: "09:00 PM" },
-];
+const OPERATING_HOURS = {
+  start: 12,
+  end: 23,
+} as const;
+
+const buildTimeOptions = () =>
+  Array.from(
+    { length: OPERATING_HOURS.end - OPERATING_HOURS.start + 1 },
+    (_, index) => {
+      const hour = OPERATING_HOURS.start + index;
+      const hourLabel = hour % 12 === 0 ? 12 : hour % 12;
+      const label = `${String(hourLabel).padStart(2, "0")}:00 PM`;
+      return {
+        value: `${String(hour).padStart(2, "0")}:00`,
+        label,
+      };
+    },
+  );
+
+const timeOptions = buildTimeOptions();
+
+const getStartOfToday = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
+
+const isValidDate = (date: Date) => !Number.isNaN(date.getTime());
+
+const isDateSelectable = (date: Date) => {
+  if (!isValidDate(date)) return false;
+  const today = getStartOfToday();
+  const candidate = new Date(date);
+  candidate.setHours(0, 0, 0, 0);
+  return candidate >= today;
+};
 
 export default function ReservationPage() {
   const [formData, setFormData] = useState<ReservationFormData>(() =>
@@ -87,6 +117,11 @@ export default function ReservationPage() {
 
   const handleDateChange = (date: Date | null) => {
     if (!date) return;
+    if (!isDateSelectable(date)) {
+      setErrorMessage("No se pueden hacer reservas para fechas pasadas.");
+      return;
+    }
+    setErrorMessage(null);
     setFormData((prev) => ({ ...prev, date }));
   };
 
@@ -98,19 +133,26 @@ export default function ReservationPage() {
       return;
     }
 
-    // Validation for TC006: Ensure time is within valid range (12:00 - 21:00)
-    const hour = parseInt(formData.time.split(":")[0]);
-    if (hour < 12 || hour > 21) {
+    const hour = parseInt(formData.time.split(":")[0], 10);
+    if (Number.isNaN(hour)) {
+      setErrorMessage("Selecciona una hora válida para tu reserva.");
+      return;
+    }
+
+    if (hour < OPERATING_HOURS.start || hour > OPERATING_HOURS.end) {
       setErrorMessage(
-        "Por favor selecciona una hora válida (12:00 PM - 09:00 PM).",
+        "Por favor selecciona una hora válida (12:00 PM - 11:00 PM).",
       );
       return;
     }
 
     // Validation for TC006: Ensure date is not in the past
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getStartOfToday();
     const selectedDate = new Date(formData.date);
+    if (!isValidDate(selectedDate)) {
+      setErrorMessage("Selecciona una fecha válida para tu reserva.");
+      return;
+    }
     selectedDate.setHours(0, 0, 0, 0);
     if (selectedDate < today) {
       setErrorMessage("No se pueden hacer reservas para fechas pasadas.");
@@ -151,6 +193,8 @@ export default function ReservationPage() {
         message:
           data?.message ?? data?.text ?? "Tu mesa quedó reservada con éxito.",
         code: data?.reservation_code ?? data?.code,
+        emailStatus: data?.emailStatus,
+        emailMessage: data?.emailMessage,
       });
     } catch (error) {
       setErrorMessage(
@@ -196,6 +240,11 @@ export default function ReservationPage() {
             {confirmation.code && (
               <p className="text-text-primary font-semibold tracking-wide">
                 Código: {confirmation.code}
+              </p>
+            )}
+            {confirmation.emailMessage && (
+              <p className="text-sm text-text-secondary">
+                {confirmation.emailMessage}
               </p>
             )}
             <div className="flex flex-col gap-3">
@@ -263,7 +312,10 @@ export default function ReservationPage() {
                   required
                   selected={formData.date}
                   onChange={handleDateChange}
-                  minDate={new Date()}
+                  minDate={getStartOfToday()}
+                  filterDate={isDateSelectable}
+                  onChangeRaw={(event) => event.preventDefault()}
+                  readOnly
                   dateFormat="dd 'de' MMMM 'de' yyyy"
                   placeholderText="Selecciona una fecha"
                   locale="es"
