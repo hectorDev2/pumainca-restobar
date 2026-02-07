@@ -10,27 +10,47 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Fuego - brasas vivas, no rojo digital
+        ember: {
+          600: '#E63946',  // Brasa brillante
+          700: '#D62828',  // Fuego profundo
+          800: '#9D0208',  // Carbón ardiente
+          900: '#6A040F',  // Brasa apagándose
+        },
+        // Tierra - noche cálida con humo
+        earth: {
+          950: '#0D0A08',  // Noche con humo
+          900: '#1A1512',  // Madera quemada
+          800: '#2B2520',  // Arcilla oscura
+          700: '#3D332E',  // Tierra tostada
+        },
+        // Accentos naturales
+        sage: '#52796F',      // Hierbas frescas
+        honey: '#CA9D5F',     // Miel/dorado
+        cream: '#F8F1E8',     // Porcelana
+        
+        // Aliases para compatibilidad (mapean a nuevos colores)
         primary: {
-          DEFAULT: '#FF0000',
-          dark: '#cc0000',
+          DEFAULT: '#E63946',
+          dark: '#D62828',
         },
         background: {
-          light: '#000000',
-          dark: '#000000',
+          light: '#0D0A08',
+          dark: '#0D0A08',
         },
         surface: {
-          light: '#121212',
-          dark: '#121212',
-          hover: '#2d2d2d',
+          light: '#1A1512',
+          dark: '#1A1512',
+          hover: '#2B2520',
         },
         text: {
           primary: {
-             light: '#ffffff', 
-             dark: '#ffffff' 
+             light: '#F8F1E8', 
+             dark: '#F8F1E8' 
           },
           secondary: {
-             light: '#d4d4d4',
-             dark: '#d4d4d4'
+             light: '#CA9D5F',
+             dark: '#CA9D5F'
           }
         },
       },
