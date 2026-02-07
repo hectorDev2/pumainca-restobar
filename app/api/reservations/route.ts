@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { supabase } from "@/lib/supabase";
@@ -130,7 +129,9 @@ export async function GET(req: Request) {
     query = query.eq("email", email);
   }
 
-  const { data, error } = await query.order("reservation_date", { ascending: false });
+  const { data, error } = await query.order("reservation_date", {
+    ascending: false,
+  });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -153,14 +154,14 @@ export async function POST(req: Request) {
     if (!email || !phone) {
       return NextResponse.json(
         { message: "Email y teléfono son requeridos" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!VALIDATION.EMAIL.test(email)) {
       return NextResponse.json(
         { message: "Formato de email inválido" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -168,7 +169,7 @@ export async function POST(req: Request) {
     if (!parsedDate) {
       return NextResponse.json(
         { message: "Selecciona una fecha válida" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -179,7 +180,7 @@ export async function POST(req: Request) {
     if (parsedDate < today) {
       return NextResponse.json(
         { message: "La fecha de reserva no puede ser anterior a hoy" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -188,7 +189,7 @@ export async function POST(req: Request) {
         {
           message: "La hora debe estar entre 12:00 PM y 11:00 PM",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -199,13 +200,13 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json(
         { message: "El número de personas debe estar entre 1 y 12" },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    
+
     // Generate code
-    const code = `RES${new Date().toISOString().slice(0,10).replace(/-/g, '')}${Math.floor(1000 + Math.random() * 9000)}`;
-    
+    const code = `RES${new Date().toISOString().slice(0, 10).replace(/-/g, "")}${Math.floor(1000 + Math.random() * 9000)}`;
+
     const { data, error } = await supabase
       .from("reservations")
       .insert({
@@ -217,7 +218,7 @@ export async function POST(req: Request) {
         reservation_time: reservationTime,
         number_of_guests: numberOfGuests,
         special_requests: body.specialRequests ?? body.special_requests,
-        status: 'pending'
+        status: "pending",
       })
       .select()
       .single();
@@ -246,7 +247,7 @@ export async function POST(req: Request) {
     console.error("[POST /api/reservations] Unexpected error:", err);
     return NextResponse.json(
       { message: err?.message || "Error interno del servidor" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

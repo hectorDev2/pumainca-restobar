@@ -1,24 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  /* Light Mode Defaults (Day Mode) */
-  --bg-dynamic: #ffffff;
-  --bg-surface-dynamic: #f4f4f5;
-  --bg-surface-hover: #e4e4e7;
-  --text-dynamic: #000000;
-  --text-secondary: #52525b;
+  /* Sistema de Colores: Fuego y Tierra */
   
-  --primary-red: #FF0000;
-  --primary-dark-red: #cc0000;
+  /* Fuego - brasas vivas */
+  --ember-600: #E63946;
+  --ember-700: #D62828;
+  --ember-800: #9D0208;
+  --ember-900: #6A040F;
+  
+  /* Tierra - noche cálida */
+  --earth-950: #0D0A08;
+  --earth-900: #1A1512;
+  --earth-800: #2B2520;
+  --earth-700: #3D332E;
+  
+  /* Naturales */
+  --sage: #52796F;
+  --honey: #CA9D5F;
+  --cream: #F8F1E8;
+  
+  /* Dynamic theme variables */
+  --bg-dynamic: var(--earth-950);
+  --bg-surface-dynamic: var(--earth-900);
+  --bg-surface-hover: var(--earth-800);
+  --text-dynamic: var(--cream);
+  --text-secondary: var(--honey);
+  
+  --primary-red: var(--ember-600);
+  --primary-dark-red: var(--ember-700);
 }
 
 [data-theme="dark"], .dark {
-  /* Dark Mode Overrides */
-  --bg-dynamic: #000000;
-  --bg-surface-dynamic: #121212;
-  --bg-surface-hover: #27272a;
-  --text-dynamic: #ffffff;
-  --text-secondary: #d4d4d4;
+  /* Dark Mode (mismo que default para este diseño) */
+  --bg-dynamic: var(--earth-950);
+  --bg-surface-dynamic: var(--earth-900);
+  --bg-surface-hover: var(--earth-800);
+  --text-dynamic: var(--cream);
+  --text-secondary: var(--honey);
 }
 
 @theme {
