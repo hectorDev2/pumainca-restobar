@@ -12,61 +12,61 @@ const config: Config = {
       colors: {
         // Fuego - brasas vivas, no rojo digital
         ember: {
-          600: '#E63946',  // Brasa brillante
-          700: '#D62828',  // Fuego profundo
-          800: '#9D0208',  // Carbón ardiente
-          900: '#6A040F',  // Brasa apagándose
+          600: "#E63946", // Brasa brillante
+          700: "#D62828", // Fuego profundo
+          800: "#9D0208", // Carbón ardiente
+          900: "#6A040F", // Brasa apagándose
         },
         // Tierra - noche cálida con humo
         earth: {
-          950: '#0D0A08',  // Noche con humo
-          900: '#1A1512',  // Madera quemada
-          800: '#2B2520',  // Arcilla oscura
-          700: '#3D332E',  // Tierra tostada
+          950: "#0D0A08", // Noche con humo
+          900: "#1A1512", // Madera quemada
+          800: "#2B2520", // Arcilla oscura
+          700: "#3D332E", // Tierra tostada
         },
         // Accentos naturales
-        sage: '#52796F',      // Hierbas frescas
-        honey: '#CA9D5F',     // Miel/dorado
-        cream: '#F8F1E8',     // Porcelana
-        
+        sage: "#52796F", // Hierbas frescas
+        honey: "#CA9D5F", // Miel/dorado
+        cream: "#F8F1E8", // Porcelana
+
         // Aliases para compatibilidad (mapean a nuevos colores)
         primary: {
-          DEFAULT: '#E63946',
-          dark: '#D62828',
+          DEFAULT: "#E63946",
+          dark: "#D62828",
         },
         background: {
-          light: '#0D0A08',
-          dark: '#0D0A08',
+          light: "#0D0A08",
+          dark: "#0D0A08",
         },
         surface: {
-          light: '#1A1512',
-          dark: '#1A1512',
-          hover: '#2B2520',
+          light: "#1A1512",
+          dark: "#1A1512",
+          hover: "#2B2520",
         },
         text: {
           primary: {
-             light: '#F8F1E8', 
-             dark: '#F8F1E8' 
+            light: "#F8F1E8",
+            dark: "#F8F1E8",
           },
           secondary: {
-             light: '#CA9D5F',
-             dark: '#CA9D5F'
-          }
+            light: "#CA9D5F",
+            dark: "#CA9D5F",
+          },
         },
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
-        'fade-in-up': 'fadeInUp 0.8s ease-out',
-        'bounce-slow': 'bounce 3s infinite',
+        "fade-in": "fadeIn 0.5s ease-out",
+        "fade-in-up": "fadeInUp 0.8s ease-out",
+        "bounce-slow": "bounce 3s infinite",
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
         fadeInUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
       },
     },
