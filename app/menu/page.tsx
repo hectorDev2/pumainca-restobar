@@ -377,10 +377,19 @@ function MenuContent() {
               ) : filteredDishes.length > 0 ? (
                 <motion.div
                   layout
-                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+                  className="grid gap-6 auto-rows-auto"
+                  style={{
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                  }}
                 >
                   <AnimatePresence mode="popLayout">
-                    {filteredDishes.map((dish) => (
+                    {filteredDishes.map((dish, index) => {
+                      // Layout asimétrico: cada 7mo elemento es destacado (span 2 columnas)
+                      const isFeatured = (index % 7) === 0 && index > 0;
+                      // Cada 5to elemento es alto (más espacio vertical)
+                      const isTall = (index % 5) === 2;
+                      
+                      return (
                     <motion.div
                         layout
                         key={dish.id}
@@ -388,11 +397,14 @@ function MenuContent() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ duration: 0.3 }}
-                        className="group relative h-full"
+                        className={`group relative h-full ${isFeatured ? 'md:col-span-2' : ''}`}
+                        style={{
+                          minHeight: isTall ? '520px' : '380px',
+                        }}
                       >
-                        <GlareCard className="flex flex-col bg-surface-dark h-full min-h-[380px] sm:min-h-[440px] shadow-2xl">
+                        <GlareCard className={`flex ${isFeatured ? 'md:flex-row' : 'flex-col'} bg-surface-dark h-full shadow-2xl`}>
                           <div
-                            className="relative h-48 sm:h-56 md:h-64 overflow-hidden cursor-pointer shrink-0"
+                            className={`relative ${isFeatured ? 'md:w-1/2' : 'w-full'} ${isFeatured ? 'h-full' : 'h-48 sm:h-56 md:h-64'} overflow-hidden cursor-pointer shrink-0`}
                             onClick={() => navigateToDish(dish.id)}
                           >
                             <MenuImage
@@ -427,16 +439,16 @@ function MenuContent() {
                             )}
                           </div>
 
-                          <div className="p-5 flex flex-col flex-1 h-full">
+                          <div className={`p-5 flex flex-col flex-1 h-full ${isFeatured ? 'md:w-1/2' : ''}`}>
                             <div className="flex justify-between items-start mb-2">
-                              <h3 className="text-text-primary text-lg font-bold leading-tight group-hover:text-primary transition-colors">
+                              <h3 className={`text-text-primary font-bold leading-tight group-hover:text-primary transition-colors ${isFeatured ? 'text-xl md:text-2xl' : 'text-lg'}`}>
                                 {dish.name}
                               </h3>
                               <span className="text-text-primary font-bold text-sm bg-surface-hover px-2 py-1 rounded ml-2 whitespace-nowrap">
                                 {priceLabel(dish)}
                               </span>
                             </div>
-                            <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-3">
+                            <p className={`text-text-secondary leading-relaxed mb-4 ${isFeatured ? 'text-base' : 'text-sm line-clamp-3'} ${isTall ? 'line-clamp-5' : ''}`}>
                               {dish.description}
                             </p>
                             <div className="mt-auto pt-4 border-t border-zinc-800 space-y-3 sm:flex sm:items-center sm:justify-between sm:space-y-0">
@@ -465,7 +477,8 @@ function MenuContent() {
                           </div>
                         </GlareCard>
                       </motion.div>
-                    ))}
+                      );
+                    })}
                   </AnimatePresence>
                 </motion.div>
               ) : (

@@ -314,9 +314,45 @@ rounded-full
 2. ✅ Signature element "Llama Flotante"
 3. ✅ Refactorización de layering en componentes
 4. ✅ Jerarquía tipográfica completa
-5. ⏳ Layout asimétrico para menú
+5. ✅ Layout asimétrico para menú
 
 ---
+
+## Layout Asimétrico: Grid Dinámico
+
+**Implementado en:** `app/menu/page.tsx`
+
+### Concepto
+Grid adaptativo con variación orgánica: productos destacados ocupan 2 columnas, algunos tienen más altura para descripción extendida. No es caos - es ritmo visual.
+
+### Patrón
+```tsx
+// Cada 7mo elemento = featured (span 2 columnas)
+const isFeatured = (index % 7) === 0 && index > 0;
+// Cada 5to elemento = tall (más altura vertical)
+const isTall = (index % 5) === 2;
+```
+
+### Grid CSS
+```css
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+/* Se adapta automáticamente según espacio disponible */
+```
+
+### Variaciones
+- **Normal**: 1 columna, 380px altura, texto line-clamp-3
+- **Featured**: 2 columnas en md+, layout horizontal (imagen 50% + contenido 50%), texto completo, título 2xl
+- **Tall**: 520px altura, texto line-clamp-5
+
+### Por Qué Funciona
+1. Rompe la monotonía del grid uniforme
+2. Destaca naturalmente productos importantes sin marcado manual
+3. Mantiene consistencia con patrón matemático predecible
+4. Responsive: en móvil todos son normales, en desktop se activa asimetría
+
+**Inspiración:** Pinterest masonry, pero controlado
+
+**Última actualización:** 7 de febrero 2026
 
 ## Signature Element: "Llama Flotante"
 
