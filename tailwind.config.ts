@@ -58,6 +58,7 @@ const config: Config = {
         "fade-in": "fadeIn 0.5s ease-out",
         "fade-in-up": "fadeInUp 0.8s ease-out",
         "bounce-slow": "bounce 3s infinite",
+        "glow-ember": "glowEmber 2s ease-in-out infinite",
       },
       keyframes: {
         fadeIn: {
@@ -67,6 +68,10 @@ const config: Config = {
         fadeInUp: {
           "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        glowEmber: {
+          "0%, 100%": { opacity: "0", transform: "translateY(20%)" },
+          "50%": { opacity: "1", transform: "translateY(0)" },
         },
       },
     },

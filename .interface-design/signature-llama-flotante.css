@@ -1,0 +1,87 @@
+/* Signature Element: Llama Flotante */
+
+/**
+ * Este es el elemento visual único de Pumainca Restobar.
+ * 
+ * Concepto:
+ * Cards de productos con resplandor cálido desde abajo que simula
+ * el brillo de brasas ardientes en una parrilla. No es un efecto
+ * mecánico - es orgánico, como una llama real.
+ * 
+ * Uso:
+ * - Aplicar en cards de productos/platos destacados
+ * - Activar en hover para revelar el resplandor
+ * - Combinar con colores ember para máximo impacto
+ */
+
+.signature-llama-flotante {
+  position: relative;
+  overflow: hidden;
+}
+
+.signature-llama-flotante::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(230, 57, 70, 0.3) 0%,
+    rgba(230, 57, 70, 0.1) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.signature-llama-flotante:hover::before {
+  opacity: 1;
+  animation: glowEmber 2s ease-in-out infinite;
+}
+
+@keyframes glowEmber {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(20%);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Variante con Tailwind */
+/*
+<div className="
+  relative overflow-hidden
+  before:absolute before:inset-0 
+  before:bg-gradient-to-t before:from-ember-700/30 before:via-ember-600/10 before:to-transparent
+  before:opacity-0 
+  hover:before:opacity-100 hover:before:animate-glow-ember
+  before:transition-opacity before:duration-500
+  before:pointer-events-none before:z-[1]
+">
+  <!-- contenido -->
+</div>
+*/
+
+/**
+ * Diferencias clave vs defaults:
+ * 
+ * ❌ Default: Sombra drop-shadow estática
+ * ✅ Signature: Resplandor animado desde abajo
+ * 
+ * ❌ Default: Color plano sin vida
+ * ✅ Signature: Gradiente orgánico ember
+ * 
+ * ❌ Default: Aparece/desaparece abruptamente
+ * ✅ Signature: Transición suave + animación flotante
+ * 
+ * Este efecto NO puede confundirse con ningún otro restaurante.
+ * Es único para Pumainca porque:
+ * - Refleja el fuego de cocina
+ * - Usa nuestra paleta ember exclusiva
+ * - Tiene movimiento orgánico, no mecánico
+ * - Solo aparece en elementos premium (recomendados, especiales)
+ */

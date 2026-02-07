@@ -311,9 +311,50 @@ rounded-full
 ## Próximos Pasos
 
 1. ✅ Sistema de colores implementado
-2. ⏳ Signature element "Llama Flotante"
+2. ✅ Signature element "Llama Flotante"
 3. ⏳ Refactorización de layering en componentes
 4. ⏳ Jerarquía tipográfica completa
 5. ⏳ Layout asimétrico para menú
+
+---
+
+## Signature Element: "Llama Flotante"
+
+**Implementado en:** `components/home/RecommendedCard.tsx`
+
+### Concepto
+Cards de productos con resplandor cálido que surge desde abajo en hover, simulando el brillo de brasas ardientes. No es un efecto mecánico - es orgánico, como una llama real.
+
+### Código Base
+```tsx
+{/* Signature: Llama Flotante */}
+<div 
+  className="absolute inset-0 bg-gradient-to-t from-ember-700/30 via-ember-600/10 to-transparent transition-opacity duration-500 pointer-events-none z-[1]
+    opacity-0 hover:opacity-100 hover:animate-glow-ember"
+/>
+```
+
+### Animación
+```css
+@keyframes glowEmber {
+  0%, 100% { opacity: 0; transform: translateY(20%); }
+  50% { opacity: 1; transform: translateY(0); }
+}
+```
+
+### Cuándo Usar
+- ✅ Cards de productos destacados/recomendados
+- ✅ Platos especiales del chef
+- ✅ Items premium en el menú
+- ❌ NO en elementos comunes (conserva su exclusividad)
+
+### Por Qué Es Único
+Este efecto identifica a Pumainca porque:
+1. Refleja el fuego de cocina de alta gastronomía
+2. Usa nuestra paleta ember exclusiva
+3. Movimiento orgánico, no mecánico (no es bounce/spring)
+4. Solo aparece en elementos premium
+
+**Archivo de referencia:** `.interface-design/signature-llama-flotante.css`
 
 **Última actualización:** 7 de febrero 2026
