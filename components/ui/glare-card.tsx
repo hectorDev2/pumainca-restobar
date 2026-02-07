@@ -69,7 +69,7 @@ export const GlareCard = ({
       style={containerStyle}
       className={cn(
         "relative isolate [contain:layout_style] [perspective:600px] transition-transform duration-[var(--duration)] ease-[var(--easing)] delay-[var(--delay)] will-change-transform w-full h-full",
-        className
+        className,
       )}
       ref={refElement}
       onPointerMove={(event) => {

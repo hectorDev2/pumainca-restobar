@@ -1,14 +1,14 @@
 "use client";
 
-import React from 'react';
-import { useProducts } from '@/lib/queries';
+import React from "react";
+import { useProducts } from "@/lib/queries";
 import Carousel3D from "@/components/ui/carousel-3d";
 import { RecommendedCard } from "./RecommendedCard";
 
 export function RecommendationsSection() {
   const { data: products = [] } = useProducts({ sort: "recommended" });
-  
-  const recommendedProducts = products.slice(0, 5); 
+
+  const recommendedProducts = products.slice(0, 5);
 
   if (recommendedProducts.length === 0) return null;
 
@@ -25,7 +25,7 @@ export function RecommendationsSection() {
         </div>
 
         <div className="w-full relative">
-          <Carousel3D 
+          <Carousel3D
             items={recommendedProducts.map((product) => (
               <div className="w-full h-full p-4" key={product.id}>
                 <RecommendedCard product={product} />
@@ -36,7 +36,7 @@ export function RecommendationsSection() {
           />
         </div>
       </div>
-      
+
       {/* Background ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-ember-600/5 rounded-full blur-[150px] pointer-events-none -z-0" />
     </section>

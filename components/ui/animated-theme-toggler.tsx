@@ -20,17 +20,21 @@ export function AnimatedThemeToggler() {
         "relative inline-flex size-9 items-center justify-center rounded-xl bg-earth-900 border border-earth-700/30 transition-all duration-200 hover:bg-earth-800/60 text-text-primary",
       )}
     >
-        <div className="relative size-5">
-            <Sun className={cn(
-                "absolute inset-0 size-full transition-all duration-300 rotate-0 scale-100", 
-                theme === "dark" && "rotate-90 scale-0"
-            )} />
-            <Moon className={cn(
-                "absolute inset-0 size-full transition-all duration-300 rotate-90 scale-0", 
-                 theme === "dark" && "rotate-0 scale-100"
-            )} />
-        </div>
-        <span className="sr-only">Toggle theme</span>
+      <div className="relative size-5">
+        <Sun
+          className={cn(
+            "absolute inset-0 size-full transition-all duration-300 rotate-0 scale-100",
+            theme === "dark" && "rotate-90 scale-0",
+          )}
+        />
+        <Moon
+          className={cn(
+            "absolute inset-0 size-full transition-all duration-300 rotate-90 scale-0",
+            theme === "dark" && "rotate-0 scale-100",
+          )}
+        />
+      </div>
+      <span className="sr-only">Toggle theme</span>
     </button>
   );
 }
