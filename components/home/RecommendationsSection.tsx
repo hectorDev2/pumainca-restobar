@@ -16,10 +16,10 @@ export function RecommendationsSection() {
     <section className="py-20 bg-[#020204] relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-4 bg-gradient-to-r from-[#FF0000] to-[#cc0000] bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-4 bg-gradient-to-r from-ember-600 to-ember-700 bg-clip-text text-transparent">
             RECOMENDADOS
           </h2>
-          <p className="text-zinc-400 text-sm uppercase tracking-[0.3em]">
+          <p className="text-honey/70 text-sm uppercase tracking-[0.3em] font-bold">
             Favoritos de la Casa
           </p>
         </div>
@@ -38,7 +38,7 @@ export function RecommendationsSection() {
       </div>
       
       {/* Background ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#FF0000]/5 rounded-full blur-[150px] pointer-events-none -z-0" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-ember-600/5 rounded-full blur-[150px] pointer-events-none -z-0" />
     </section>
   );
 }

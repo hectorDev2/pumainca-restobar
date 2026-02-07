@@ -100,7 +100,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-background-dark/95 backdrop-blur-md transition-colors duration-300">
+      <nav className="sticky top-0 z-50 w-full border-b border-earth-700/30 bg-earth-950/95 backdrop-blur-md transition-all duration-300">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-10 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4 md:gap-8">
               {/* Mobile Menu Button */}
@@ -157,7 +157,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
 
                 {/* In-situ Search Dropdown */}
                 {showDropdown && searchTerm.length >= 2 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-background-dark border border-zinc-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-earth-900 border border-earth-700/30 rounded-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                       {isLoading ? (
                           <div className="p-4 text-center text-text-secondary text-sm flex items-center justify-center gap-2">
                               <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
@@ -173,7 +173,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                                           setShowDropdown(false);
                                           router.push(`/menu/${product.id}`);
                                       }}
-                                      className="w-full text-left p-3 hover:bg-surface-hover flex items-center gap-3 transition-colors border-b border-zinc-800/50 last:border-0"
+                                      className="w-full text-left p-3 hover:bg-earth-800/40 flex items-center gap-3 transition-colors border-b border-earth-700/20 last:border-0"
                                   >
                                       <div className="size-10 rounded-lg bg-surface-dark bg-cover bg-center shrink-0" 
                                            style={{ backgroundImage: `url('${product.image_url || '/placeholder.png'}')` }} 
@@ -221,7 +221,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
               </Link>
               <Link 
                 href="/cart"
-                className="relative flex items-center justify-center size-9 sm:size-10 bg-surface-dark hover:bg-surface-hover rounded-xl border border-zinc-800 transition-colors">
+                className="relative flex items-center justify-center size-9 sm:size-10 bg-earth-900 hover:bg-earth-800/60 rounded-xl border border-earth-700/30 transition-all duration-200">
                 <span className="material-symbols-outlined text-text-primary text-lg sm:text-xl">shopping_cart</span>
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 size-4 sm:size-5 bg-primary text-white text-[9px] sm:text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-background-dark">
@@ -253,10 +253,10 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                 animate={{ x: 0 }}
                 exit={{ x: "-100%" }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="lg:hidden fixed left-0 top-0 bottom-0 z-[101] w-[280px] bg-black border-r border-zinc-800 flex flex-col overflow-y-auto shadow-2xl"
+                className="lg:hidden fixed left-0 top-0 bottom-0 z-[101] w-[280px] bg-earth-950 border-r border-earth-700/30 flex flex-col overflow-y-auto"
             >
                 {/* Drawer Header */}
-                <div className="p-6 border-b border-zinc-800 flex items-center justify-between sticky top-0 bg-black z-20">
+                <div className="p-6 border-b border-earth-700/30 flex items-center justify-between sticky top-0 bg-earth-950 z-20">
                     <div className="flex items-center gap-3">
                         <NextImage src="/logo.png" width={96} height={32} className="w-24 h-auto" alt="Logo" />
                     </div>
@@ -275,7 +275,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                         <Link 
                             href="/menu" 
                             onClick={() => setIsMenuOpen(false)}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-bold ${pathname === '/menu' ? 'bg-primary/10 text-primary' : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'}`}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-bold ${pathname === '/menu' ? 'bg-ember-600/10 text-ember-600 border border-ember-700/20' : 'text-honey hover:bg-earth-800/40 hover:text-cream'}`}
                         >
                             <span className="material-symbols-outlined">restaurant_menu</span>
                             Menú
@@ -283,7 +283,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                         <Link 
                             href="/nosotros" 
                             onClick={() => setIsMenuOpen(false)}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-bold ${pathname === '/nosotros' ? 'bg-primary/10 text-primary' : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'}`}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-bold ${pathname === '/nosotros' ? 'bg-ember-600/10 text-ember-600 border border-ember-700/20' : 'text-honey hover:bg-earth-800/40 hover:text-cream'}`}
                         >
                              <span className="material-symbols-outlined">groups</span>
                             Nosotros
@@ -291,20 +291,20 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                         <Link 
                             href="/reservas" 
                             onClick={() => setIsMenuOpen(false)}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-bold ${pathname === '/reservas' ? 'bg-primary/10 text-primary' : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'}`}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-bold ${pathname === '/reservas' ? 'bg-ember-600/10 text-ember-600 border border-ember-700/20' : 'text-honey hover:bg-earth-800/40 hover:text-cream'}`}
                         >
                              <span className="material-symbols-outlined">calendar_today</span>
                             Reservas
                         </Link>
                     </div>
 
-                    <div className="h-px bg-zinc-800" />
+                    <div className="h-px bg-earth-700/20" />
 
                     {/* Categories Section */}
                     <div className="space-y-4">
                         <div className="flex flex-col px-2">
                             <h3 className="text-primary text-sm font-bold uppercase tracking-widest mb-1">Menú</h3>
-                            <p className="text-zinc-500 text-xs">Explorar por categoría</p>
+                            <p className="text-honey/70 text-xs">Explorar por categoría</p>
                         </div>
                         
                         <div className="flex flex-col gap-1">
@@ -315,7 +315,7 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                                         setIsMenuOpen(false);
                                         router.push(`/menu?category=${cat.id}`);
                                     }}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors relative z-10 group outline-none text-zinc-400 hover:text-white hover:bg-zinc-900"
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors relative z-10 group outline-none text-honey hover:text-cream hover:bg-earth-800/40"
                                 >
                                     <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">{cat.icon}</span>
                                     <span className="text-sm font-bold">{cat.name}</span>
@@ -327,13 +327,13 @@ const Navbar: React.FC<Props> = ({ showSearch = true }) => {
                     <div className="space-y-4">
                         <div className="flex flex-col px-2">
                             <h3 className="text-primary text-sm font-bold uppercase tracking-widest mb-1">Dietética</h3>
-                            <p className="text-zinc-500 text-xs">Filtros rápidos</p>
+                            <p className="text-honey/70 text-xs">Filtros rápidos</p>
                         </div>
                         <div className="space-y-3 px-4">
                             {['Vegetariano', 'Vegano', 'Sin Gluten'].map((label) => (
                             <label key={label} className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="w-4 h-4 bg-zinc-900 border-zinc-700 rounded text-primary focus:ring-0 focus:ring-offset-0" />
-                                <span className="text-zinc-400 text-sm font-medium group-hover:text-white transition-colors">{label}</span>
+                                <input type="checkbox" className="w-4 h-4 bg-earth-900 border-earth-700/50 rounded text-ember-600 focus:ring-0 focus:ring-offset-0" />
+                                <span className="text-honey text-sm font-medium group-hover:text-cream transition-colors">{label}</span>
                             </label>
                             ))}
                         </div>

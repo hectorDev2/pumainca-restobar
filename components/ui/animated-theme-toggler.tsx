@@ -17,7 +17,7 @@ export function AnimatedThemeToggler() {
     <button
       onClick={toggleTheme}
       className={cn(
-        "relative inline-flex size-9 items-center justify-center rounded-xl bg-surface-dark border border-zinc-800 transition-colors hover:bg-surface-hover text-text-primary",
+        "relative inline-flex size-9 items-center justify-center rounded-xl bg-earth-900 border border-earth-700/30 transition-all duration-200 hover:bg-earth-800/60 text-text-primary",
       )}
     >
         <div className="relative size-5">

@@ -312,8 +312,8 @@ rounded-full
 
 1. ✅ Sistema de colores implementado
 2. ✅ Signature element "Llama Flotante"
-3. ⏳ Refactorización de layering en componentes
-4. ⏳ Jerarquía tipográfica completa
+3. ✅ Refactorización de layering en componentes
+4. ✅ Jerarquía tipográfica completa
 5. ⏳ Layout asimétrico para menú
 
 ---

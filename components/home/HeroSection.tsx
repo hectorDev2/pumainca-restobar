@@ -16,7 +16,7 @@ function HeroContent() {
 
   return (
     <>
-      <h1 className="text-cream text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-6 drop-shadow-2xl">
+      <h1 className="text-cream text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-6">
         {title}
         <br />
         <span className="text-ember-600">{subtitle}</span>
@@ -31,7 +31,7 @@ function HeroContent() {
 function HeroFallback() {
   return (
     <>
-      <h1 className="text-cream text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-6 drop-shadow-2xl">
+      <h1 className="text-cream text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tight mb-6">
         Sabores Auténticos,
         <br />
         <span className="text-ember-600">Experiencia Inolvidable.</span>
