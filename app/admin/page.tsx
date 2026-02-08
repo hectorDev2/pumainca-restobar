@@ -398,7 +398,7 @@ export default function AdminPage() {
         <div className="sticky top-20 z-40 bg-zinc-900/80 backdrop-blur-md p-4 md:p-6 rounded-3xl border border-zinc-800 flex flex-col md:flex-row gap-4 md:items-center md:justify-between shadow-2xl">
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch">
             <select
-              className="bg-black/40 border border-zinc-700 rounded-full px-4 py-2 text-sm w-full sm:w-auto min-w-0"
+              className="bg-black/40 border border-zinc-700 rounded-full px-4 py-2 text-sm w-full sm:w-auto min-w-[180px] max-w-fit"
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
             >

@@ -150,7 +150,7 @@ export default function AdminOrdersPage() {
                             </span>
                           </td>
                           <td className="px-6 py-4 font-bold text-white">
-                            S/. {Number(o.total || o.amount || 0).toFixed(2)}
+                            S/. {Number(o.total_amount || o.total || o.amount || 0).toFixed(2)}
                           </td>
                           <td className="px-6 py-4">
                             <select
