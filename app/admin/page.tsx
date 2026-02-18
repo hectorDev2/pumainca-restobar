@@ -8,14 +8,10 @@ import {
   useCategorySubcategories,
   useCreateProduct,
   useUpdateProduct,
-  useUploadProductImage,
   useDeleteProduct,
 } from "@/lib/queries";
-import { useCreateCategory } from "@/lib/queries";
 import CreateCategoryForm from "@/components/CreateCategoryForm";
-import { AdminModal } from "@/components/ui/admin-modal";
 import {
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
@@ -145,15 +141,6 @@ export default function AdminPage() {
   );
   // --- Crear categoría ---
   const [isCreateCategoryOpen, setCreateCategoryOpen] = useState(false);
-  const [createCategoryName, setCreateCategoryName] = useState("");
-  const [createCategoryDescription, setCreateCategoryDescription] =
-    useState("");
-  const [createCategoryImage, setCreateCategoryImage] = useState<File | null>(
-    null,
-  );
-  const [createCategoryPreview, setCreateCategoryPreview] = useState<
-    string | null
-  >(null);
 
   const [isDetailModalOpen, setDetailModalOpen] = useState(false);
   const [detailModalProduct, setDetailModalProduct] = useState<Product | null>(
@@ -166,14 +153,12 @@ export default function AdminPage() {
   // --- Mutations ---
   const createProductMutation = useCreateProduct();
   const updateProductMutation = useUpdateProduct();
-  const uploadImageMutation = useUploadProductImage();
   const deleteProductMutation = useDeleteProduct();
   // createCategory handled inside CreateCategoryForm
 
   const isSaving =
     createProductMutation.isPending ||
     updateProductMutation.isPending ||
-    uploadImageMutation.isPending ||
     deleteProductMutation.isPending;
 
   // --- Memos & Effects ---
@@ -203,15 +188,6 @@ export default function AdminPage() {
     }
     setCreateImagePreview(null);
   }, [createMainImage]);
-
-  useEffect(() => {
-    if (createCategoryImage) {
-      const url = URL.createObjectURL(createCategoryImage);
-      setCreateCategoryPreview(url);
-      return () => URL.revokeObjectURL(url);
-    }
-    setCreateCategoryPreview(null);
-  }, [createCategoryImage]);
 
   useEffect(() => {
     if (editMainImage) {
@@ -944,9 +920,6 @@ export default function AdminPage() {
               <CreateCategoryForm
                 onCreated={() => {
                   setCreateCategoryOpen(false);
-                  setCreateCategoryName("");
-                  setCreateCategoryDescription("");
-                  setCreateCategoryImage(null);
                   try {
                     router.refresh();
                   } catch (err) {
