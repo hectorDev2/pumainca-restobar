@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { badRequest, notFound, serverError } from "@/lib/utils/api-errors";
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-z0-9.-]/gi, "_");
@@ -28,10 +29,7 @@ export async function GET(
     .single();
 
   if (error || !p) {
-    return NextResponse.json(
-      { statusCode: 404, message: "Not found" },
-      { status: 404 },
-    );
+    return notFound("Producto no encontrado");
   }
 
   const mappedData = {
@@ -70,14 +68,22 @@ export async function PUT(
   const { id } = await params;
   const contentType = req.headers.get("content-type") || "";
   if (!contentType.includes("multipart/form-data")) {
-    return NextResponse.json(
-      { message: "Content-Type must be multipart/form-data" },
-      { status: 400 },
-    );
+    return badRequest("Content-Type must be multipart/form-data");
   }
 
   try {
     const formData = await req.formData();
+
+    // Verificar que el producto existe
+    const { data: existingProduct } = await supabase
+      .from("products")
+      .select("id")
+      .eq("id", id)
+      .single();
+
+    if (!existingProduct) {
+      return notFound("Producto no encontrado");
+    }
 
     // Build update object
     const updates: any = { updated_at: new Date().toISOString() };
@@ -210,7 +216,7 @@ export async function PUT(
 
     return NextResponse.json(updated);
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return serverError(err.message);
   }
 }
 
@@ -229,10 +235,7 @@ export async function DELETE(
       .single();
 
     if (fetchError || !product) {
-      return NextResponse.json(
-        { message: "Product not found" },
-        { status: 404 },
-      );
+      return notFound("Producto no encontrado");
     }
 
     const imagesToDelete: string[] = [];
@@ -287,6 +290,6 @@ export async function DELETE(
       deletedImages: imagesToDelete.length,
     });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return serverError(err.message);
   }
 }

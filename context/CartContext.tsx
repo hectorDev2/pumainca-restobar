@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useMemo } from "react";
-import { Product, CartItem } from "@/types"; // Need to update types import path or alias
+import { Product, CartItem } from "@/types";
+import { IGV_DIVISOR } from "@/lib/constants";
 
 // We might need to duplicate types here if they aren't easily shareable due to module resolution,
 // but using @/types should work if tsconfig paths are set.
@@ -73,11 +74,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return acc + price * item.quantity;
     }, 0);
 
-    // Total now includes IGV.
-    // Price = Net + IGV
-    // Price = Net + (Net * 0.18) = Net * 1.18
-    // Net = Price / 1.18
-    const subtotal = rawTotal / 1.18;
+    // Los precios ya incluyen IGV.
+    // Precio = Neto * IGV_DIVISOR  →  Neto = Precio / IGV_DIVISOR
+    const subtotal = rawTotal / IGV_DIVISOR;
     const tax = rawTotal - subtotal;
     const serviceFee = 0;
     

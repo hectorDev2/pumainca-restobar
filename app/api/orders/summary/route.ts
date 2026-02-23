@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { serverError } from "@/lib/utils/api-errors";
 
 export async function GET() {
   // Get summary stats
@@ -11,18 +12,22 @@ export async function GET() {
     .from("orders")
     .select("*", { count: "exact", head: true });
 
-  if (errTotal) return NextResponse.json({ error: errTotal.message }, { status: 500 });
+  if (errTotal) return serverError(errTotal.message);
 
   // Status counts
   const { data: statusCounts, error: errStatus } = await supabase
     .from("orders")
     .select("status");
 
+  if (errStatus) return serverError(errStatus.message);
+
   // Revenue (completed orders)
   const { data: revenueData, error: errRevenue } = await supabase
-      .from("orders")
-      .select("total_amount")
-      .eq("payment_status", "completed");
+    .from("orders")
+    .select("total_amount")
+    .eq("payment_status", "completed");
+
+  if (errRevenue) return serverError(errRevenue.message);
 
   const revenue = revenueData?.reduce((acc, curr) => acc + (Number(curr.total_amount) || 0), 0) || 0;
 

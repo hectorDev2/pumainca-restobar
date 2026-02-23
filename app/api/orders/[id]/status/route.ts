@@ -2,17 +2,8 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import type { OrderStatus, PaymentStatus } from "@/types/domain";
-
-const VALID_STATUSES: OrderStatus[] = [
-  "pending",
-  "confirmed",
-  "preparing",
-  "ready",
-  "completed",
-  "cancelled",
-];
-
-const VALID_PAYMENT_STATUSES: PaymentStatus[] = ["pending", "completed", "failed"];
+import { VALID_ORDER_STATUSES, VALID_PAYMENT_STATUSES } from "@/lib/constants";
+import { serverError } from "@/lib/utils/api-errors";
 
 export async function PUT(
   req: Request,
@@ -31,10 +22,10 @@ export async function PUT(
       );
     }
 
-    if (status !== undefined && !VALID_STATUSES.includes(status)) {
+    if (status !== undefined && !VALID_ORDER_STATUSES.includes(status)) {
       return NextResponse.json(
         {
-          error: `status inválido. Valores permitidos: ${VALID_STATUSES.join(", ")}`,
+          error: `status inválido. Valores permitidos: ${VALID_ORDER_STATUSES.join(", ")}`,
         },
         { status: 400 }
       );
@@ -78,7 +69,7 @@ export async function PUT(
 
     return NextResponse.json(data);
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return serverError(err.message);
   }
 }
 

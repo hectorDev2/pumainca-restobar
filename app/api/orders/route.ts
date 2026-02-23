@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { badRequest, serverError } from "@/lib/utils/api-errors";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
   const { data, error, count } = await query;
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error.message);
   }
 
   return NextResponse.json({
@@ -43,7 +44,12 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    let body: { items?: unknown[] } & Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return badRequest("JSON inválido en el cuerpo de la solicitud");
+    }
     const { items, ...orderData } = body;
     
     // Generate Order Number
@@ -84,6 +90,6 @@ export async function POST(req: Request) {
     });
 
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return serverError(err.message);
   }
 }
