@@ -223,9 +223,22 @@ const deleteCategory = (categoryId: string) =>
 
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
-  return useMutation<{ message: string; id: string }, Error, string>({
+  return useMutation<{ message: string; id: string }, Error, string, { previous: Category[] | undefined }>({
     mutationFn: deleteCategory,
-    onSuccess: () => {
+    onMutate: async (categoryId) => {
+      await queryClient.cancelQueries({ queryKey: ["categories"] });
+      const previous = queryClient.getQueryData<Category[]>(["categories"]);
+      queryClient.setQueryData<Category[]>(["categories"], (old) =>
+        old?.filter((c) => c.id !== categoryId) ?? [],
+      );
+      return { previous };
+    },
+    onError: (_, __, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["categories"], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
   });
@@ -347,15 +360,35 @@ const deleteProduct = (productId: string) =>
     { method: "DELETE" },
   );
 
+type DeleteProductContext = {
+  queries: [unknown, Product[] | undefined][];
+};
+
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
   return useMutation<
     { message: string; id: string; deletedImages: number },
     Error,
-    string
+    string,
+    DeleteProductContext
   >({
     mutationFn: deleteProduct,
-    onSuccess: () => {
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries({ queryKey: ["products"] });
+      const queries = queryClient.getQueriesData<Product[]>({
+        queryKey: ["products"],
+      });
+      queryClient.setQueriesData<Product[]>({ queryKey: ["products"] }, (old) =>
+        old?.filter((p) => p.id !== productId),
+      );
+      return { queries };
+    },
+    onError: (_, __, context) => {
+      context?.queries.forEach(([key, data]) => {
+        queryClient.setQueryData(key as Parameters<typeof queryClient.setQueryData>[0], data);
+      });
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product"] });
     },
@@ -492,19 +525,77 @@ export const cancelOrder = (orderId: string) =>
 export const fetchOrdersSummary = () =>
   apiFetch<OrdersSummary>("/api/orders/summary");
 
+// Filtra solo queries de lista de órdenes, excluyendo el summary
+const ordersListFilter = {
+  predicate: (query: { queryKey: unknown }) => {
+    const key = query.queryKey as unknown[];
+    return key[0] === "orders" && key[1] !== "summary";
+  },
+};
+
+type OrdersContext = { queries: [unknown, OrdersResponse | undefined][] };
+
+const matchesOrderId = (order: BackendOrder, id: string): boolean =>
+  order.id === id || order.order_number === id;
+
 export const useCancelOrder = () => {
   const qc = useQueryClient();
-  return useMutation<BackendOrder, Error, string>({
+  return useMutation<BackendOrder, Error, string, OrdersContext>({
     mutationFn: cancelOrder,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["orders"] }),
+    onMutate: async (orderId) => {
+      await qc.cancelQueries(ordersListFilter);
+      const queries = qc.getQueriesData<OrdersResponse>(ordersListFilter);
+      qc.setQueriesData<OrdersResponse>(ordersListFilter, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: old.data.map((order) =>
+            matchesOrderId(order, orderId)
+              ? { ...order, status: "cancelled" as const }
+              : order,
+          ),
+        };
+      });
+      return { queries };
+    },
+    onError: (_, __, context) => {
+      context?.queries.forEach(([key, data]) => {
+        qc.setQueryData(key as Parameters<typeof qc.setQueryData>[0], data);
+      });
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["orders"] }),
   });
 };
 
 export const useUpdateOrderStatus = () => {
   const qc = useQueryClient();
-  return useMutation<BackendOrder, Error, { orderId: string; body: UpdateOrderStatusBody }>({
+  return useMutation<
+    BackendOrder,
+    Error,
+    { orderId: string; body: UpdateOrderStatusBody },
+    OrdersContext
+  >({
     mutationFn: ({ orderId, body }) => updateOrderStatus(orderId, body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["orders"] }),
+    onMutate: async ({ orderId, body }) => {
+      await qc.cancelQueries(ordersListFilter);
+      const queries = qc.getQueriesData<OrdersResponse>(ordersListFilter);
+      qc.setQueriesData<OrdersResponse>(ordersListFilter, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: old.data.map((order) =>
+            matchesOrderId(order, orderId) ? { ...order, ...body } : order,
+          ),
+        };
+      });
+      return { queries };
+    },
+    onError: (_, __, context) => {
+      context?.queries.forEach(([key, data]) => {
+        qc.setQueryData(key as Parameters<typeof qc.setQueryData>[0], data);
+      });
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["orders"] }),
   });
 };
 

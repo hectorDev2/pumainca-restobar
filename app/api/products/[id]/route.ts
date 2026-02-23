@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { badRequest, notFound, serverError } from "@/lib/utils/api-errors";
+import { extractStoragePath } from "@/lib/utils/storage";
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-z0-9.-]/gi, "_");
@@ -174,11 +175,8 @@ export async function PUT(
       // Delete old image from storage if it exists
       if (currentProduct?.image_url) {
         try {
-          const oldImageUrl = currentProduct.image_url;
-          // Extract file path from the public URL
-          const urlParts = oldImageUrl.split("/storage/v1/object/public/menu/");
-          if (urlParts.length > 1) {
-            const oldFilePath = urlParts[1];
+          const oldFilePath = extractStoragePath(currentProduct.image_url, "menu");
+          if (oldFilePath) {
             await supabase.storage.from("menu").remove([oldFilePath]);
           }
         } catch (deleteError) {
@@ -242,24 +240,16 @@ export async function DELETE(
 
     // Add main image to deletion list
     if (product.image_url) {
-      const urlParts = product.image_url.split(
-        "/storage/v1/object/public/menu/",
-      );
-      if (urlParts.length > 1) {
-        imagesToDelete.push(urlParts[1]);
-      }
+      const filePath = extractStoragePath(product.image_url, "menu");
+      if (filePath) imagesToDelete.push(filePath);
     }
 
     // Add gallery images to deletion list
     if (product.gallery && Array.isArray(product.gallery)) {
       for (const galleryImage of product.gallery) {
         if (galleryImage.image_url) {
-          const urlParts = galleryImage.image_url.split(
-            "/storage/v1/object/public/menu/",
-          );
-          if (urlParts.length > 1) {
-            imagesToDelete.push(urlParts[1]);
-          }
+          const filePath = extractStoragePath(galleryImage.image_url, "menu");
+          if (filePath) imagesToDelete.push(filePath);
         }
       }
     }
