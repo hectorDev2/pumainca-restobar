@@ -23,7 +23,7 @@ export default function AdminSettingsPage() {
     setIsLoading(true);
 
     try {
-      const attributes: any = {};
+      const attributes: { email?: string; password?: string } = {};
       if (email !== user?.email) attributes.email = email;
       if (password) attributes.password = password;
 

@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import type { OrderStatus } from "@/types/domain";
+import type { OrderStatus, PaymentStatus } from "@/types/domain";
 
 const VALID_STATUSES: OrderStatus[] = [
   "pending",
@@ -12,8 +12,7 @@ const VALID_STATUSES: OrderStatus[] = [
   "cancelled",
 ];
 
-const VALID_PAYMENT_STATUSES = ["pending", "completed", "failed"] as const;
-type PaymentStatus = (typeof VALID_PAYMENT_STATUSES)[number];
+const VALID_PAYMENT_STATUSES: PaymentStatus[] = ["pending", "completed", "failed"];
 
 export async function PUT(
   req: Request,
