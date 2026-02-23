@@ -13,13 +13,16 @@ import type { OrderResponse } from "@/lib/api-types";
 import {
   createInitialContactInfo,
   pickupEstimateLabels,
-  pickupOptions,
   getItemPrice,
 } from "./utils";
 import {
   CheckoutHeader,
   OrderConfirmationView,
   OrderSummary,
+  ContactInfoSection,
+  PickupInfoSection,
+  SpecialInstructionsSection,
+  PaymentMethodSection,
 } from "./components";
 
 export default function CheckoutPage() {
@@ -153,153 +156,22 @@ export default function CheckoutPage() {
             </div>
 
             <div className="space-y-6">
-              {/* Contact Info */}
-              <section className="space-y-4">
-                <h2 className="text-primary text-xl font-bold flex items-center gap-2">
-                  <span className="material-symbols-outlined">
-                    contact_page
-                  </span>
-                  Información de Contacto
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-text-secondary">
-                      Nombre completo (opcional)
-                    </label>
-                    <input
-                      name="name"
-                      value={contactInfo.name}
-                      onChange={handleContactChange}
-                      type="text"
-                      placeholder="Juan Pérez"
-                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-primary outline-none"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-text-secondary">
-                      Correo electrónico
-                    </label>
-                    <input
-                      required
-                      name="email"
-                      value={contactInfo.email}
-                      onChange={handleContactChange}
-                      type="email"
-                      placeholder="tu@ejemplo.com"
-                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-primary outline-none"
-                    />
-                  </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium text-text-secondary">
-                      Teléfono
-                    </label>
-                    <input
-                      required
-                      name="phone"
-                      value={contactInfo.phone}
-                      onChange={handleContactChange}
-                      type="tel"
-                      placeholder="+51 900 000 000"
-                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-primary outline-none"
-                    />
-                  </div>
-                </div>
-              </section>
-
-              {/* Pickup Info */}
-              <section className="space-y-4">
-                <h2 className="text-primary text-xl font-bold flex items-center gap-2">
-                  <span className="material-symbols-outlined">storefront</span>
-                  Detalles de Recogida
-                </h2>
-                <div className="bg-surface-dark border border-zinc-800 rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center gap-6">
-                  <div className="flex gap-4 items-center">
-                    <div className="w-12 h-12 bg-zinc-900 rounded-xl flex items-center justify-center">
-                      <span className="material-symbols-outlined">
-                        location_on
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="text-primary font-bold">
-                        PUMAINCA RESTOBAR
-                      </h3>
-                      <p className="text-sm text-text-secondary">
-                        Prolongacion Jaquijahuana, al frente de Astral GYM
-                      </p>
-                    </div>
-                  </div>
-                  <div className="w-full md:w-auto">
-                    <label className="text-xs text-text-secondary block mb-1">
-                      Hora estimada
-                    </label>
-                    <select
-                      value={pickupEstimate}
-                      onChange={(e) =>
-                        setPickupEstimate(
-                          e.target.value as "20m" | "45m" | "1h",
-                        )
-                      }
-                      className="w-full md:w-48 bg-black border border-zinc-800 text-white rounded-lg px-3 py-2 outline-none"
-                    >
-                      {pickupOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </section>
-
-              {/* Special Instructions */}
-              <section className="space-y-4">
-                <label className="text-sm font-medium text-text-secondary">
-                  Instrucciones especiales (opcional)
-                </label>
-                <textarea
-                  name="specialInstructions"
-                  value={contactInfo.specialInstructions}
-                  onChange={handleContactChange}
-                  rows={3}
-                  placeholder="Necesitas cubiertos, alergias o celebraciones"
-                  className="w-full bg-black border border-zinc-800 rounded-2xl px-4 py-3 text-white focus:ring-1 focus:ring-primary outline-none"
-                />
-              </section>
-
-              {/* Payment Method */}
-              <section className="space-y-4">
-                <h2 className="text-primary text-xl font-bold flex items-center gap-2">
-                  <span className="material-symbols-outlined">credit_card</span>
-                  Método de Pago
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {[
-                    { id: "cash", label: "Pago en Local", icon: "payments" },
-                  ].map((method) => (
-                    <button
-                      key={method.id}
-                      type="button"
-                      onClick={() => setPaymentMethod(method.id as "cash")}
-                      className={`p-6 rounded-2xl border transition-all flex flex-col items-center gap-3 ${
-                        paymentMethod === method.id
-                          ? "border-primary bg-primary/10"
-                          : "border-zinc-800 bg-surface-dark hover:bg-zinc-800"
-                      }`}
-                    >
-                      <span
-                        className={`material-symbols-outlined text-3xl ${paymentMethod === method.id ? "text-primary" : "text-zinc-500"}`}
-                      >
-                        {method.icon}
-                      </span>
-                      <span
-                        className={`font-bold text-sm ${paymentMethod === method.id ? "text-white" : "text-zinc-500"}`}
-                      >
-                        {method.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </section>
+              <ContactInfoSection
+                contactInfo={contactInfo}
+                onChange={handleContactChange}
+              />
+              <PickupInfoSection
+                pickupEstimate={pickupEstimate}
+                onPickupChange={setPickupEstimate}
+              />
+              <SpecialInstructionsSection
+                value={contactInfo.specialInstructions}
+                onChange={handleContactChange}
+              />
+              <PaymentMethodSection
+                paymentMethod={paymentMethod}
+                onPaymentMethodChange={setPaymentMethod}
+              />
             </div>
           </div>
 
