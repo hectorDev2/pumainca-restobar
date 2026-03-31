@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { badRequest, notFound, serverError } from "@/lib/utils/api-errors";
 import { extractStoragePath } from "@/lib/utils/storage";
 

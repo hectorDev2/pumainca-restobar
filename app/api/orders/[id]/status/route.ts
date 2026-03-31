@@ -1,6 +1,6 @@
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import type { OrderStatus, PaymentStatus } from "@/types/domain";
 import { VALID_ORDER_STATUSES, VALID_PAYMENT_STATUSES } from "@/lib/constants";
 import { serverError } from "@/lib/utils/api-errors";

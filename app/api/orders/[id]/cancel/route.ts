@@ -1,6 +1,6 @@
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { notFound, serverError } from "@/lib/utils/api-errors";
 
 export async function PUT(
