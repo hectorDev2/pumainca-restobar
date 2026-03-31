@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
+import { badRequest, notFound, serverError } from "@/lib/utils/api-errors";
+import { extractStoragePath } from "@/lib/utils/storage";
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-z0-9.-]/gi, "_");
@@ -28,10 +30,7 @@ export async function GET(
     .single();
 
   if (error || !p) {
-    return NextResponse.json(
-      { statusCode: 404, message: "Not found" },
-      { status: 404 },
-    );
+    return notFound("Producto no encontrado");
   }
 
   const mappedData = {
@@ -70,14 +69,22 @@ export async function PUT(
   const { id } = await params;
   const contentType = req.headers.get("content-type") || "";
   if (!contentType.includes("multipart/form-data")) {
-    return NextResponse.json(
-      { message: "Content-Type must be multipart/form-data" },
-      { status: 400 },
-    );
+    return badRequest("Content-Type must be multipart/form-data");
   }
 
   try {
     const formData = await req.formData();
+
+    // Verificar que el producto existe
+    const { data: existingProduct } = await supabase
+      .from("products")
+      .select("id")
+      .eq("id", id)
+      .single();
+
+    if (!existingProduct) {
+      return notFound("Producto no encontrado");
+    }
 
     // Build update object
     const updates: any = { updated_at: new Date().toISOString() };
@@ -168,11 +175,8 @@ export async function PUT(
       // Delete old image from storage if it exists
       if (currentProduct?.image_url) {
         try {
-          const oldImageUrl = currentProduct.image_url;
-          // Extract file path from the public URL
-          const urlParts = oldImageUrl.split("/storage/v1/object/public/menu/");
-          if (urlParts.length > 1) {
-            const oldFilePath = urlParts[1];
+          const oldFilePath = extractStoragePath(currentProduct.image_url, "menu");
+          if (oldFilePath) {
             await supabase.storage.from("menu").remove([oldFilePath]);
           }
         } catch (deleteError) {
@@ -210,7 +214,7 @@ export async function PUT(
 
     return NextResponse.json(updated);
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return serverError(err.message);
   }
 }
 
@@ -229,34 +233,23 @@ export async function DELETE(
       .single();
 
     if (fetchError || !product) {
-      return NextResponse.json(
-        { message: "Product not found" },
-        { status: 404 },
-      );
+      return notFound("Producto no encontrado");
     }
 
     const imagesToDelete: string[] = [];
 
     // Add main image to deletion list
     if (product.image_url) {
-      const urlParts = product.image_url.split(
-        "/storage/v1/object/public/menu/",
-      );
-      if (urlParts.length > 1) {
-        imagesToDelete.push(urlParts[1]);
-      }
+      const filePath = extractStoragePath(product.image_url, "menu");
+      if (filePath) imagesToDelete.push(filePath);
     }
 
     // Add gallery images to deletion list
     if (product.gallery && Array.isArray(product.gallery)) {
       for (const galleryImage of product.gallery) {
         if (galleryImage.image_url) {
-          const urlParts = galleryImage.image_url.split(
-            "/storage/v1/object/public/menu/",
-          );
-          if (urlParts.length > 1) {
-            imagesToDelete.push(urlParts[1]);
-          }
+          const filePath = extractStoragePath(galleryImage.image_url, "menu");
+          if (filePath) imagesToDelete.push(filePath);
         }
       }
     }
@@ -287,6 +280,6 @@ export async function DELETE(
       deletedImages: imagesToDelete.length,
     });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return serverError(err.message);
   }
 }

@@ -1,13 +1,12 @@
 // Tipos para las respuestas de la API
 
 export interface OrderResponse {
-  id?: string;
+  id?: string | number;
+  order_number?: string;
   number?: string;
   orderNumber?: string;
-  order_number?: string;
-  message?: string;
   status?: string;
-  [key: string]: any;
+  message?: string;
 }
 
 export interface ReservationResponse {
@@ -17,5 +16,4 @@ export interface ReservationResponse {
   message?: string;
   text?: string;
   status?: string;
-  [key: string]: any;
 }

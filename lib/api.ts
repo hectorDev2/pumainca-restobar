@@ -5,7 +5,7 @@ export function resolveApiUrl(path: string) {
   return API_BASE_URL ? `${API_BASE_URL}${path}` : path;
 }
 
-export async function apiFetch<T extends Record<string, any>>(
+export async function apiFetch<T>(
   path: string,
   init?: RequestInit,
 ): Promise<T> {
@@ -39,8 +39,11 @@ export async function apiFetch<T extends Record<string, any>>(
   const payload = (await response.json().catch(() => null)) as T;
 
   if (!response.ok) {
+    const errorPayload = payload as Record<string, unknown> | null;
     const message =
-      payload?.message ?? response.statusText ?? "Error en la petición";
+      (errorPayload?.message as string | undefined) ??
+      response.statusText ??
+      "Error en la petición";
     throw new Error(message);
   }
 

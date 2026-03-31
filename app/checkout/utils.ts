@@ -21,6 +21,7 @@ export const pickupOptions = [
 
 export const getItemPrice = (item: CartItem): number => {
   if (typeof item.dish.price === "number") return item.dish.price;
-  if (item.selectedSize) return (item.dish.price as any)[item.selectedSize];
-  return Math.min(...Object.values(item.dish.price as object));
+  const priceMap = item.dish.price as Record<string, number>;
+  if (item.selectedSize) return priceMap[item.selectedSize] ?? 0;
+  return Math.min(...Object.values(priceMap));
 };

@@ -2,6 +2,8 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Category, Product, SubCategory } from "@/types";
+import type { OrderStatus, PaymentStatus } from "@/types/domain";
+import type { SiteSettings } from "@/types/common";
 import { apiFetch } from "@/lib/api";
 
 export type ProductFilters = {
@@ -63,6 +65,7 @@ type BackendProduct = {
   isChefSpecial?: boolean;
   is_recommended?: boolean;
   isRecommended?: boolean;
+  preparation_time_minutes?: number | string | null;
   ingredients?: (string | BackendIngredientEntry)[];
   allergens?: string[];
   gallery?: (string | BackendImageEntry)[];
@@ -169,6 +172,10 @@ const normalizeProduct = (backend: BackendProduct): Product => {
     isGlutenFree: backend.is_gluten_free ?? backend.isGlutenFree,
     isChefSpecial: backend.is_chef_special ?? backend.isChefSpecial,
     isRecommended: backend.is_recommended ?? backend.isRecommended,
+    isVariablePrice: backend.is_variable_price ?? backend.isVariablePrice,
+    preparationTimeMinutes: parseNumberValue(
+      backend.preparation_time_minutes as number | string | null | undefined,
+    ),
   };
 };
 
@@ -177,11 +184,11 @@ export const fetchCategories = async () => {
 };
 
 export const createCategory = (formData: FormData) =>
-  apiFetch<any>("/api/categories", { method: "POST", body: formData });
+  apiFetch<Category>("/api/categories", { method: "POST", body: formData });
 
 export const useCreateCategory = () => {
   const queryClient = useQueryClient();
-  return useMutation<any, Error, FormData>({
+  return useMutation<Category, Error, FormData>({
     mutationFn: createCategory,
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["categories"] }),
@@ -194,14 +201,14 @@ type UpdateCategoryInput = {
 };
 
 const updateCategory = ({ categoryId, formData }: UpdateCategoryInput) =>
-  apiFetch<any>(`/api/categories/${categoryId}`, {
+  apiFetch<Category>(`/api/categories/${categoryId}`, {
     method: "PUT",
     body: formData,
   });
 
 export const useUpdateCategory = () => {
   const queryClient = useQueryClient();
-  return useMutation<any, Error, UpdateCategoryInput>({
+  return useMutation<Category, Error, UpdateCategoryInput>({
     mutationFn: updateCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
@@ -216,9 +223,22 @@ const deleteCategory = (categoryId: string) =>
 
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
-  return useMutation<{ message: string; id: string }, Error, string>({
+  return useMutation<{ message: string; id: string }, Error, string, { previous: Category[] | undefined }>({
     mutationFn: deleteCategory,
-    onSuccess: () => {
+    onMutate: async (categoryId) => {
+      await queryClient.cancelQueries({ queryKey: ["categories"] });
+      const previous = queryClient.getQueryData<Category[]>(["categories"]);
+      queryClient.setQueryData<Category[]>(["categories"], (old) =>
+        old?.filter((c) => c.id !== categoryId) ?? [],
+      );
+      return { previous };
+    },
+    onError: (_, __, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["categories"], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
   });
@@ -340,15 +360,35 @@ const deleteProduct = (productId: string) =>
     { method: "DELETE" },
   );
 
+type DeleteProductContext = {
+  queries: [unknown, Product[] | undefined][];
+};
+
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
   return useMutation<
     { message: string; id: string; deletedImages: number },
     Error,
-    string
+    string,
+    DeleteProductContext
   >({
     mutationFn: deleteProduct,
-    onSuccess: () => {
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries({ queryKey: ["products"] });
+      const queries = queryClient.getQueriesData<Product[]>({
+        queryKey: ["products"],
+      });
+      queryClient.setQueriesData<Product[]>({ queryKey: ["products"] }, (old) =>
+        old?.filter((p) => p.id !== productId),
+      );
+      return { queries };
+    },
+    onError: (_, __, context) => {
+      context?.queries.forEach(([key, data]) => {
+        queryClient.setQueryData(key as Parameters<typeof queryClient.setQueryData>[0], data);
+      });
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product"] });
     },
@@ -378,9 +418,64 @@ export const useUploadProductImage = () => {
 };
 
 // Orders
+export type BackendOrderItem = {
+  id?: string;
+  order_id?: string;
+  product_id?: string;
+  product_name?: string;
+  quantity?: number;
+  unit_price?: number;
+  subtotal?: number;
+  selected_size?: string;
+  cooking_point?: string;
+  special_instructions?: string;
+};
+
+export type BackendOrder = {
+  id: string;
+  order_number?: string;
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  payment_method?: string;
+  status?: OrderStatus;
+  payment_status?: PaymentStatus;
+  subtotal?: number;
+  tax_amount?: number;
+  service_fee?: number;
+  total_amount?: number;
+  pickup_time_estimate?: string;
+  special_instructions?: string;
+  created_at?: string;
+  updated_at?: string;
+  items?: BackendOrderItem[];
+};
+
+type OrderStatusResponse = {
+  status: OrderStatus;
+  payment_status: PaymentStatus;
+};
+
+export type UpdateOrderStatusBody = {
+  status?: OrderStatus;
+  payment_status?: PaymentStatus;
+};
+
+type OrdersSummary = {
+  totalOrders: number | null;
+  revenue: number;
+  statusBreakdown: {
+    pending: number;
+    preparing: number;
+    ready: number;
+    completed: number;
+    cancelled: number;
+  };
+};
+
 type OrdersQueryParams = {
-  status?: string;
-  paymentStatus?: string;
+  status?: OrderStatus;
+  paymentStatus?: PaymentStatus;
   from?: string;
   to?: string;
   page?: number;
@@ -388,7 +483,7 @@ type OrdersQueryParams = {
 };
 
 type OrdersResponse = {
-  data: any[];
+  data: BackendOrder[];
   meta?: { total: number; page: number; limit: number; pages: number };
 };
 
@@ -413,53 +508,112 @@ export const useOrders = (params?: OrdersQueryParams) =>
   });
 
 export const fetchOrderByNumber = (number: string) =>
-  apiFetch<any>(`/api/orders/${number}`);
+  apiFetch<BackendOrder>(`/api/orders/${number}`);
 
 export const fetchOrderStatus = (orderId: string) =>
-  apiFetch<any>(`/api/orders/${orderId}/status`);
+  apiFetch<OrderStatusResponse>(`/api/orders/${orderId}/status`);
 
-export const updateOrderStatus = (orderId: string, body: any) =>
-  apiFetch<any>(`/api/orders/${orderId}/status`, {
+export const updateOrderStatus = (orderId: string, body: UpdateOrderStatusBody) =>
+  apiFetch<BackendOrder>(`/api/orders/${orderId}/status`, {
     method: "PUT",
     body: JSON.stringify(body),
   });
 
 export const cancelOrder = (orderId: string) =>
-  apiFetch<any>(`/api/orders/${orderId}/cancel`, { method: "PUT" });
+  apiFetch<BackendOrder>(`/api/orders/${orderId}/cancel`, { method: "PUT" });
 
-export const fetchOrdersSummary = () => apiFetch<any>("/api/orders/summary");
+export const fetchOrdersSummary = () =>
+  apiFetch<OrdersSummary>("/api/orders/summary");
+
+// Filtra solo queries de lista de órdenes, excluyendo el summary
+const ordersListFilter = {
+  predicate: (query: { queryKey: unknown }) => {
+    const key = query.queryKey as unknown[];
+    return key[0] === "orders" && key[1] !== "summary";
+  },
+};
+
+type OrdersContext = { queries: [unknown, OrdersResponse | undefined][] };
+
+const matchesOrderId = (order: BackendOrder, id: string): boolean =>
+  order.id === id || order.order_number === id;
 
 export const useCancelOrder = () => {
   const qc = useQueryClient();
-  return useMutation<any, Error, string>({
+  return useMutation<BackendOrder, Error, string, OrdersContext>({
     mutationFn: cancelOrder,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["orders"] }),
+    onMutate: async (orderId) => {
+      await qc.cancelQueries(ordersListFilter);
+      const queries = qc.getQueriesData<OrdersResponse>(ordersListFilter);
+      qc.setQueriesData<OrdersResponse>(ordersListFilter, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: old.data.map((order) =>
+            matchesOrderId(order, orderId)
+              ? { ...order, status: "cancelled" as const }
+              : order,
+          ),
+        };
+      });
+      return { queries };
+    },
+    onError: (_, __, context) => {
+      context?.queries.forEach(([key, data]) => {
+        qc.setQueryData(key as Parameters<typeof qc.setQueryData>[0], data);
+      });
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["orders"] }),
   });
 };
 
 export const useUpdateOrderStatus = () => {
   const qc = useQueryClient();
-  return useMutation<any, Error, { orderId: string; body: any }>({
+  return useMutation<
+    BackendOrder,
+    Error,
+    { orderId: string; body: UpdateOrderStatusBody },
+    OrdersContext
+  >({
     mutationFn: ({ orderId, body }) => updateOrderStatus(orderId, body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["orders"] }),
+    onMutate: async ({ orderId, body }) => {
+      await qc.cancelQueries(ordersListFilter);
+      const queries = qc.getQueriesData<OrdersResponse>(ordersListFilter);
+      qc.setQueriesData<OrdersResponse>(ordersListFilter, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: old.data.map((order) =>
+            matchesOrderId(order, orderId) ? { ...order, ...body } : order,
+          ),
+        };
+      });
+      return { queries };
+    },
+    onError: (_, __, context) => {
+      context?.queries.forEach(([key, data]) => {
+        qc.setQueryData(key as Parameters<typeof qc.setQueryData>[0], data);
+      });
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["orders"] }),
   });
 };
 
 export const useOrdersSummary = () =>
-  useQuery<any, Error>({
+  useQuery<OrdersSummary, Error>({
     queryKey: ["orders", "summary"],
     queryFn: fetchOrdersSummary,
   });
 
 export const useOrderByNumber = (number?: string) =>
-  useQuery<any, Error>({
+  useQuery<BackendOrder, Error>({
     queryKey: ["order", number],
     queryFn: () => fetchOrderByNumber(number!),
     enabled: Boolean(number),
   });
 
 export const useOrderStatus = (orderId?: string) =>
-  useQuery<any, Error>({
+  useQuery<OrderStatusResponse, Error>({
     queryKey: ["order", orderId, "status"],
     queryFn: () => fetchOrderStatus(orderId!),
     enabled: Boolean(orderId),
@@ -508,20 +662,23 @@ export const useReservationByCode = (code?: string) =>
   });
 
 // Settings
-export const fetchSettings = () => apiFetch<any>("/api/settings");
+export const fetchSettings = () => apiFetch<SiteSettings>("/api/settings");
 
 export const useSettings = () =>
-  useQuery<any, Error>({
+  useQuery<SiteSettings, Error>({
     queryKey: ["settings"],
     queryFn: fetchSettings,
   });
 
-export const updateSettings = (body: any) =>
-  apiFetch<any>("/api/settings", { method: "PUT", body: JSON.stringify(body) });
+export const updateSettings = (body: SiteSettings) =>
+  apiFetch<SiteSettings>("/api/settings", {
+    method: "PUT",
+    body: JSON.stringify(body),
+  });
 
 export const useUpdateSettings = () => {
   const qc = useQueryClient();
-  return useMutation<any, Error, any>({
+  return useMutation<SiteSettings, Error, SiteSettings>({
     mutationFn: updateSettings,
     onSuccess: () => qc.invalidateQueries({ queryKey: ["settings"] }),
   });

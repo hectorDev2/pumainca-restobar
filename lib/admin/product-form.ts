@@ -75,22 +75,15 @@ export const buildProductFormState = (product: Product): ProductFormState => ({
   price: resolveProductPrice(product.price).toFixed(2),
   category: product.category ?? "",
   subcategory: product.subcategory ?? "",
-  subcategoryName:
-    (product as any).subcategory_name ?? (product as any).subcategoryName ?? "",
+  subcategoryName: "",
   isAvailable: !!product.isAvailable,
   isChefSpecial: !!product.isChefSpecial,
   isRecommended: !!product.isRecommended,
   isVegetarian: !!product.isVegetarian,
   isSpicy: !!product.isSpicy,
   isGlutenFree: !!product.isGlutenFree,
-  isVariablePrice: !!(
-    (product as any).is_variable_price ?? (product as any).isVariablePrice
-  ),
-  preparationTimeMinutes: String(
-    (product as any).preparation_time_minutes ??
-      (product as any).preparationTimeMinutes ??
-      "",
-  ),
+  isVariablePrice: !!product.isVariablePrice,
+  preparationTimeMinutes: String(product.preparationTimeMinutes ?? ""),
 });
 
 export const buildProductFormData = (

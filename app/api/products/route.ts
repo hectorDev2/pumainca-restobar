@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
+import { badRequest, serverError } from "@/lib/utils/api-errors";
 
 
 function sanitizeFileName(name: string) {
@@ -114,7 +115,7 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const name = String(formData.get("name") || "").trim();
-    if (!name) throw new Error("Name is required");
+    if (!name) return badRequest("El nombre del producto es requerido");
 
     const description = formData.get("description") as string;
     const priceRaw = formData.get("price");
@@ -201,6 +202,6 @@ export async function POST(req: Request) {
     return NextResponse.json(newOk);
 
   } catch (err: any) {
-     return NextResponse.json({ error: err.message }, { status: 500 });
+    return serverError(err.message);
   }
 }

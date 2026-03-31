@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
+import { badRequest, serverError } from "@/lib/utils/api-errors";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
   const { data, error } = await query.order("reservation_date", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error.message);
   }
 
   return NextResponse.json(data);
@@ -26,10 +27,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     
     if (!body.email || (!body.phone_number && !body.phoneNumber)) {
-      return NextResponse.json(
-        { error: "Email y teléfono son requeridos" },
-        { status: 400 }
-      );
+      return badRequest("Email y teléfono son requeridos");
     }
     
     // Generate code
@@ -62,9 +60,6 @@ export async function POST(req: Request) {
     });
   } catch (err: any) {
     console.error("[POST /api/reservations] Unexpected error:", err);
-    return NextResponse.json(
-      { error: err?.message || "Error interno del servidor" },
-      { status: 500 }
-    );
+    return serverError(err?.message || "Error interno del servidor");
   }
 }

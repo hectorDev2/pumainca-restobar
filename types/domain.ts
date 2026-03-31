@@ -34,7 +34,8 @@ export interface Product {
   isChefSpecial?: boolean;
   isRecommended?: boolean;
   isAvailable?: boolean;
-  preparation_time_minutes?: number;
+  isVariablePrice?: boolean;
+  preparationTimeMinutes?: number;
 }
 
 // Alias para compatibilidad durante refactor
@@ -71,6 +72,8 @@ export type OrderStatus =
   | "ready"
   | "completed"
   | "cancelled";
+
+export type PaymentStatus = "pending" | "completed" | "failed";
 
 export interface OrderItem {
   product_id: string;

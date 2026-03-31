@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
+import { extractStoragePath } from "@/lib/utils/storage";
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-z0-9.-]/gi, "_");
@@ -90,10 +91,8 @@ export async function PUT(
       // Delete old image from storage if it exists
       if (currentCategory.image_url) {
         try {
-          const oldImageUrl = currentCategory.image_url;
-          const urlParts = oldImageUrl.split("/storage/v1/object/public/menu/");
-          if (urlParts.length > 1) {
-            const oldFilePath = urlParts[1];
+          const oldFilePath = extractStoragePath(currentCategory.image_url, "menu");
+          if (oldFilePath) {
             await supabase.storage.from("menu").remove([oldFilePath]);
           }
         } catch (deleteError) {
@@ -182,10 +181,8 @@ export async function DELETE(
     // Delete associated image from storage if exists
     if (category.image_url) {
       try {
-        const imageUrl = category.image_url;
-        const urlParts = imageUrl.split("/storage/v1/object/public/menu/");
-        if (urlParts.length > 1) {
-          const filePath = urlParts[1];
+        const filePath = extractStoragePath(category.image_url, "menu");
+        if (filePath) {
           await supabase.storage.from("menu").remove([filePath]);
         }
       } catch (storageError) {

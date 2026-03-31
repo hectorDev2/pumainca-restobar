@@ -118,10 +118,12 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
   const pivotTransform = useTransform(rotationValue, (r) => `translateZ(-${curve}px) rotateY(${r}deg)`);
 
   return (
-    <div 
+    <div
         className="carousel-container relative w-full h-[600px] overflow-hidden flex items-center justify-center cursor-grab active:cursor-grabbing"
         ref={containerRef}
         style={{ perspective: "1000px" }}
+        onMouseEnter={() => { hovering.current = true; }}
+        onMouseLeave={() => { hovering.current = false; }}
     >
       <motion.div
         className="carousel-track relative w-full h-full flex items-center justify-center"
@@ -147,9 +149,7 @@ const Carousel3D: React.FC<Carousel3DProps> = ({
                 return (
                     <div
                         key={`carousel-item-${index}`}
-                        className="carousel-item absolute top-1/2 left-1/2" 
-                        onMouseEnter={() => { hovering.current = true; }}
-                        onMouseLeave={() => { hovering.current = false; }}
+                        className="carousel-item absolute top-1/2 left-1/2"
                         style={{
                             width: itemWidth,
                             height: "100%",

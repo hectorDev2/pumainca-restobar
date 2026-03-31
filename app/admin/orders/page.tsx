@@ -8,14 +8,16 @@ import {
   useCancelOrder,
   useOrdersSummary,
   useUpdateOrderStatus,
+  type BackendOrder,
 } from "@/lib/queries";
+import type { OrderStatus, PaymentStatus } from "@/types/domain";
 import { Loader } from "@/components/ui/loader";
 
 export default function AdminOrdersPage() {
-  const [statusFilter, setStatusFilter] = useState<string | undefined>(
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>(
     undefined,
   );
-  const [paymentFilter, setPaymentFilter] = useState<string | undefined>(
+  const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | undefined>(
     undefined,
   );
   const [page, setPage] = useState(1);
@@ -36,7 +38,7 @@ export default function AdminOrdersPage() {
   const cancelMutation = useCancelOrder();
   const updateStatusMutation = useUpdateOrderStatus();
   const { data: summary } = useOrdersSummary();
-  const [selected, setSelected] = useState<any | null>(null);
+  const [selected, setSelected] = useState<BackendOrder | null>(null);
 
   return (
     <ProtectedRoute>
@@ -55,7 +57,7 @@ export default function AdminOrdersPage() {
                 className="bg-black/40 border border-zinc-700 rounded px-3 py-2 text-sm"
                 value={statusFilter ?? ""}
                 onChange={(e) => {
-                  setStatusFilter(e.target.value || undefined);
+                  setStatusFilter((e.target.value as OrderStatus) || undefined);
                   setPage(1);
                 }}
               >
@@ -69,7 +71,7 @@ export default function AdminOrdersPage() {
                 className="bg-black/40 border border-zinc-700 rounded px-3 py-2 text-sm"
                 value={paymentFilter ?? ""}
                 onChange={(e) => {
-                  setPaymentFilter(e.target.value || undefined);
+                  setPaymentFilter((e.target.value as PaymentStatus) || undefined);
                   setPage(1);
                 }}
               >
@@ -78,7 +80,7 @@ export default function AdminOrdersPage() {
                 <option value="completed">completed</option>
               </select>
               <div className="text-sm text-zinc-400 ml-auto">
-                Total pedidos: {summary?.total ?? "-"}
+                Total pedidos: {summary?.totalOrders ?? "-"}
               </div>
               <button
                 onClick={() => refetch()}
@@ -113,7 +115,7 @@ export default function AdminOrdersPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800">
-                      {ordersResp.data.map((o: any) => (
+                      {ordersResp.data.map((o: BackendOrder) => (
                         <tr
                           key={o.id ?? o.order_number}
                           className="hover:bg-zinc-800/50 transition-colors"
@@ -130,9 +132,9 @@ export default function AdminOrdersPage() {
                             <div className="text-xs">{o.customer_phone}</div>
                           </td>
                           <td className="px-6 py-4">
-                            {new Date(
-                              o.created_at || o.createdAt || o.created,
-                            ).toLocaleString()}
+                            {o.created_at
+                              ? new Date(o.created_at).toLocaleString()
+                              : "—"}
                           </td>
                           <td className="px-6 py-4">
                             <span
@@ -151,9 +153,7 @@ export default function AdminOrdersPage() {
                           </td>
                           <td className="px-6 py-4 font-bold text-white">
                             S/.{" "}
-                            {Number(
-                              o.total_amount || o.total || o.amount || 0,
-                            ).toFixed(2)}
+                            {Number(o.total_amount ?? 0).toFixed(2)}
                           </td>
                           <td className="px-6 py-4">
                             <select
@@ -166,11 +166,11 @@ export default function AdminOrdersPage() {
                                       ? "text-blue-500"
                                       : "text-yellow-500"
                               }`}
-                              value={o.status ?? o.order_status ?? "pending"}
+                              value={o.status ?? "pending"}
                               onChange={(e) =>
                                 updateStatusMutation.mutate({
                                   orderId: o.id,
-                                  body: { status: e.target.value },
+                                  body: { status: e.target.value as OrderStatus },
                                 })
                               }
                               disabled={updateStatusMutation.isPending}
@@ -250,7 +250,9 @@ export default function AdminOrdersPage() {
                     <div className="text-right">
                       <p className="text-zinc-400">Fecha</p>
                       <p className="font-bold">
-                        {new Date(selected.created_at).toLocaleString()}
+                        {selected.created_at
+                          ? new Date(selected.created_at).toLocaleString()
+                          : "—"}
                       </p>
                       <p className="mt-2 text-zinc-400">Estado Pago</p>
                       <p className="font-bold capitalize">

@@ -59,13 +59,15 @@ export function formatTime(
   });
 }
 
-export function calculateTax(amount: number, taxRate: number = 0.18): number {
+import { IGV_RATE } from "@/lib/constants";
+
+export function calculateTax(amount: number, taxRate: number = IGV_RATE): number {
   return amount * taxRate;
 }
 
 export function calculateTotal(
   subtotal: number,
-  taxRate: number = 0.18,
+  taxRate: number = IGV_RATE,
   serviceFee: number = 0,
 ): number {
   const tax = calculateTax(subtotal, taxRate);

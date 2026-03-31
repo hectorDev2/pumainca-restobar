@@ -219,7 +219,7 @@ export default function DishDetailPage() {
               <div className="flex items-center gap-4 mt-3">
                  <div className="flex items-center gap-1 text-zinc-400 text-sm">
                     <span className="material-symbols-outlined text-[18px]">schedule</span>
-                    <span>{dish.preparation_time_minutes || 20} min</span>
+                    <span>{dish.preparationTimeMinutes || 20} min</span>
                  </div>
               </div>
 
